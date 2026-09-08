@@ -1,0 +1,203 @@
+{
+  "_note": "Expected optical outcome per NAP, derived by hand from the loss model below and committed before any calculator existed. Phase 1's deterministic calculator must reproduce these numbers; if it disagrees, one of the two is wrong.",
+  "_constants_pending_validation": "The loss values are industry-typical and NOT validated against real specifications. Phase 1 owns the authoritative constants module; this copy records what produced these numbers.",
+  "gpon_class": "B+",
+  "budget_db": 28,
+  "min_margin_db": 3,
+  "loss_model": {
+    "fiber_db_per_km": 0.25,
+    "connector_db": 0.4,
+    "splice_db": 0.08,
+    "splitter_db": {
+      "1:2": 3.5,
+      "1:4": 7.2,
+      "1:8": 10.5,
+      "1:16": 13.5,
+      "1:32": 17
+    }
+  },
+  "naps": {
+    "NAP-01": {
+      "cumulative_km": 3.2,
+      "connectors": 2,
+      "splices": 3,
+      "splitter_chain": [
+        "1:8"
+      ],
+      "fiber_db": 0.8,
+      "splitters_db": 10.5,
+      "connectors_db": 0.8,
+      "splices_db": 0.24,
+      "total_db": 12.34,
+      "margin_db": 15.66,
+      "status": "pass"
+    },
+    "NAP-02": {
+      "cumulative_km": 5.6,
+      "connectors": 3,
+      "splices": 4,
+      "splitter_chain": [
+        "1:16"
+      ],
+      "fiber_db": 1.4,
+      "splitters_db": 13.5,
+      "connectors_db": 1.2,
+      "splices_db": 0.32,
+      "total_db": 16.42,
+      "margin_db": 11.58,
+      "status": "pass"
+    },
+    "NAP-03": {
+      "cumulative_km": 11.2,
+      "connectors": 3,
+      "splices": 6,
+      "splitter_chain": [
+        "1:2"
+      ],
+      "fiber_db": 2.8,
+      "splitters_db": 3.5,
+      "connectors_db": 1.2,
+      "splices_db": 0.48,
+      "total_db": 7.98,
+      "margin_db": 20.02,
+      "status": "pass"
+    },
+    "NAP-04": {
+      "cumulative_km": 12,
+      "connectors": 3,
+      "splices": 6,
+      "splitter_chain": [
+        "1:8"
+      ],
+      "fiber_db": 3,
+      "splitters_db": 10.5,
+      "connectors_db": 1.2,
+      "splices_db": 0.48,
+      "total_db": 15.18,
+      "margin_db": 12.82,
+      "status": "pass"
+    },
+    "NAP-05": {
+      "cumulative_km": 6.4,
+      "connectors": 2,
+      "splices": 4,
+      "splitter_chain": [
+        "1:8"
+      ],
+      "fiber_db": 1.6,
+      "splitters_db": 10.5,
+      "connectors_db": 0.8,
+      "splices_db": 0.32,
+      "total_db": 13.22,
+      "margin_db": 14.78,
+      "status": "pass"
+    },
+    "NAP-06": {
+      "cumulative_km": 20,
+      "connectors": 5,
+      "splices": 7,
+      "splitter_chain": [
+        "1:32"
+      ],
+      "fiber_db": 5,
+      "splitters_db": 17,
+      "connectors_db": 2,
+      "splices_db": 0.56,
+      "total_db": 24.56,
+      "margin_db": 3.44,
+      "status": "pass"
+    },
+    "NAP-07": {
+      "cumulative_km": 12.4,
+      "connectors": 4,
+      "splices": 6,
+      "splitter_chain": [
+        "1:8"
+      ],
+      "fiber_db": 3.1,
+      "splitters_db": 10.5,
+      "connectors_db": 1.6,
+      "splices_db": 0.48,
+      "total_db": 15.68,
+      "margin_db": 12.32,
+      "status": "pass"
+    },
+    "NAP-08": {
+      "cumulative_km": 7.8,
+      "connectors": 3,
+      "splices": 5,
+      "splitter_chain": [
+        "1:16"
+      ],
+      "fiber_db": 1.95,
+      "splitters_db": 13.5,
+      "connectors_db": 1.2,
+      "splices_db": 0.4,
+      "total_db": 17.05,
+      "margin_db": 10.95,
+      "status": "pass"
+    },
+    "NAP-09": {
+      "cumulative_km": 20.8,
+      "connectors": 6,
+      "splices": 10,
+      "splitter_chain": [
+        "1:8",
+        "1:8"
+      ],
+      "fiber_db": 5.2,
+      "splitters_db": 21,
+      "connectors_db": 2.4,
+      "splices_db": 0.8,
+      "total_db": 29.4,
+      "margin_db": -1.4,
+      "status": "fail"
+    },
+    "NAP-10": {
+      "cumulative_km": 9.1,
+      "connectors": 3,
+      "splices": 5,
+      "splitter_chain": [
+        "1:4"
+      ],
+      "fiber_db": 2.28,
+      "splitters_db": 7.2,
+      "connectors_db": 1.2,
+      "splices_db": 0.4,
+      "total_db": 11.08,
+      "margin_db": 16.92,
+      "status": "pass"
+    },
+    "NAP-11": {
+      "cumulative_km": 4.5,
+      "connectors": 2,
+      "splices": 3,
+      "splitter_chain": [
+        "1:16"
+      ],
+      "fiber_db": 1.13,
+      "splitters_db": 13.5,
+      "connectors_db": 0.8,
+      "splices_db": 0.24,
+      "total_db": 15.67,
+      "margin_db": 12.33,
+      "status": "pass"
+    },
+    "NAP-12": {
+      "cumulative_km": 19.8,
+      "connectors": 6,
+      "splices": 11,
+      "splitter_chain": [
+        "1:2",
+        "1:16"
+      ],
+      "fiber_db": 4.95,
+      "splitters_db": 17,
+      "connectors_db": 2.4,
+      "splices_db": 0.88,
+      "total_db": 25.23,
+      "margin_db": 2.77,
+      "status": "marginal"
+    }
+  }
+}

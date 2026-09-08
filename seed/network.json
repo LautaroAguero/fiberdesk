@@ -1,0 +1,620 @@
+{
+  "olt": {
+    "id": "OLT-RES-01",
+    "name": "Resistencia Head End",
+    "lat": -27.4512,
+    "lon": -58.9866,
+    "tx_power_dbm": 3,
+    "gpon_class": "B+"
+  },
+  "splitters": [
+    {
+      "id": "NAP-01",
+      "name": "Centro",
+      "lat": -27.4432,
+      "lon": -58.9786,
+      "ratio": "1:8",
+      "parent": "OLT-RES-01"
+    },
+    {
+      "id": "NAP-02",
+      "name": "Barrio España",
+      "lat": -27.469,
+      "lon": -58.999,
+      "ratio": "1:16",
+      "parent": "OLT-RES-01"
+    },
+    {
+      "id": "NAP-03",
+      "name": "Villa Don Andrés",
+      "lat": -27.418,
+      "lon": -59.018,
+      "ratio": "1:2",
+      "parent": "OLT-RES-01"
+    },
+    {
+      "id": "NAP-04",
+      "name": "Barrio Provincias Unidas",
+      "lat": -27.479,
+      "lon": -58.96,
+      "ratio": "1:8",
+      "parent": "OLT-RES-01"
+    },
+    {
+      "id": "NAP-05",
+      "name": "Barrio Sarmiento",
+      "lat": -27.47,
+      "lon": -58.97,
+      "ratio": "1:8",
+      "parent": "OLT-RES-01"
+    },
+    {
+      "id": "NAP-06",
+      "name": "Villa Prosperidad",
+      "lat": -27.493,
+      "lon": -59.038,
+      "ratio": "1:32",
+      "parent": "OLT-RES-01"
+    },
+    {
+      "id": "NAP-07",
+      "name": "Barrio Mujeres Argentinas",
+      "lat": -27.408,
+      "lon": -58.945,
+      "ratio": "1:8",
+      "parent": "OLT-RES-01"
+    },
+    {
+      "id": "NAP-08",
+      "name": "Barrio Italia",
+      "lat": -27.439,
+      "lon": -59.018,
+      "ratio": "1:16",
+      "parent": "OLT-RES-01"
+    },
+    {
+      "id": "NAP-09",
+      "name": "Barrio Los Silos",
+      "lat": -27.497,
+      "lon": -58.938,
+      "ratio": "1:8",
+      "parent": "NAP-04"
+    },
+    {
+      "id": "NAP-10",
+      "name": "Villa Río Negro",
+      "lat": -27.417,
+      "lon": -58.96,
+      "ratio": "1:4",
+      "parent": "OLT-RES-01"
+    },
+    {
+      "id": "NAP-11",
+      "name": "Barrio San Cayetano",
+      "lat": -27.462,
+      "lon": -58.97,
+      "ratio": "1:16",
+      "parent": "OLT-RES-01"
+    },
+    {
+      "id": "NAP-12",
+      "name": "Barrio Güiraldes",
+      "lat": -27.406,
+      "lon": -59.043,
+      "ratio": "1:16",
+      "parent": "NAP-03"
+    }
+  ],
+  "fiber_runs": [
+    {
+      "id": "FR-01",
+      "from": "OLT-RES-01",
+      "to": "NAP-01",
+      "length_km": 3.2,
+      "splices": 3,
+      "connectors": 2,
+      "geometry": [
+        [
+          -58.9866,
+          -27.4512
+        ],
+        [
+          -58.98476,
+          -27.44744
+        ],
+        [
+          -58.98004,
+          -27.44656
+        ],
+        [
+          -58.9786,
+          -27.4432
+        ]
+      ]
+    },
+    {
+      "id": "FR-02",
+      "from": "OLT-RES-01",
+      "to": "NAP-02",
+      "length_km": 5.6,
+      "splices": 4,
+      "connectors": 3,
+      "geometry": [
+        [
+          -58.9866,
+          -27.4512
+        ],
+        [
+          -58.987914,
+          -27.459538
+        ],
+        [
+          -58.998306,
+          -27.461552
+        ],
+        [
+          -58.999,
+          -27.469
+        ]
+      ]
+    },
+    {
+      "id": "FR-03",
+      "from": "OLT-RES-01",
+      "to": "NAP-03",
+      "length_km": 11.2,
+      "splices": 6,
+      "connectors": 3,
+      "geometry": [
+        [
+          -58.9866,
+          -27.4512
+        ],
+        [
+          -59.004894,
+          -27.446488
+        ],
+        [
+          -59.001276,
+          -27.421052
+        ],
+        [
+          -59.018,
+          -27.418
+        ]
+      ]
+    },
+    {
+      "id": "FR-04",
+      "from": "OLT-RES-01",
+      "to": "NAP-04",
+      "length_km": 12,
+      "splices": 6,
+      "connectors": 3,
+      "geometry": [
+        [
+          -58.9866,
+          -27.4512
+        ],
+        [
+          -58.973954,
+          -27.457738
+        ],
+        [
+          -58.971316,
+          -27.473852
+        ],
+        [
+          -58.96,
+          -27.479
+        ]
+      ]
+    },
+    {
+      "id": "FR-05",
+      "from": "OLT-RES-01",
+      "to": "NAP-05",
+      "length_km": 6.4,
+      "splices": 4,
+      "connectors": 2,
+      "geometry": [
+        [
+          -58.9866,
+          -27.4512
+        ],
+        [
+          -58.977594,
+          -27.454958
+        ],
+        [
+          -58.978176,
+          -27.467182
+        ],
+        [
+          -58.97,
+          -27.47
+        ]
+      ]
+    },
+    {
+      "id": "FR-06",
+      "from": "OLT-RES-01",
+      "to": "NAP-06",
+      "length_km": 20,
+      "splices": 7,
+      "connectors": 5,
+      "geometry": [
+        [
+          -58.9866,
+          -27.4512
+        ],
+        [
+          -58.995394,
+          -27.477138
+        ],
+        [
+          -59.031776,
+          -27.469152
+        ],
+        [
+          -59.038,
+          -27.493
+        ]
+      ]
+    },
+    {
+      "id": "FR-07",
+      "from": "OLT-RES-01",
+      "to": "NAP-07",
+      "length_km": 12.4,
+      "splices": 6,
+      "connectors": 4,
+      "geometry": [
+        [
+          -58.9866,
+          -27.4512
+        ],
+        [
+          -58.977224,
+          -27.431088
+        ],
+        [
+          -58.952296,
+          -27.425952
+        ],
+        [
+          -58.945,
+          -27.408
+        ]
+      ]
+    },
+    {
+      "id": "FR-08",
+      "from": "OLT-RES-01",
+      "to": "NAP-08",
+      "length_km": 7.8,
+      "splices": 5,
+      "connectors": 3,
+      "geometry": [
+        [
+          -58.9866,
+          -27.4512
+        ],
+        [
+          -58.999664,
+          -27.452268
+        ],
+        [
+          -59.006506,
+          -27.437322
+        ],
+        [
+          -59.018,
+          -27.439
+        ]
+      ]
+    },
+    {
+      "id": "FR-09",
+      "from": "NAP-04",
+      "to": "NAP-09",
+      "length_km": 8.8,
+      "splices": 4,
+      "connectors": 3,
+      "geometry": [
+        [
+          -58.96,
+          -27.479
+        ],
+        [
+          -58.94834,
+          -27.48046
+        ],
+        [
+          -58.94856,
+          -27.49644
+        ],
+        [
+          -58.938,
+          -27.497
+        ]
+      ]
+    },
+    {
+      "id": "FR-10",
+      "from": "OLT-RES-01",
+      "to": "NAP-10",
+      "length_km": 9.1,
+      "splices": 5,
+      "connectors": 3,
+      "geometry": [
+        [
+          -58.9866,
+          -27.4512
+        ],
+        [
+          -58.981394,
+          -27.436038
+        ],
+        [
+          -58.963876,
+          -27.430452
+        ],
+        [
+          -58.96,
+          -27.417
+        ]
+      ]
+    },
+    {
+      "id": "FR-11",
+      "from": "OLT-RES-01",
+      "to": "NAP-11",
+      "length_km": 4.5,
+      "splices": 3,
+      "connectors": 2,
+      "geometry": [
+        [
+          -58.9866,
+          -27.4512
+        ],
+        [
+          -58.978954,
+          -27.452158
+        ],
+        [
+          -58.976816,
+          -27.461582
+        ],
+        [
+          -58.97,
+          -27.462
+        ]
+      ]
+    },
+    {
+      "id": "FR-12",
+      "from": "NAP-03",
+      "to": "NAP-12",
+      "length_km": 8.6,
+      "splices": 5,
+      "connectors": 3,
+      "geometry": [
+        [
+          -59.018,
+          -27.418
+        ],
+        [
+          -59.02939,
+          -27.4193
+        ],
+        [
+          -59.03286,
+          -27.4041
+        ],
+        [
+          -59.043,
+          -27.406
+        ]
+      ]
+    }
+  ],
+  "subscribers": [
+    {
+      "id": "SUB-001",
+      "name": "Subscriber 001",
+      "lat": -27.439976,
+      "lon": -58.977237,
+      "nap": "NAP-01"
+    },
+    {
+      "id": "SUB-002",
+      "name": "Subscriber 002",
+      "lat": -27.445992,
+      "lon": -58.97649,
+      "nap": "NAP-01"
+    },
+    {
+      "id": "SUB-003",
+      "name": "Subscriber 003",
+      "lat": -27.443631,
+      "lon": -58.982073,
+      "nap": "NAP-01"
+    },
+    {
+      "id": "SUB-004",
+      "name": "Subscriber 004",
+      "lat": -27.465776,
+      "lon": -58.997637,
+      "nap": "NAP-02"
+    },
+    {
+      "id": "SUB-005",
+      "name": "Subscriber 005",
+      "lat": -27.472224,
+      "lon": -59.000363,
+      "nap": "NAP-02"
+    },
+    {
+      "id": "SUB-006",
+      "name": "Subscriber 006",
+      "lat": -27.414776,
+      "lon": -59.016637,
+      "nap": "NAP-03"
+    },
+    {
+      "id": "SUB-007",
+      "name": "Subscriber 007",
+      "lat": -27.475776,
+      "lon": -58.958637,
+      "nap": "NAP-04"
+    },
+    {
+      "id": "SUB-008",
+      "name": "Subscriber 008",
+      "lat": -27.482224,
+      "lon": -58.961363,
+      "nap": "NAP-04"
+    },
+    {
+      "id": "SUB-009",
+      "name": "Subscriber 009",
+      "lat": -27.466776,
+      "lon": -58.968637,
+      "nap": "NAP-05"
+    },
+    {
+      "id": "SUB-010",
+      "name": "Subscriber 010",
+      "lat": -27.473224,
+      "lon": -58.971363,
+      "nap": "NAP-05"
+    },
+    {
+      "id": "SUB-011",
+      "name": "Subscriber 011",
+      "lat": -27.489776,
+      "lon": -59.036637,
+      "nap": "NAP-06"
+    },
+    {
+      "id": "SUB-012",
+      "name": "Subscriber 012",
+      "lat": -27.495792,
+      "lon": -59.03589,
+      "nap": "NAP-06"
+    },
+    {
+      "id": "SUB-013",
+      "name": "Subscriber 013",
+      "lat": -27.493431,
+      "lon": -59.041473,
+      "nap": "NAP-06"
+    },
+    {
+      "id": "SUB-014",
+      "name": "Subscriber 014",
+      "lat": -27.404776,
+      "lon": -58.943637,
+      "nap": "NAP-07"
+    },
+    {
+      "id": "SUB-015",
+      "name": "Subscriber 015",
+      "lat": -27.411224,
+      "lon": -58.946363,
+      "nap": "NAP-07"
+    },
+    {
+      "id": "SUB-016",
+      "name": "Subscriber 016",
+      "lat": -27.435776,
+      "lon": -59.016637,
+      "nap": "NAP-08"
+    },
+    {
+      "id": "SUB-017",
+      "name": "Subscriber 017",
+      "lat": -27.442224,
+      "lon": -59.019363,
+      "nap": "NAP-08"
+    },
+    {
+      "id": "SUB-018",
+      "name": "Subscriber 018",
+      "lat": -27.493776,
+      "lon": -58.936637,
+      "nap": "NAP-09"
+    },
+    {
+      "id": "SUB-019",
+      "name": "Subscriber 019",
+      "lat": -27.499792,
+      "lon": -58.93589,
+      "nap": "NAP-09"
+    },
+    {
+      "id": "SUB-020",
+      "name": "Subscriber 020",
+      "lat": -27.497431,
+      "lon": -58.941473,
+      "nap": "NAP-09"
+    },
+    {
+      "id": "SUB-021",
+      "name": "Subscriber 021",
+      "lat": -27.413776,
+      "lon": -58.958637,
+      "nap": "NAP-10"
+    },
+    {
+      "id": "SUB-022",
+      "name": "Subscriber 022",
+      "lat": -27.420224,
+      "lon": -58.961363,
+      "nap": "NAP-10"
+    },
+    {
+      "id": "SUB-023",
+      "name": "Subscriber 023",
+      "lat": -27.458776,
+      "lon": -58.968637,
+      "nap": "NAP-11"
+    },
+    {
+      "id": "SUB-024",
+      "name": "Subscriber 024",
+      "lat": -27.465224,
+      "lon": -58.971363,
+      "nap": "NAP-11"
+    },
+    {
+      "id": "SUB-025",
+      "name": "Subscriber 025",
+      "lat": -27.402776,
+      "lon": -59.041637,
+      "nap": "NAP-12"
+    },
+    {
+      "id": "SUB-026",
+      "name": "Subscriber 026",
+      "lat": -27.407363,
+      "lon": -59.039776,
+      "nap": "NAP-12"
+    },
+    {
+      "id": "SUB-027",
+      "name": "Subscriber 027",
+      "lat": -27.409224,
+      "lon": -59.044363,
+      "nap": "NAP-12"
+    },
+    {
+      "id": "SUB-028",
+      "name": "Subscriber 028",
+      "lat": -27.404637,
+      "lon": -59.046224,
+      "nap": "NAP-12"
+    }
+  ]
+}

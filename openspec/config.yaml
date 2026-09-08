@@ -42,12 +42,12 @@ rules:
     - Include a "Non-goals" section — scope creep is the main risk.
     - If the change adds a numeric calculation, state explicitly that it runs
       in deterministic code, never in the model.
-  spec:
+  specs:
     - Requirements use SHALL. Every requirement has at least one scenario.
     - Scenarios covering optical calculations must include concrete numbers
       and the expected result, so they double as test cases.
     - Any requirement touching assistant answers must state the behaviour when
-      the source data does not contain the answer: the system says so
+      the source data does not contain the answer — the system says so
       explicitly and never fabricates.
   tasks:
     - Break tasks into chunks of max 2 hours.
