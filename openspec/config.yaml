@@ -1,0 +1,67 @@
+schema: spec-driven
+
+# Project context shown to AI when creating artifacts.
+context: |
+  FiberDesk is an AI copilot over an FTTH (fiber-to-the-home) network:
+  an interactive map plus technical documentation. Users see the fiber
+  infrastructure — OLT, splitter enclosures (NAPs), fiber runs, subscribers —
+  ask questions in natural language, and the assistant answers AND highlights
+  the answer on the map. It also computes optical power budgets and answers
+  from uploaded technical documentation with source citations.
+
+  Tech stack: Next.js (App Router), TypeScript, Tailwind CSS, Anthropic SDK.
+  Later phases add Python/FastAPI, PostgreSQL + pgvector (RAG) and MapLibre GL
+  (map copilot).
+
+  THE RULE THAT SHAPES EVERY DESIGN DECISION:
+  The model reasons and orchestrates. The code calculates.
+  The LLM decides WHAT to compute and over WHICH entities, then explains the
+  result. Arithmetic is done by deterministic TypeScript tools that always
+  return the same output. A numeric answer produced by the model instead of a
+  tool is a bug, not a shortcut.
+
+  Domain: GPON/FTTH. Light leaves an OLT, travels through fiber, is divided by
+  splitters housed in NAPs, and reaches each subscriber's ONT. Every element
+  attenuates the signal. An optical power budget sums all losses and compares
+  them against the GPON class budget (B+ = 28 dB, C+ = 32 dB), keeping a
+  recommended 3 dB margin. Splitters cascade, and cascading is the most common
+  reason a link ends up marginal.
+
+  Data: the network lives in seed/network.json and is entirely SYNTHETIC —
+  real coordinates in Resistencia, Chaco, Argentina; real physics; fictional
+  data. It deliberately includes edge cases: a link that fails, one that closes
+  without enough margin, and at least one splitter cascade.
+
+  Language: code, comments, README and OpenSpec artifacts in English.
+  Conversation with the user in Spanish.
+
+# Per-artifact rules.
+rules:
+  proposal:
+    - State which phase (0-4) the change belongs to.
+    - Include a "Non-goals" section — scope creep is the main risk.
+    - If the change adds a numeric calculation, state explicitly that it runs
+      in deterministic code, never in the model.
+  spec:
+    - Requirements use SHALL. Every requirement has at least one scenario.
+    - Scenarios covering optical calculations must include concrete numbers
+      and the expected result, so they double as test cases.
+    - Any requirement touching assistant answers must state the behaviour when
+      the source data does not contain the answer: the system says so
+      explicitly and never fabricates.
+  tasks:
+    - Break tasks into chunks of max 2 hours.
+    - Deterministic calculation tasks must include their unit tests.
+
+# Per-operation guidance.
+operations:
+  apply:
+    guidance:
+      - Optical constants belong in a single config module, each commented with
+        its unit and source. Never hardcode them inline.
+      - Optical constant values are industry-typical and PENDING VALIDATION
+        against real specifications. Do not present them as established fact.
+  archive:
+    guidance:
+      - Note which phase the change completed and whether that phase is now
+        deployable on its own.
