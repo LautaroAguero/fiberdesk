@@ -1,0 +1,23 @@
+# Line endings.
+#
+# The repository is public and will be cloned on Windows, macOS and Linux. Without
+# this, each platform's core.autocrlf decides for itself and the same file comes
+# back as a whole-file diff on someone else's machine.
+#
+# text=auto lets Git detect which files are text; eol=lf pins those to LF both in
+# the repository and in the working tree, on every platform.
+* text=auto eol=lf
+
+# Binary assets Git must never inspect or normalise.
+*.ico  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.pdf  binary
+*.woff binary
+*.woff2 binary
+
+# Generated: collapse it in diffs and mark it so GitHub's language stats ignore it.
+package-lock.json -diff linguist-generated
