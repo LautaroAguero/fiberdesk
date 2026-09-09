@@ -90,10 +90,15 @@ Todo el diseño se ordena alrededor de este recorrido. Hay que poder demostrarlo
 
 **El usuario, con el mapa abierto, escribe:** *"¿qué cajas no cierran el presupuesto óptico?"*
 
-1. El frontend manda al route handler: historial + pregunta + entidades cargadas.
-2. El modelo decide invocar `calculate_optical_budget` sobre cada caja — **las 12 llamadas en
-   paralelo**.
-3. El código recorre el árbol desde cada caja hasta el OLT y suma pérdidas:
+1. El frontend manda al route handler: historial + pregunta + estado del mapa.
+2. **Censo primero, zoom después.** El modelo llama `calculate_all_budgets()` —sin argumentos— y
+   recibe 12 filas flacas: id, atenuación total, margen y estado. Con eso ya sabe *cuáles* fallan,
+   sin conocer ningún ID de antemano.
+3. Recién ahí invoca `calculate_optical_budget` sobre **las dos** que le interesan, NAP-09 y
+   NAP-12, para pedir el desglose completo. Si las pide en el mismo turno salen en paralelo, que
+   es el comportamiento por defecto y no cuesta un token extra.
+
+   El código recorre el árbol desde cada caja hasta el OLT y suma pérdidas:
 
    ```
    NAP-12 — Caja Barrio Güiraldes
@@ -109,8 +114,11 @@ Todo el diseño se ordena alrededor de este recorrido. Hay que poder demostrarlo
    MARGEN DISPONIBLE                       2,77 dB   ⚠️ bajo el mínimo de 3 dB
    ```
 
-4. El modelo explica **por qué** NAP-12 está al límite (la cascada de splitters aporta 17 de
-   los 25,23 dB) y devuelve además una salida estructurada:
+4. El modelo explica en prosa **por qué** NAP-12 está al límite: la cascada de splitters aporta
+   17 de los 25,23 dB, y 3,50 de esos los hereda de NAP-03.
+
+5. **El `highlight` no sale del modelo.** El route handler ya ejecutó las herramientas y tiene
+   los resultados en memoria, así que proyecta la salida estructurada él mismo:
 
    ```json
    { "highlight": [
@@ -120,7 +128,19 @@ Todo el diseño se ordena alrededor de este recorrido. Hay que poder demostrarlo
      "fit_bounds": true }
    ```
 
-5. El mapa pinta las cajas problemáticas, encuadra la vista y muestra el desglose al hacer clic.
+6. El mapa pinta las cajas problemáticas, encuadra la vista y muestra el desglose al hacer clic.
+
+> **Por qué este recorrido y no otro.** Una versión anterior pedía las 12 llamadas en paralelo de
+> entrada. Se cambió por dos razones. Primero, el costo: 12 desgloses completos son ~1.650 tokens
+> contra ~630 del censo más el zoom, y sólo dos de esos desgloses se terminan citando. Segundo, y
+> más de fondo: para disparar 12 llamadas el modelo necesita **conocer los 12 IDs antes de
+> empezar**, lo que obliga a inyectarlos en el prompt o a gastar un viaje extra en listarlos. El
+> censo se los descubre.
+>
+> Lo mismo con el `highlight`: cada campo de ese JSON ya existe en un `tool_result` que produjo
+> código determinista. Pedírselo al modelo sería pedirle que **copie números**, y copiar es
+> exactamente donde un LLM escribe 2,7 en vez de 2,77. La regla que ordena el proyecto aplica
+> también a la salida estructurada, no sólo al cálculo.
 
 ---
 
@@ -178,15 +198,19 @@ y desplegar la anterior.
 
 ## Estado actual
 
-**Fase 0, en curso.** Hecho: repositorio creado, OpenSpec inicializado, esta documentación.
+**Fase 0 cerrada.** Scaffold de Next.js verificado, `seed/network.json` con sus casos límite,
+carga y validación estructural del dataset, y el flujo de OpenSpec andando de punta a punta.
 
-**Lo próximo:**
-1. ⚠️ **Verificar el scaffold de Next.js.** Se creó con `create-next-app` pero la instalación
-   se interrumpió — `node_modules` puede estar incompleto. Correr `npm install` y confirmar
-   que `npm run dev` levanta antes de seguir.
-2. Generar `seed/network.json` con los casos límite descritos arriba.
-3. Escribir la primera propuesta con `/opsx:propose` — **antes de escribir código de features**.
-4. `git init` y primer commit.
+**Fase 1 a mitad de camino.** El motor de presupuesto óptico está hecho: `src/lib/optical/`
+calcula, clasifica y desglosa por tramo, con las constantes centralizadas y los tests atados a
+`seed/expected-budgets.json`. Es TypeScript puro — no interviene ningún modelo.
+
+Dos capacidades viven en `openspec/specs/`: `network-dataset` y `optical-budget`.
+
+**Lo próximo — la otra mitad de la Fase 1:** la capa conversacional. Route handler con streaming,
+las dos herramientas del caso de uso de referencia (`calculate_all_budgets` y
+`calculate_optical_budget`) expuestas al modelo con `strict: true`, y el `highlight` proyectado
+por el código. Arranca, como todo, con una propuesta de OpenSpec.
 
 ---
 
