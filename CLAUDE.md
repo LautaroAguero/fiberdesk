@@ -91,12 +91,12 @@ Todo el diseño se ordena alrededor de este recorrido. Hay que poder demostrarlo
 **El usuario, con el mapa abierto, escribe:** *"¿qué cajas no cierran el presupuesto óptico?"*
 
 1. El frontend manda al route handler: historial + pregunta + estado del mapa.
-2. **Censo primero, zoom después.** El modelo llama `calculate_all_budgets()` —sin argumentos— y
-   recibe 12 filas flacas: id, atenuación total, margen y estado. Con eso ya sabe *cuáles* fallan,
-   sin conocer ningún ID de antemano.
-3. Recién ahí invoca `calculate_optical_budget` sobre **las dos** que le interesan, NAP-09 y
-   NAP-12, para pedir el desglose completo. Si las pide en el mismo turno salen en paralelo, que
-   es el comportamiento por defecto y no cuesta un token extra.
+2. **Censo primero, zoom después.** El modelo llama `summarize_optical_budgets` —sin argumentos
+   obligatorios— y recibe 12 filas flacas: id, nombre, atenuación total, margen y estado. Con eso
+   ya sabe *cuáles* fallan, sin conocer ningún ID de antemano.
+3. Recién ahí invoca `detail_optical_budget` sobre **las dos** que le interesan, NAP-09 y NAP-12,
+   para pedir el desglose completo. Si las pide en el mismo turno salen en paralelo, que es el
+   comportamiento por defecto y no cuesta un token extra.
 
    El código recorre el árbol desde cada caja hasta el OLT y suma pérdidas:
 
@@ -208,9 +208,14 @@ calcula, clasifica y desglosa por tramo, con las constantes centralizadas y los 
 Dos capacidades viven en `openspec/specs/`: `network-dataset` y `optical-budget`.
 
 **Lo próximo — la otra mitad de la Fase 1:** la capa conversacional. Route handler con streaming,
-las dos herramientas del caso de uso de referencia (`calculate_all_budgets` y
-`calculate_optical_budget`) expuestas al modelo con `strict: true`, y el `highlight` proyectado
-por el código. Arranca, como todo, con una propuesta de OpenSpec.
+las dos herramientas del caso de uso de referencia (`summarize_optical_budgets` y
+`detail_optical_budget`) expuestas al modelo con `strict: true`, y el `highlight` proyectado por
+el código. Arranca, como todo, con una propuesta de OpenSpec.
+
+Los nombres importan más de lo que parece: el modelo elige qué herramienta llamar leyendo el
+nombre y la descripción, y nada más. `summarize_` y `detail_` nombran **la forma de la
+respuesta**, que es justo el criterio de elección. Dos nombres parecidos serían pedirle que se
+confunda.
 
 ---
 
