@@ -14,8 +14,12 @@ answer produced by the model instead of a tool is a bug, not a shortcut.
 
 ## Status
 
-**Phase 0 — foundations.** The scaffold, the spec workflow and the network dataset are in place.
-The optical budget engine, the assistant and the map belong to later phases.
+**Phase 0 — foundations — done.** The scaffold, the spec workflow and the network dataset are in
+place.
+
+**Phase 1 — the conversational core — in progress.** The optical budget engine is done: plain
+TypeScript, no model involved. The assistant that calls it — the Anthropic SDK, streaming, tool
+use — is the next change.
 
 ## Getting started
 
@@ -72,6 +76,43 @@ Do not treat them as established fact.
 you get a network satisfying every structural rule — single root, no cascade cycles, every
 reference resolving, supported splitter ratios, coordinates inside the modelled city — or an error
 naming what broke. Nothing is silently dropped, defaulted or repaired.
+
+## The optical budget engine
+
+`src/lib/optical/` computes how much a link from the OLT to a NAP attenuates, how much headroom
+that leaves against the OLT's declared GPON class, and what that headroom means.
+
+**This arithmetic never runs in the model.** `calculateBudget(network, napId)` is plain,
+deterministic TypeScript: same inputs, same output, every time. In the next change, the model's
+job is to decide which NAPs to ask about and to explain the result in words — never to compute a
+number itself.
+
+```ts
+const result = calculateBudget(network, "NAP-12");
+// { total_loss_db: 25.23, margin_db: 2.77, status: "marginal",
+//   rx_power_dbm: -22.23, by_source: { fiber_db: 4.95, splitters_db: 17, ... },
+//   hops: [ { run_id: "FR-03", splitter: { at: "NAP-03", ratio: "1:2", ... } },
+//           { run_id: "FR-12", splitter: { at: "NAP-12", ratio: "1:16", ... } } ] }
+```
+
+The result carries a per-hop breakdown, not just a total, because *explaining* a marginal link
+means naming which cascade is responsible — NAP-12's 17 dB of splitter loss splits into 13.50 dB
+of its own 1:16 and 3.50 dB inherited from NAP-03 upstream. Without that attribution, an
+explanation can only be guessed at, which is exactly what this project is built to avoid.
+
+`calculateAllBudgets(network)` evaluates every NAP in one pass. It is a plain `map` over the
+single-NAP function — one implementation of the arithmetic, never two that could drift apart.
+
+Every optical constant — fiber attenuation, connector and splice loss, splitter insertion loss,
+the per-class GPON budget — lives in `src/lib/optical/constants.ts`, each commented with its unit
+and its standing as industry-typical and **pending validation**. The 3 dB minimum margin used to
+classify a link lives there too, but separately: it is an operational recommendation, not a
+physical constant, and every call can override it.
+
+**The dataset's fixture is bound to the tests.** `seed/expected-budgets.json` was derived by hand
+before this engine existed; `src/lib/optical/fixture.test.ts` asserts the engine reproduces it
+exactly, for all 12 NAPs. Editing a constant now fails the suite — on purpose, so that change has
+to go through a spec rather than land as a quiet data edit.
 
 ## How changes are made here
 
