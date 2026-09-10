@@ -2,11 +2,13 @@ import { describe, expect, test } from "vitest";
 
 import { runAssistantLoop } from "@/lib/assistant/loop";
 import { buildToolDefinitions, DETAIL_TOOL_NAME, SUMMARIZE_TOOL_NAME } from "@/lib/assistant/tool-definitions";
+import { buildSearchIndex } from "@/lib/corpus/search";
 import { loadNetwork } from "@/lib/network/load";
 import { createFakeModelClient, makeFixtureMessage, textBlock, toolUseBlock } from "@/lib/assistant/test-fixtures";
 
 const network = loadNetwork();
 const tools = buildToolDefinitions(network);
+const searchIndex = buildSearchIndex([]); // empty: this file never exercises documentation search
 
 function baseParams(client: ReturnType<typeof createFakeModelClient>["client"], userText: string) {
   return {
@@ -15,6 +17,7 @@ function baseParams(client: ReturnType<typeof createFakeModelClient>["client"], 
     maxTokens: 4096,
     tools,
     network,
+    searchIndex,
     messages: [{ role: "user" as const, content: userText }],
     onEvent: () => {},
   };

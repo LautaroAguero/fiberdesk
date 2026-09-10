@@ -21,6 +21,11 @@ place.
 calls it are both in place. Phase 1 is demonstrable end to end: ask a question, watch the answer
 stream in.
 
+**Phase 2 — documentation search — done.** The assistant can search a corpus of technical
+documentation and cite what it finds, and can compare a documented figure against the system's
+own optical constants. No vector database, no second service — see *The documentation corpus*,
+below, for why.
+
 ## Getting started
 
 ```bash
@@ -122,9 +127,10 @@ to go through a spec rather than land as a quiet data edit.
 ## The assistant
 
 `src/lib/assistant/` and `src/app/api/chat/route.ts` are the copilot: a route handler that streams
-an answer while orchestrating the optical budget engine through tool calls. **The model never
-computes a number.** Every figure it states comes from one of two tools, named for the shape of
-their answer rather than the operation:
+an answer while orchestrating the optical budget engine and the documentation corpus through tool
+calls. **The model never computes a number and never states a documented figure it did not just
+retrieve.** Every figure it states comes from one of four tools, named for the shape of their
+answer rather than the operation:
 
 - **`summarize_optical_budgets`** — one thin row per NAP (id, name, total loss, margin, status).
   No required arguments, so the model does not need to know any NAP identifier in advance. Call
@@ -132,6 +138,10 @@ their answer rather than the operation:
 - **`detail_optical_budget`** — the full per-hop breakdown for one NAP, the only source that can
   attribute a loss to a specific fiber run or splitter. Call this after, only for the NAPs worth
   explaining.
+- **`search_documentation`** — the passages in the technical corpus that match a query, returned
+  as citable `search_result` blocks. See *The documentation corpus*, below.
+- **`get_optical_constants`** — what the system itself computes with, so a documented figure can
+  be checked against it rather than assumed to agree.
 
 Survey first, detail second: twelve full breakdowns cost roughly 1,650 tokens against roughly 630
 for a survey plus detail on the two links that actually fail — and firing all twelve at once would
@@ -157,11 +167,57 @@ network loader follows.
 Every test in `src/lib/assistant/` runs against recorded fixtures — literal `Message` objects
 standing in for what the API would return — with the tools executing for real against the seed.
 The loop, the dispatcher, the highlight projection and the SSE encoding are all exercised this way;
-the model itself is not. Two behaviours can't be tested this way at all — that the assistant
-surveys before it drills into detail, and that it says "I don't know" instead of inventing an
-answer — and are verified by hand instead. This project has no evals; see the `design.md` of the
-`add-conversational-layer` change (under `openspec/changes/`, or `openspec/changes/archive/` once
-archived) for what that costs.
+the model itself is not. Some behaviours can't be tested this way at all — that the assistant
+surveys before it drills into detail, that it says "I don't know" instead of inventing an answer,
+that it cites what it retrieves, and that it surfaces rather than silently resolves a disagreement
+between a document and the constants — and are verified by hand instead. This project has no
+evals; see the `design.md` of the `add-conversational-layer` and `add-documentation-search`
+changes (under `openspec/changes/`, or `openspec/changes/archive/` once archived) for what that
+costs.
+
+## The documentation corpus
+
+`corpus/*.md` holds the technical documentation the assistant can search and cite. Each file is
+plain Markdown: one `#` title, one or more `##` sections, each with at least one paragraph.
+
+**Everything in it is invented**, the same as the network dataset — these read like GPON
+deployment and specification notes, but no document is copied from a real vendor, a real operator,
+or a published standard. A citation the assistant produces points at one of these invented
+documents; the mechanism is real, the source is not.
+
+### Why there is no vector database
+
+The original plan for this phase was FastAPI, PostgreSQL and pgvector. It didn't survive three
+facts, checked against the installed SDK rather than recalled: Anthropic has no embeddings
+endpoint, so a vector database would mean a second AI provider for five documents; citations are
+native (`citations: { enabled: true }`); and the `search_result` content block exists,
+purpose-built for a tool to return citable passages.
+
+What replaced it is `src/lib/corpus/`: a loader, a BM25 ranker, and a mapping from a ranked section
+to a citable result — all TypeScript, all in-process, all covered by unit tests because the
+ranking is deterministic. The model still closes the semantic gap BM25 can't: it composes the
+search query, so a question in Spanish about "atenuación por humedad" becomes an English query
+about moisture and water absorption before it ever reaches the ranker.
+
+### The gap and the contradiction are deliberate
+
+Same reasoning as the network dataset's edge cases: a corpus where everything is present and
+everything agrees can't demonstrate anything.
+
+- **A gap.** No document states an ONT receiver sensitivity figure — deliberately, because the
+  optical constants don't model it either. Ask about it and the assistant should say so, the same
+  answer it already gives when asked about the constant directly.
+- **A contradiction.** `gpon-link-budget.md` states fiber attenuation at 1490 nm as 0.22 dB/km;
+  `src/lib/optical/constants.ts` computes with 0.25. Ask what figure to use and the assistant
+  should report both, name where each came from, and say they disagree — not pick one quietly.
+
+### The scale this is built for
+
+A handful of short documents, indexed in memory at process start with no persistence. This is a
+deliberate choice, not a placeholder for something bigger: see `design.md` for when embeddings
+would actually earn their cost. Replacing `corpus/` with your own Markdown files works as long as
+you stay roughly in this range — the loader will happily index more, but relevance and cost both
+degrade well before a corpus of hundreds of documents, and that scale needs a different design.
 
 ## How changes are made here
 
@@ -175,5 +231,6 @@ npx openspec view   # interactive dashboard
 
 ## Stack
 
-Next.js (App Router) · TypeScript · Tailwind CSS · Vitest. Later phases add the Anthropic SDK,
-Python/FastAPI with PostgreSQL + pgvector, and MapLibre GL.
+Next.js (App Router) · TypeScript · Tailwind CSS · Vitest · the Anthropic SDK. No database, no
+second service, no second language — documentation search is BM25 in the same process as
+everything else. Phase 3 adds MapLibre GL.

@@ -16,6 +16,8 @@ import { projectHighlight } from "@/lib/assistant/highlight";
 import { createSseStream } from "@/lib/assistant/stream";
 import { SYSTEM_PROMPT } from "@/lib/assistant/system-prompt";
 import { buildToolDefinitions } from "@/lib/assistant/tool-definitions";
+import { buildSearchIndex } from "@/lib/corpus/search";
+import { loadCorpus } from "@/lib/corpus/load";
 import { loadNetwork } from "@/lib/network/load";
 
 const MODEL = "claude-opus-5";
@@ -60,9 +62,11 @@ export async function POST(request: Request): Promise<Response> {
   // an "error" event — see specs/network-assistant/spec.md, "Failures reach
   // the user rather than being swallowed".
   let network: ReturnType<typeof loadNetwork>;
+  let searchIndex: ReturnType<typeof buildSearchIndex>;
   let client: ReturnType<typeof createModelClient>;
   try {
     network = loadNetwork();
+    searchIndex = buildSearchIndex(loadCorpus());
     client = createModelClient(createAnthropicClient());
   } catch (error) {
     return Response.json(
@@ -82,6 +86,7 @@ export async function POST(request: Request): Promise<Response> {
       system: SYSTEM_PROMPT,
       tools,
       network,
+      searchIndex,
       messages,
       effort: EFFORT,
       onEvent: emit,

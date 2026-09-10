@@ -4,14 +4,21 @@ import { dispatchTool } from "@/lib/assistant/dispatcher";
 import { projectHighlight } from "@/lib/assistant/highlight";
 import type { ToolCallRecord } from "@/lib/assistant/loop";
 import { DETAIL_TOOL_NAME, SUMMARIZE_TOOL_NAME } from "@/lib/assistant/tool-definitions";
+import { buildSearchIndex } from "@/lib/corpus/search";
 import { loadNetwork } from "@/lib/network/load";
 
 const network = loadNetwork();
+const searchIndex = buildSearchIndex([]); // empty: highlight projection never reads documentation results
 
 /** Builds a ToolCallRecord the way loop.ts would, from a real dispatch. */
 function record(name: string, input: unknown): ToolCallRecord {
-  const { content, isError } = dispatchTool(name, input, network);
-  return { name, input, result: isError ? null : content, isError };
+  const { content, isError } = dispatchTool(name, input, network, searchIndex);
+  return {
+    name,
+    input,
+    result: isError ? null : typeof content === "string" ? JSON.parse(content) : content,
+    isError,
+  };
 }
 
 describe("6.1 the highlight is projected from tool results, never derived by the model", () => {

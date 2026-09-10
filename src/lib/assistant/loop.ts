@@ -19,13 +19,18 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { runToolUse } from "@/lib/assistant/dispatcher";
 import type { AssistantEvent } from "@/lib/assistant/events";
 import type { AssistantModelClient } from "@/lib/assistant/model-client";
+import type { SearchIndex } from "@/lib/corpus/search";
 import type { Network } from "@/lib/network/types";
 
 /** One tool call this turn made, kept for the highlight projection that follows the loop. */
 export interface ToolCallRecord {
   name: string;
   input: unknown;
-  /** Parsed adapter output. `null` when `isError` is true. */
+  /**
+   * The adapter's output. `null` when `isError` is true. Parsed from JSON
+   * for tools that return a JSON string; passed through as-is for tools
+   * (documentation search) that already return structured content blocks.
+   */
   result: unknown;
   isError: boolean;
 }
@@ -39,6 +44,7 @@ export interface RunAssistantLoopParams {
   /** Prior turns plus the new user message, oldest first. */
   messages: Anthropic.MessageParam[];
   network: Network;
+  searchIndex: SearchIndex;
   onEvent: (event: AssistantEvent) => void;
   /** Reasoning depth. See design.md, decision 7 — low/medium serve this domain. */
   effort?: "low" | "medium" | "high" | "xhigh" | "max";
@@ -61,7 +67,7 @@ const DEFAULT_MAX_ITERATIONS = 8;
 export async function runAssistantLoop(
   params: RunAssistantLoopParams,
 ): Promise<RunAssistantLoopResult> {
-  const { client, model, maxTokens, system, tools, network, onEvent, effort } = params;
+  const { client, model, maxTokens, system, tools, network, searchIndex, onEvent, effort } = params;
   const maxIterations = params.maxIterations ?? DEFAULT_MAX_ITERATIONS;
 
   const messages: Anthropic.MessageParam[] = [...params.messages];
@@ -97,12 +103,16 @@ export async function runAssistantLoop(
     for (const block of toolUseBlocks) {
       onEvent({ type: "tool_start", tool_use_id: block.id, name: block.name, input: block.input });
 
-      const resultBlock = runToolUse(block, network);
+      const resultBlock = runToolUse(block, network, searchIndex);
       toolResults.push(resultBlock);
       toolCalls.push({
         name: block.name,
         input: block.input,
-        result: resultBlock.is_error ? null : JSON.parse(resultBlock.content as string),
+        result: resultBlock.is_error
+          ? null
+          : typeof resultBlock.content === "string"
+            ? JSON.parse(resultBlock.content)
+            : resultBlock.content,
         isError: Boolean(resultBlock.is_error),
       });
 
