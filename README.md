@@ -17,23 +17,28 @@ answer produced by the model instead of a tool is a bug, not a shortcut.
 **Phase 0 — foundations — done.** The scaffold, the spec workflow and the network dataset are in
 place.
 
-**Phase 1 — the conversational core — in progress.** The optical budget engine is done: plain
-TypeScript, no model involved. The assistant that calls it — the Anthropic SDK, streaming, tool
-use — is the next change.
+**Phase 1 — the conversational core — done.** The optical budget engine and the assistant that
+calls it are both in place. Phase 1 is demonstrable end to end: ask a question, watch the answer
+stream in.
 
 ## Getting started
 
 ```bash
 npm install
+cp .env.example .env.local   # then set ANTHROPIC_API_KEY
 npm run dev
 ```
 
-The app runs at [http://localhost:3000](http://localhost:3000).
+The app runs at [http://localhost:3000](http://localhost:3000). Without a key, the chat page still
+loads and reports the missing variable as soon as you ask a question — see *Failing loudly*, below.
 
 ```bash
 npm test          # run the suite once
 npm run test:watch
 ```
+
+Every test runs against recorded fixtures and the real seed. **None of them call the Anthropic
+API** — see *The assistant*, below.
 
 ## The network dataset
 
@@ -113,6 +118,50 @@ physical constant, and every call can override it.
 before this engine existed; `src/lib/optical/fixture.test.ts` asserts the engine reproduces it
 exactly, for all 12 NAPs. Editing a constant now fails the suite — on purpose, so that change has
 to go through a spec rather than land as a quiet data edit.
+
+## The assistant
+
+`src/lib/assistant/` and `src/app/api/chat/route.ts` are the copilot: a route handler that streams
+an answer while orchestrating the optical budget engine through tool calls. **The model never
+computes a number.** Every figure it states comes from one of two tools, named for the shape of
+their answer rather than the operation:
+
+- **`summarize_optical_budgets`** — one thin row per NAP (id, name, total loss, margin, status).
+  No required arguments, so the model does not need to know any NAP identifier in advance. Call
+  this first.
+- **`detail_optical_budget`** — the full per-hop breakdown for one NAP, the only source that can
+  attribute a loss to a specific fiber run or splitter. Call this after, only for the NAPs worth
+  explaining.
+
+Survey first, detail second: twelve full breakdowns cost roughly 1,650 tokens against roughly 630
+for a survey plus detail on the two links that actually fail — and firing all twelve at once would
+require the model to already know every identifier, which the survey exists to avoid.
+
+**The map highlight is projected in code, never emitted by the model.** Every field in it —
+identifier, status, margin — already exists in a tool result. Asking the model to repeat it back
+would be asking it to copy numbers, and copying is exactly where a model writes 2.7 for 2.77.
+
+There is no server-side conversation store. Each streamed turn ends with the exact updated message
+array the server sent to the model — tool calls and results intact — and the browser tab holds
+that array and resends it verbatim on the next question. Close the tab and the conversation is
+gone; that is by design for now.
+
+### Failing loudly
+
+Ask a question without `ANTHROPIC_API_KEY` set and the chat page shows the error in place, rather
+than hanging or crashing — the same "fail with a named error, never a silent gap" principle the
+network loader follows.
+
+### Tests never call the API
+
+Every test in `src/lib/assistant/` runs against recorded fixtures — literal `Message` objects
+standing in for what the API would return — with the tools executing for real against the seed.
+The loop, the dispatcher, the highlight projection and the SSE encoding are all exercised this way;
+the model itself is not. Two behaviours can't be tested this way at all — that the assistant
+surveys before it drills into detail, and that it says "I don't know" instead of inventing an
+answer — and are verified by hand instead. This project has no evals; see the `design.md` of the
+`add-conversational-layer` change (under `openspec/changes/`, or `openspec/changes/archive/` once
+archived) for what that costs.
 
 ## How changes are made here
 
