@@ -201,16 +201,39 @@ y desplegar la anterior.
 **Fase 0 cerrada.** Scaffold de Next.js verificado, `seed/network.json` con sus casos límite,
 carga y validación estructural del dataset, y el flujo de OpenSpec andando de punta a punta.
 
-**Fase 1 a mitad de camino.** El motor de presupuesto óptico está hecho: `src/lib/optical/`
-calcula, clasifica y desglosa por tramo, con las constantes centralizadas y los tests atados a
-`seed/expected-budgets.json`. Es TypeScript puro — no interviene ningún modelo.
+**Fase 1 cerrada.** Las dos mitades están hechas:
 
-Dos capacidades viven en `openspec/specs/`: `network-dataset` y `optical-budget`.
+- **El motor óptico** (`src/lib/optical/`) calcula, clasifica y desglosa por tramo, con las
+  constantes centralizadas y los tests atados a `seed/expected-budgets.json`. TypeScript puro —
+  no interviene ningún modelo.
+- **La capa conversacional** (`src/lib/assistant/` y `src/app/api/chat/route.ts`): route handler
+  con streaming SSE, loop de tool use escrito a mano, las dos herramientas con `strict: true` y
+  el `nap_id` como enum derivado del dataset, y el `highlight` proyectado por el código. La
+  página de chat en `src/app/page.tsx` es deliberadamente fea: existe para que la fase se pueda
+  demostrar sola, no para lucirse. El mapa es Fase 3.
 
-**Lo próximo — la otra mitad de la Fase 1:** la capa conversacional. Route handler con streaming,
-las dos herramientas del caso de uso de referencia (`summarize_optical_budgets` y
-`detail_optical_budget`) expuestas al modelo con `strict: true`, y el `highlight` proyectado por
-el código. Arranca, como todo, con una propuesta de OpenSpec.
+**145 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados y el seed real. Las
+dos conductas que ningún test puede cubrir —que haga censo antes que zoom, y que diga "no lo
+tengo" en vez de inventar— se verificaron a mano una vez contra la API real; las dos
+transcripciones quedaron en
+`openspec/changes/archive/2026-09-09-add-conversational-layer/verification.md`.
+
+⚠️ **Este proyecto no tiene evals.** Si alguna de esas dos conductas se rompe más adelante, nada
+lo va a detectar automáticamente. Está documentado a propósito, no olvidado.
+
+Correr la app requiere `ANTHROPIC_API_KEY` — ver `.env.example`.
+
+**No hay base de datos.** La red se lee de `seed/network.json` en disco. Postgres + pgvector
+entra recién en Fase 2, y no para la red sino para la documentación técnica: son dos fuentes con
+mecanismos distintos, porque un árbol de 12 cajas cabe en memoria y debe responder exacto,
+mientras que un corpus de texto necesita búsqueda semántica.
+
+Tres capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget` y
+`network-assistant`.
+
+**Lo próximo:** Fase 2 (RAG sobre documentación, que suma una tercera herramienta al lado de las
+dos actuales) o Fase 3 (el mapa, que consume el `highlight` que la Fase 1 ya define y emite).
+Cualquiera de las dos arranca, como todo, con una propuesta de OpenSpec.
 
 Los nombres importan más de lo que parece: el modelo elige qué herramienta llamar leyendo el
 nombre y la descripción, y nada más. `summarize_` y `detail_` nombran **la forma de la
