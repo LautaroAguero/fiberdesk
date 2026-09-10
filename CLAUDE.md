@@ -180,9 +180,30 @@ y desplegar la anterior.
 |---|---|---|
 | **0** | Cimientos: repo, OpenSpec, set de datos | — |
 | **1** | Núcleo conversacional: streaming, tool use, structured outputs | Anthropic SDK |
-| **2** | RAG sobre documentación técnica, con citas | FastAPI · PostgreSQL + pgvector |
+| **2** | RAG sobre documentación técnica, con citas | — *(nada: ver abajo)* |
 | **3** | **Copiloto sobre el mapa** — el diferenciador | MapLibre GL |
 | **4** | Producción: deploy, evals, observabilidad de costo *(opcional)* | AWS · Docker |
+
+> **La Fase 2 no suma infraestructura, y eso fue un cambio de plan.** El plan original decía
+> FastAPI + PostgreSQL + pgvector. Se cayó al verificar tres cosas contra el SDK instalado:
+>
+> 1. **Anthropic no tiene endpoint de embeddings.** El cliente expone `messages`, `models`,
+>    `files`, `skills` y `beta`, nada más. pgvector obligaría a sumar un **segundo proveedor de
+>    IA** al proyecto, con su clave y su factura, por un corpus de cinco documentos.
+> 2. **Las citas son nativas de la API.** `citations: { enabled: true }` sobre un bloque
+>    devuelve el texto citado y su ubicación exacta. La mitad de "con citas" no hay que
+>    construirla.
+> 3. **Existe el bloque `search_result`** —con `source`, `title`, `content[]` y `citations`— y
+>    el tipo de `tool_result` lo acepta. Una tool propia devuelve resultados de búsqueda y el
+>    modelo los cita nativamente. Está hecho a medida para esto.
+>
+> Con un corpus chico, la recuperación se resuelve con **BM25 en TypeScript**: determinista, sin
+> proveedor externo, y —lo que más pesa— **testeable unitariamente**, igual que el motor óptico.
+> Es la misma jugada que proyectar el `highlight` en código: correr trabajo de territorio-eval a
+> territorio-test.
+>
+> Si algún día el corpus creciera a cientos de documentos, o las consultas fueran muy
+> parafraseadas, ahí sí los embeddings se ganan el lugar. Hoy no.
 
 ---
 
@@ -190,7 +211,7 @@ y desplegar la anterior.
 
 **Base:** Next.js (App Router) · TypeScript · Tailwind CSS
 **IA:** Anthropic SDK (`@anthropic-ai/sdk`)
-**Fase 2:** Python/FastAPI · PostgreSQL + pgvector
+**Fase 2:** nada nuevo — BM25 propio sobre un corpus en disco
 **Fase 3:** MapLibre GL
 **Fase 4:** Docker · AWS
 
@@ -223,10 +244,10 @@ lo va a detectar automáticamente. Está documentado a propósito, no olvidado.
 
 Correr la app requiere `ANTHROPIC_API_KEY` — ver `.env.example`.
 
-**No hay base de datos.** La red se lee de `seed/network.json` en disco. Postgres + pgvector
-entra recién en Fase 2, y no para la red sino para la documentación técnica: son dos fuentes con
-mecanismos distintos, porque un árbol de 12 cajas cabe en memoria y debe responder exacto,
-mientras que un corpus de texto necesita búsqueda semántica.
+**No hay base de datos, y la Fase 2 tampoco va a traer una.** La red se lee de
+`seed/network.json` en disco, y la documentación técnica va a vivir igual: archivos en disco,
+recuperados con BM25 en TypeScript. Ver la nota bajo la tabla de fases para por qué se descartó
+pgvector.
 
 Tres capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget` y
 `network-assistant`.
