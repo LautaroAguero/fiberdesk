@@ -233,28 +233,45 @@ carga y validación estructural del dataset, y el flujo de OpenSpec andando de p
   página de chat en `src/app/page.tsx` es deliberadamente fea: existe para que la fase se pueda
   demostrar sola, no para lucirse. El mapa es Fase 3.
 
-**145 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados y el seed real. Las
-dos conductas que ningún test puede cubrir —que haga censo antes que zoom, y que diga "no lo
-tengo" en vez de inventar— se verificaron a mano una vez contra la API real; las dos
-transcripciones quedaron en
-`openspec/changes/archive/2026-09-09-add-conversational-layer/verification.md`.
+**Fase 2 cerrada.** Búsqueda sobre documentación técnica con citas, sin sumar infraestructura:
 
-⚠️ **Este proyecto no tiene evals.** Si alguna de esas dos conductas se rompe más adelante, nada
+- **El corpus** (`corpus/`): cuatro documentos Markdown sintéticos, en inglés, con cargador y
+  validador estructural en `src/lib/corpus/` que falla fuerte y nombra qué se rompió, igual que
+  el de la red.
+- **La recuperación**: BM25 en TypeScript, indexado en memoria al arrancar. Mismo corpus y misma
+  consulta dan siempre el mismo ranking, así que se testea como el motor óptico.
+- **Dos herramientas nuevas**, que suman cuatro: `search_documentation` devuelve bloques
+  `search_result` con citas nativas, y `get_optical_constants` expone las constantes con su
+  unidad y su estado de "pendiente de validación", para comparar lo que dice un documento contra
+  lo que el sistema usa para calcular.
+- **Dos fallas a propósito en el corpus**, como los casos límite del dataset: un **hueco** (la
+  sensibilidad del receptor de la ONT no está documentada) y una **contradicción** (un documento
+  da una atenuación de fibra distinta a la de `src/lib/optical/constants.ts`).
+
+**196 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
+reales. Seis conductas que ningún test puede cubrir se verificaron a mano una vez contra la API
+real:
+
+- Fase 1 (`openspec/changes/archive/2026-09-09-add-conversational-layer/verification.md`): que
+  haga censo antes que zoom, y que diga "no lo tengo" en vez de inventar.
+- Fase 2 (`openspec/changes/archive/2026-09-10-add-documentation-search/verification.md`): que
+  responda citando la fuente, que una pregunta en español recupere del corpus en inglés, que
+  señale la contradicción de atenuación en vez de elegir un valor en silencio, y que siga
+  declinando la sensibilidad de la ONT.
+
+⚠️ **Este proyecto no tiene evals.** Si alguna de esas seis conductas se rompe más adelante, nada
 lo va a detectar automáticamente. Está documentado a propósito, no olvidado.
 
 Correr la app requiere `ANTHROPIC_API_KEY` — ver `.env.example`.
 
-**No hay base de datos, y la Fase 2 tampoco va a traer una.** La red se lee de
-`seed/network.json` en disco, y la documentación técnica va a vivir igual: archivos en disco,
-recuperados con BM25 en TypeScript. Ver la nota bajo la tabla de fases para por qué se descartó
-pgvector.
+**No hay base de datos.** La red se lee de `seed/network.json` y la documentación de `corpus/`,
+las dos desde disco. Ver la nota bajo la tabla de fases para por qué se descartó pgvector.
 
-Tres capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget` y
-`network-assistant`.
+Cuatro capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
+`network-assistant` y `documentation-search`.
 
-**Lo próximo:** Fase 2 (RAG sobre documentación, que suma una tercera herramienta al lado de las
-dos actuales) o Fase 3 (el mapa, que consume el `highlight` que la Fase 1 ya define y emite).
-Cualquiera de las dos arranca, como todo, con una propuesta de OpenSpec.
+**Lo próximo:** Fase 3, el mapa con MapLibre GL, que consume el `highlight` que la Fase 1 ya
+define y emite. Arranca, como todo, con una propuesta de OpenSpec.
 
 Los nombres importan más de lo que parece: el modelo elige qué herramienta llamar leyendo el
 nombre y la descripción, y nada más. `summarize_` y `detail_` nombran **la forma de la
