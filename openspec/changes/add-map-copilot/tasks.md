@@ -14,7 +14,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
       (`https://tiles.openfreemap.org/styles/positron`), the fallback background style, the initial
       center (the OLT, `[-58.9866, -27.4512]`) and zoom, the fit-bounds padding, and the status
       colour table from design.md decision 2 — each constant commented; verify `tsc` passes.
-- [ ] 1.3 Change `metadata` in `src/app/layout.tsx` to title "FiberDesk" and a one-line description;
+- [x] 1.3 Change `metadata` in `src/app/layout.tsx` to title "FiberDesk" and a one-line description;
       verify by reading the file.
 
 ## 2. Pure helpers (unit-tested, no DOM)
