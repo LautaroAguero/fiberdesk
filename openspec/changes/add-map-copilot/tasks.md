@@ -24,7 +24,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
       `src/lib/map/geojson.test.ts` against the seed asserting 1 / 12 / 12 / 28 features, that node
       coordinates are `[lon, lat]` (OLT → `[-58.9866, -27.4512]`), that FR-12's first vertex is
       NAP-03's position, and that NAP features carry `id`, `name`, `ratio`, `parent`.
-- [ ] 2.2 Add `src/lib/map/highlight.ts` with `resolveHighlight(payload, network, budgets)`
+- [x] 2.2 Add `src/lib/map/highlight.ts` with `resolveHighlight(payload, network, budgets)`
       (design.md decision 3); add tests: the reference payload (NAP-12 marginal 2.77, NAP-09 fail
       -1.40, `fit_bounds: true`) gives `napStatus` with exactly those two, `runIds` equal to
       `FR-03, FR-12, FR-04, FR-09` (any order), bounds containing the OLT, both NAPs and every

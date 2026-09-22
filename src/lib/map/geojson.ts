@@ -11,8 +11,8 @@
 
 import type { Network, Position } from "@/lib/network/types";
 
-/** `{ lat, lon }` to a GeoJSON `[lon, lat]` position. */
-function toLngLat(node: Position): [number, number] {
+/** `{ lat, lon }` to a GeoJSON `[lon, lat]` position. Exported: `highlight.ts` reuses it for bounds. */
+export function toLngLat(node: Position): [number, number] {
   return [node.lon, node.lat];
 }
 
