@@ -115,6 +115,6 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 8. Docs
 
-- [ ] 8.1 Update `README.md` for the map (what you see, how to run, OpenFreeMap as the tile source)
+- [x] 8.1 Update `README.md` for the map (what you see, how to run, OpenFreeMap as the tile source)
       and the "Estado actual" section of `CLAUDE.md` to mark Phase 3 complete; verify both read
       correctly.

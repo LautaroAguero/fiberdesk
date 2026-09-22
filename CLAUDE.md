@@ -230,8 +230,8 @@ carga y validación estructural del dataset, y el flujo de OpenSpec andando de p
 - **La capa conversacional** (`src/lib/assistant/` y `src/app/api/chat/route.ts`): route handler
   con streaming SSE, loop de tool use escrito a mano, las dos herramientas con `strict: true` y
   el `nap_id` como enum derivado del dataset, y el `highlight` proyectado por el código. La
-  página de chat en `src/app/page.tsx` es deliberadamente fea: existe para que la fase se pueda
-  demostrar sola, no para lucirse. El mapa es Fase 3.
+  página de chat de entonces era deliberadamente fea: existía para que la fase se pudiera
+  demostrar sola, no para lucirse. La Fase 3 la reemplaza por el mapa.
 
 **Fase 2 cerrada.** Búsqueda sobre documentación técnica con citas, sin sumar infraestructura:
 
@@ -248,9 +248,31 @@ carga y validación estructural del dataset, y el flujo de OpenSpec andando de p
   sensibilidad del receptor de la ONT no está documentada) y una **contradicción** (un documento
   da una atenuación de fibra distinta a la de `src/lib/optical/constants.ts`).
 
-**196 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
-reales. Seis conductas que ningún test puede cubrir se verificaron a mano una vez contra la API
-real:
+**Fase 3 implementada.** El mapa copiloto que reemplaza la página de chat plana:
+
+- **El mapa** (`src/components/NetworkMap.tsx`, MapLibre GL sobre tiles de OpenFreeMap, sin clave
+  ni cuenta) dibuja toda la red al abrir la página — OLT, 12 NAPs, 12 tendidos, 28 clientes — y
+  cae a un fondo liso si el estilo base no carga.
+- **Dos helpers puros más, con tests** (`src/lib/map/`): `resolveHighlight` traduce el
+  `HighlightPayload` de un turno en qué NAP colorear, qué tendidos marcar y a dónde encuadrar —
+  sin recorrer el árbol de nuevo, usa los `hops` que ya trae cada `BudgetResult` — y
+  `formatBreakdown` da formato al desglose por NAP sin tocar ningún número. `networkToGeoJson`
+  (de la Fase 1) alimenta las capas del mapa.
+- **`src/app/page.tsx` es ahora un server component**: carga la red y calcula los doce
+  presupuestos una sola vez, server-side, y se los pasa a `Copilot` (client), que compone el mapa
+  con `ChatPanel` — el chat de la Fase 1, sacado de la página sin cambiar su lógica. Ningún
+  número en pantalla sale del modelo ni se recalcula en el navegador.
+
+⚠️ **La verificación en navegador de esta fase quedó pendiente.** El entorno de esta sesión no
+pudo renderizar MapLibre — el pane de preview reporta `document.hidden`, lo que congela el loop de
+`requestAnimationFrame` del que depende la carga del estilo, confirmado con una reproducción
+mínima fuera del componente. El código pasa `npm test`, `npm run lint`, `npx tsc --noEmit` y
+`npm run build`; lo que falta por confirmar a mano, en un navegador real, son los checks visuales
+del grupo 6 de `tasks.md` y la corrida real contra la API (tarea 7.1, como en las Fases 1 y 2).
+
+**222 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
+reales. Las conductas que ningún test puede cubrir se verificaron a mano una vez contra la API
+real, para las fases ya cerradas:
 
 - Fase 1 (`openspec/changes/archive/2026-09-09-add-conversational-layer/verification.md`): que
   haga censo antes que zoom, y que diga "no lo tengo" en vez de inventar.
@@ -258,20 +280,23 @@ real:
   responda citando la fuente, que una pregunta en español recupere del corpus en inglés, que
   señale la contradicción de atenuación en vez de elegir un valor en silencio, y que siga
   declinando la sensibilidad de la ONT.
+- Fase 3: pendiente — ver el aviso de arriba.
 
-⚠️ **Este proyecto no tiene evals.** Si alguna de esas seis conductas se rompe más adelante, nada
+⚠️ **Este proyecto no tiene evals.** Si alguna de esas conductas se rompe más adelante, nada
 lo va a detectar automáticamente. Está documentado a propósito, no olvidado.
 
-Correr la app requiere `ANTHROPIC_API_KEY` — ver `.env.example`.
+Correr la app requiere `ANTHROPIC_API_KEY` — ver `.env.example`. El mapa y la red se ven sin ella;
+sólo el chat lo necesita.
 
 **No hay base de datos.** La red se lee de `seed/network.json` y la documentación de `corpus/`,
 las dos desde disco. Ver la nota bajo la tabla de fases para por qué se descartó pgvector.
 
 Cuatro capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
-`network-assistant` y `documentation-search`.
+`network-assistant` y `documentation-search`. La quinta, `network-map`, vive en
+`openspec/changes/add-map-copilot/specs/` hasta que la fase se archive.
 
-**Lo próximo:** Fase 3, el mapa con MapLibre GL, que consume el `highlight` que la Fase 1 ya
-define y emite. Arranca, como todo, con una propuesta de OpenSpec.
+**Lo próximo:** cerrar la Fase 3 — verificación en navegador y contra la API real, después
+archivar el cambio — y luego la Fase 4 (producción).
 
 Los nombres importan más de lo que parece: el modelo elige qué herramienta llamar leyendo el
 nombre y la descripción, y nada más. `summarize_` y `detail_` nombran **la forma de la
