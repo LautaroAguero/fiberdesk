@@ -19,7 +19,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 2. Pure helpers (unit-tested, no DOM)
 
-- [ ] 2.1 Add `src/lib/map/geojson.ts` with `networkToGeoJson(network)` returning `olt`, `naps`,
+- [x] 2.1 Add `src/lib/map/geojson.ts` with `networkToGeoJson(network)` returning `olt`, `naps`,
       `runs`, `subscribers` FeatureCollections (design.md decision 3); add
       `src/lib/map/geojson.test.ts` against the seed asserting 1 / 12 / 12 / 28 features, that node
       coordinates are `[lon, lat]` (OLT → `[-58.9866, -27.4512]`), that FR-12's first vertex is
