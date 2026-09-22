@@ -10,7 +10,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 - [x] 1.1 Install `maplibre-gl` as a runtime dependency (`npm install maplibre-gl`); verify it is in
       `package.json` `dependencies` and `npm test` still reports the existing 196 tests passing.
-- [ ] 1.2 Add `src/lib/map/config.ts` with the OpenFreeMap style URL
+- [x] 1.2 Add `src/lib/map/config.ts` with the OpenFreeMap style URL
       (`https://tiles.openfreemap.org/styles/positron`), the fallback background style, the initial
       center (the OLT, `[-58.9866, -27.4512]`) and zoom, the fit-bounds padding, and the status
       colour table from design.md decision 2 — each constant commented; verify `tsc` passes.
