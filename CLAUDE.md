@@ -279,7 +279,7 @@ real, para las fases ya cerradas:
   responda citando la fuente, que una pregunta en español recupere del corpus en inglés, que
   señale la contradicción de atenuación en vez de elegir un valor en silencio, y que siga
   declinando la sensibilidad de la ONT.
-- Fase 3 (`openspec/changes/add-map-copilot/verification.md`): que el mapa marque las cajas de la
+- Fase 3 (`openspec/changes/archive/2026-09-22-add-map-copilot/verification.md`): que el mapa marque las cajas de la
   respuesta y reencuadre, y que siga declinando la sensibilidad de la ONT con el mapa delante.
 
 ⚠️ **Este proyecto no tiene evals.** Si alguna de esas conductas se rompe más adelante, nada
@@ -291,12 +291,12 @@ sólo el chat lo necesita.
 **No hay base de datos.** La red se lee de `seed/network.json` y la documentación de `corpus/`,
 las dos desde disco. Ver la nota bajo la tabla de fases para por qué se descartó pgvector.
 
-Cuatro capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
-`network-assistant` y `documentation-search`. La quinta, `network-map`, vive en
-`openspec/changes/add-map-copilot/specs/` hasta que la fase se archive.
+Cinco capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
+`network-assistant`, `documentation-search` y `network-map`.
 
-**Lo próximo:** archivar el cambio `add-map-copilot` —que mueve `network-map` a
-`openspec/specs/`— y después la Fase 4 (producción), que es opcional.
+**Lo próximo:** la Fase 4 (producción), que es opcional. Lo que más pesa ahí no es el deploy sino
+los **evals**: el proyecto acumula ocho conductas verificadas a mano una sola vez y nada las
+vigila.
 
 Los nombres importan más de lo que parece: el modelo elige qué herramienta llamar leyendo el
 nombre y la descripción, y nada más. `summarize_` y `detail_` nombran **la forma de la
