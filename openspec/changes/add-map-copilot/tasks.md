@@ -40,7 +40,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
       "2.77", status marginal; NAP-09 total "29.40", margin "-1.40", fail; NAP-03 total "7.98",
       margin "20.02", pass; and every numeric string equals `value.toFixed(2)` of the matching
       `BudgetResult` field (no re-computation).
-- [ ] 2.4 Move the SSE frame splitter out of `src/app/page.tsx` into `src/lib/assistant/stream.ts`
+- [x] 2.4 Move the SSE frame splitter out of `src/app/page.tsx` into `src/lib/assistant/stream.ts`
       as exported `createFrameSplitter()`; add tests in `stream.test.ts` for a frame split across
       two chunks, two frames in one chunk, blank frames dropped, and a trailing partial frame held
       back; verify the old copy is deleted from the page and tests pass.

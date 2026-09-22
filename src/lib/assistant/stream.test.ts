@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { createSseStream, decodeSseEvent, encodeSseEvent } from "@/lib/assistant/stream";
+import { createFrameSplitter, createSseStream, decodeSseEvent, encodeSseEvent } from "@/lib/assistant/stream";
 import type { AssistantEvent } from "@/lib/assistant/events";
 
 /** Reads every event out of a stream built by createSseStream, fully draining it. */
@@ -76,5 +76,39 @@ describe("5.2 the loop's events reach the stream in order", () => {
     const events = await readAllEvents(stream);
     expect(events.map((e) => e.type)).toEqual(["text", "error"]);
     expect((events[1] as { message: string }).message).toContain("upstream request failed");
+  });
+});
+
+describe("2.4 createFrameSplitter", () => {
+  test("a frame split across two chunks is only returned once the second chunk arrives", () => {
+    const splitter = createFrameSplitter();
+    const frame = encodeSseEvent({ type: "text", text: "hello" });
+    const midpoint = Math.floor(frame.length / 2);
+
+    expect(splitter.push(frame.slice(0, midpoint))).toEqual([]);
+    expect(splitter.push(frame.slice(midpoint))).toEqual([frame.trimEnd()]);
+  });
+
+  test("two frames delivered in one chunk are both returned", () => {
+    const splitter = createFrameSplitter();
+    const first = encodeSseEvent({ type: "text", text: "one" });
+    const second = encodeSseEvent({ type: "text", text: "two" });
+
+    expect(splitter.push(first + second)).toEqual([first.trimEnd(), second.trimEnd()]);
+  });
+
+  test("blank frames are dropped", () => {
+    const splitter = createFrameSplitter();
+
+    expect(splitter.push("\n\n\n\n")).toEqual([]);
+  });
+
+  test("a trailing partial frame is held back until it completes", () => {
+    const splitter = createFrameSplitter();
+    const complete = encodeSseEvent({ type: "text", text: "done" });
+    const partial = "event: text\ndata: {\"type\":\"text\"";
+
+    expect(splitter.push(complete + partial)).toEqual([complete.trimEnd()]);
+    expect(splitter.push("")).toEqual([]);
   });
 });

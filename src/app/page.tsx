@@ -18,7 +18,7 @@ import { useRef, useState } from "react";
 import type Anthropic from "@anthropic-ai/sdk";
 
 import type { AssistantEvent, HighlightPayload } from "@/lib/assistant/events";
-import { decodeSseEvent } from "@/lib/assistant/stream";
+import { createFrameSplitter, decodeSseEvent } from "@/lib/assistant/stream";
 
 /** One line of the visible transcript. Derived from `history`, never the other way round. */
 interface DisplayTurn {
@@ -37,19 +37,6 @@ function toolActivityLabel(name: string): string {
   if (name === "summarize_optical_budgets") return "Surveying every NAP";
   if (name === "detail_optical_budget") return "Pulling the detailed breakdown";
   return name;
-}
-
-/** Splits an SSE byte stream into complete frames as they arrive, holding back partial ones. */
-function frameSplitter() {
-  let buffer = "";
-  return {
-    push(chunk: string): string[] {
-      buffer += chunk;
-      const parts = buffer.split("\n\n");
-      buffer = parts.pop() ?? "";
-      return parts.filter((frame) => frame.trim() !== "");
-    },
-  };
 }
 
 export default function ChatPage() {
@@ -85,7 +72,7 @@ export default function ChatPage() {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      const splitter = frameSplitter();
+      const splitter = createFrameSplitter();
 
       for (;;) {
         const { done, value } = await reader.read();
