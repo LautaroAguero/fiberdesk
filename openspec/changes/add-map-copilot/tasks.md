@@ -47,7 +47,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 3. Chat panel
 
-- [ ] 3.1 Create `src/components/ChatPanel.tsx` ("use client") by moving the chat state, SSE reading
+- [x] 3.1 Create `src/components/ChatPanel.tsx` ("use client") by moving the chat state, SSE reading
       and transcript UI out of `src/app/page.tsx` with behaviour unchanged, using
       `createFrameSplitter`; add prop `onTurnDone(payload: HighlightPayload)` called in the `done`
       case in place of the `console.log`; drop the "Map highlight logged to the console" note; make
