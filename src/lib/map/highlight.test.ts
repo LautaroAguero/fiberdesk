@@ -27,6 +27,15 @@ describe("2.2 resolveHighlight on the reference payload", () => {
     expect(result.runIds.sort()).toEqual(["FR-03", "FR-04", "FR-09", "FR-12"].sort());
   });
 
+  test("4.3 runStatus colours each run with the status of the NAP it leads to", () => {
+    expect(result.runStatus).toEqual({
+      "FR-03": "marginal",
+      "FR-12": "marginal",
+      "FR-04": "fail",
+      "FR-09": "fail",
+    });
+  });
+
   test("bounds contain the OLT, both NAPs and every vertex of the four runs", () => {
     expect(result.bounds).not.toBeNull();
     const [[west, south], [east, north]] = result.bounds!;
@@ -64,6 +73,7 @@ describe("2.2 resolveHighlight edge cases", () => {
 
     expect(result.napStatus).toEqual({});
     expect(result.runIds).toEqual([]);
+    expect(result.runStatus).toEqual({});
     expect(result.bounds).toBeNull();
   });
 

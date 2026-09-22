@@ -26,6 +26,16 @@ export interface ResolvedHighlight {
   napStatus: Record<string, BudgetStatus>;
   /** Ids of every fiber run on a highlighted NAP's path back to the OLT. */
   runIds: string[];
+  /**
+   * Status to paint each run in `runIds` with, keyed by run id — the status of
+   * the highlighted NAP that run's hop belongs to (design.md, decision 2: "the
+   * highlighted path takes its NAP's status colour"). Not part of the original
+   * task 2.2 shape; added for the map layer (task 4.3), which needs a colour
+   * per run, not just a flat id list. If two highlighted NAPs of different
+   * status ever shared a run — they do not in the seed dataset — the later
+   * entry in `payload.highlight` wins; this is not exercised by any test.
+   */
+  runStatus: Record<string, BudgetStatus>;
   /** Payload ids that name no NAP in `network` — ignored, never drawn at an invented position. */
   unknownIds: string[];
   /** Bounds to fit the view to, or `null` when `fit_bounds` is false or no entry is known. */
@@ -46,6 +56,7 @@ export function resolveHighlight(
   const budgetByNapId = new Map(budgets.map((budget) => [budget.nap_id, budget]));
 
   const napStatus: Record<string, BudgetStatus> = {};
+  const runStatus: Record<string, BudgetStatus> = {};
   const runIdSet = new Set<string>();
   const unknownIds: string[] = [];
 
@@ -59,6 +70,7 @@ export function resolveHighlight(
     napStatus[entry.nap_id] = entry.status;
     for (const hop of budget.hops) {
       runIdSet.add(hop.run_id);
+      runStatus[hop.run_id] = entry.status;
     }
   }
 
@@ -68,7 +80,7 @@ export function resolveHighlight(
       ? computeBounds(network, highlightedNapIds, [...runIdSet])
       : null;
 
-  return { napStatus, runIds: [...runIdSet], unknownIds, bounds };
+  return { napStatus, runIds: [...runIdSet], runStatus, unknownIds, bounds };
 }
 
 /** Bounds covering the OLT, the given NAPs, and every vertex of the given runs' geometry. */

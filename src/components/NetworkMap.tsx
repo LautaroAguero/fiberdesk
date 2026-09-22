@@ -11,8 +11,8 @@
  * scope references it.
  */
 
-import { useEffect, useRef } from "react";
-import type { Map as MaplibreMap } from "maplibre-gl";
+import { useEffect, useRef, useState } from "react";
+import type { ExpressionSpecification, Map as MaplibreMap } from "maplibre-gl";
 
 import {
   FALLBACK_STYLE,
@@ -23,15 +23,40 @@ import {
   MAP_STYLE_URL,
   NEUTRAL_NAP_COLOR,
   OLT_COLOR,
+  STATUS_COLOR,
   SUBSCRIBER_COLOR,
 } from "@/lib/map/config";
 import { networkToGeoJson, type NetworkGeoJson } from "@/lib/map/geojson";
+import type { ResolvedHighlight } from "@/lib/map/highlight";
 import type { Network } from "@/lib/network/types";
 
 const LABEL_COLOR = "#27272a"; // Tailwind zinc-800 — legible on the light Positron base.
 
 export interface NetworkMapProps {
   network: Network;
+  /** The current turn's resolved highlight — see design.md, decision 6 for how the parent tracks it. */
+  highlight: ResolvedHighlight;
+}
+
+/**
+ * A paint expression that reads `featureStateKey` (a `BudgetStatus` string,
+ * or unset) off feature state and resolves it to that status's colour,
+ * falling back to `fallback` when unset. Shared between the NAP layer
+ * (`status`) and the run layer (`onPath`) — see design.md, decision 2: "the
+ * highlighted path takes its NAP's status colour".
+ */
+function statusColorExpression(featureStateKey: "status" | "onPath", fallback: string): ExpressionSpecification {
+  return [
+    "match",
+    ["feature-state", featureStateKey],
+    "pass",
+    STATUS_COLOR.pass,
+    "marginal",
+    STATUS_COLOR.marginal,
+    "fail",
+    STATUS_COLOR.fail,
+    fallback,
+  ];
 }
 
 /**
@@ -50,7 +75,10 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
     id: "runs-line",
     type: "line",
     source: "runs",
-    paint: { "line-color": FIBER_COLOR, "line-width": 2 },
+    paint: {
+      "line-color": statusColorExpression("onPath", FIBER_COLOR),
+      "line-width": ["case", ["!=", ["feature-state", "onPath"], null], 4, 2],
+    },
   });
 
   map.addLayer({
@@ -64,7 +92,7 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
     id: "naps-circle",
     type: "circle",
     source: "naps",
-    paint: { "circle-radius": 7, "circle-color": NEUTRAL_NAP_COLOR },
+    paint: { "circle-radius": 7, "circle-color": statusColorExpression("status", NEUTRAL_NAP_COLOR) },
   });
   map.addLayer({
     id: "naps-label",
@@ -99,9 +127,13 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
   });
 }
 
-export default function NetworkMap({ network }: NetworkMapProps) {
+export default function NetworkMap({ network, highlight }: NetworkMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MaplibreMap | null>(null);
+  // Flips once the sources/layers exist, so the highlight effect below knows
+  // it is safe to call setFeatureState. Toggling it again on every style
+  // reload (including a fallback swap) is intentional, not just the first one.
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     if (mapRef.current !== null || containerRef.current === null) return;
@@ -147,6 +179,8 @@ export default function NetworkMap({ network }: NetworkMapProps) {
           }
           map.fitBounds(bounds, { padding: FIT_BOUNDS_PADDING_PX, animate: false });
         }
+
+        setIsReady(true);
       });
     })();
 
@@ -156,6 +190,35 @@ export default function NetworkMap({ network }: NetworkMapProps) {
       mapRef.current = null;
     };
   }, [network]);
+
+  // Applies the resolved highlight through setFeatureState — see design.md,
+  // decision 5: no layer is ever re-added for a turn, only paint state.
+  const previousHighlightRef = useRef<{ napIds: string[]; runIds: string[] }>({ napIds: [], runIds: [] });
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!isReady || map === null) return;
+
+    const previous = previousHighlightRef.current;
+    for (const napId of previous.napIds) {
+      map.removeFeatureState({ source: "naps", id: napId });
+    }
+    for (const runId of previous.runIds) {
+      map.removeFeatureState({ source: "runs", id: runId });
+    }
+
+    for (const [napId, status] of Object.entries(highlight.napStatus)) {
+      map.setFeatureState({ source: "naps", id: napId }, { status });
+    }
+    for (const runId of highlight.runIds) {
+      map.setFeatureState({ source: "runs", id: runId }, { onPath: highlight.runStatus[runId] });
+    }
+
+    previousHighlightRef.current = { napIds: Object.keys(highlight.napStatus), runIds: highlight.runIds };
+
+    if (highlight.bounds !== null) {
+      map.fitBounds(highlight.bounds, { padding: FIT_BOUNDS_PADDING_PX });
+    }
+  }, [highlight, isReady]);
 
   return <div ref={containerRef} className="h-full w-full" />;
 }
