@@ -1,26 +1,18 @@
-"use client";
-
 /**
- * Transitional wrapper around `ChatPanel` — see design.md, decision 4. This
- * file becomes a server component in task 5.3, once `Copilot` (the map plus
- * this panel) exists to render instead. Until then it keeps the chat
- * reachable and every check green.
+ * The map copilot's page. A server component: it loads the network and
+ * computes every NAP's budget once, server-side, and hands both down as
+ * props — see design.md, decision 1. `loadNetwork` uses `node:fs` and must
+ * stay out of any "use client" file; `Copilot` (client) is the only thing
+ * that touches the browser-only pieces (MapLibre, the chat's SSE reading).
  */
 
-import ChatPanel from "@/components/ChatPanel";
-import type { HighlightPayload } from "@/lib/assistant/events";
+import Copilot from "@/components/Copilot";
+import { loadNetwork } from "@/lib/network/load";
+import { calculateAllBudgets } from "@/lib/optical/budget";
 
-export default function ChatPage() {
-  function handleTurnDone(payload: HighlightPayload) {
-    // The map does not exist yet (Phase 3) — logging is the whole point here.
-    console.log("[FiberDesk] map highlight", payload);
-  }
+export default function Page() {
+  const network = loadNetwork();
+  const budgets = calculateAllBudgets(network);
 
-  return (
-    <div className="flex flex-1 flex-col items-center bg-zinc-50 dark:bg-black">
-      <main className="flex w-full max-w-2xl flex-1 flex-col">
-        <ChatPanel onTurnDone={handleTurnDone} />
-      </main>
-    </div>
-  );
+  return <Copilot network={network} budgets={budgets} />;
 }

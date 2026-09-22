@@ -86,7 +86,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
       from `formatBreakdown` for the selected NAP, with a status badge in the status colour and a
       close button. Verify in the browser: clicking NAP-12 shows 25.23 / 28.00 / 2.77 marginal and
       both hops; NAP-03 shows 7.98 / 20.02 pass — before any question is asked.
-- [ ] 5.3 Turn `src/app/page.tsx` into a server component: `loadNetwork()` +
+- [x] 5.3 Turn `src/app/page.tsx` into a server component: `loadNetwork()` +
       `calculateAllBudgets(network)` → `<Copilot network budgets />`. Verify `npm run build`
       succeeds and the page loads in the preview with map and chat side by side.
 
