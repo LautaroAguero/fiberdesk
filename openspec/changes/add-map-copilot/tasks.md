@@ -77,7 +77,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 5. Page composition
 
-- [ ] 5.1 Create `src/components/Copilot.tsx` ("use client") taking `network` and `budgets`; hold the
+- [x] 5.1 Create `src/components/Copilot.tsx` ("use client") taking `network` and `budgets`; hold the
       latest non-empty `HighlightPayload` (design.md decision 6) and `selectedNapId`; compute
       `resolveHighlight` with `useMemo`; import `maplibre-gl/dist/maplibre-gl.css`; layout per
       design.md decision 5 (map full height, chat right column ~400px on `md`+, stacked under `md`);
