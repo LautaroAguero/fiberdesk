@@ -36,6 +36,8 @@ export interface NetworkMapProps {
   network: Network;
   /** The current turn's resolved highlight — see design.md, decision 6 for how the parent tracks it. */
   highlight: ResolvedHighlight;
+  /** Called with a NAP's id when the user clicks it — any NAP, highlighted or not (spec: "Clicking a NAP shows its optical budget"). */
+  onSelectNap: (napId: string) => void;
 }
 
 /**
@@ -127,13 +129,20 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
   });
 }
 
-export default function NetworkMap({ network, highlight }: NetworkMapProps) {
+export default function NetworkMap({ network, highlight, onSelectNap }: NetworkMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MaplibreMap | null>(null);
   // Flips once the sources/layers exist, so the highlight effect below knows
   // it is safe to call setFeatureState. Toggling it again on every style
   // reload (including a fallback swap) is intentional, not just the first one.
   const [isReady, setIsReady] = useState(false);
+  // A ref, not a `useEffect` dependency: the click handler is bound once,
+  // below, and should always call whichever `onSelectNap` the latest render
+  // passed without needing to rebind the map listener for it.
+  const onSelectNapRef = useRef(onSelectNap);
+  useEffect(() => {
+    onSelectNapRef.current = onSelectNap;
+  }, [onSelectNap]);
 
   useEffect(() => {
     if (mapRef.current !== null || containerRef.current === null) return;
@@ -153,6 +162,20 @@ export default function NetworkMap({ network, highlight }: NetworkMapProps) {
         zoom: INITIAL_ZOOM,
       });
       mapRef.current = map;
+
+      // Any NAP is clickable, highlighted or not (spec: "Clicking a NAP shows
+      // its optical budget"). Bound once here rather than inside style.load,
+      // so a fallback style swap does not register a second listener.
+      map.on("mouseenter", "naps-circle", () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", "naps-circle", () => {
+        map.getCanvas().style.cursor = "";
+      });
+      map.on("click", "naps-circle", (mouseEvent) => {
+        const napId = mouseEvent.features?.[0]?.properties?.id as string | undefined;
+        if (napId !== undefined) onSelectNapRef.current(napId);
+      });
 
       // Spec: "The base map is unavailable" — if the OpenFreeMap style never
       // loads, fall back to a plain background rather than an empty map.
