@@ -32,7 +32,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
       an empty payload gives empty status, no runs, `bounds: null`; an unknown id `NAP-99` lands in
       `unknownIds` and does not affect the rest; the status in the result is the payload's even if
       a test passes a payload whose status differs from the budget's.
-- [ ] 2.3 Add `src/lib/map/breakdown.ts` with `formatBreakdown(result, napName)` returning display
+- [x] 2.3 Add `src/lib/map/breakdown.ts` with `formatBreakdown(result, napName)` returning display
       rows (per hop: run id, length km, fiber dB, splitter ratio + dB, connectors count + dB, splices
       count + dB; then by-source totals, total, budget, margin, status); add tests using the real
       engine on the seed: NAP-12 shows two hops (FR-03 with 1:2 at "3.50", FR-12 with 1:16 at
