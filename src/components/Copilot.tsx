@@ -14,9 +14,11 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useMemo, useState } from "react";
 
+import BudgetBreakdown from "@/components/BudgetBreakdown";
 import ChatPanel from "@/components/ChatPanel";
 import NetworkMap from "@/components/NetworkMap";
 import type { HighlightPayload } from "@/lib/assistant/events";
+import { formatBreakdown } from "@/lib/map/breakdown";
 import { resolveHighlight } from "@/lib/map/highlight";
 import type { BudgetResult } from "@/lib/optical/budget";
 import type { Network } from "@/lib/network/types";
@@ -39,6 +41,14 @@ export default function Copilot({ network, budgets }: CopilotProps) {
     () => resolveHighlight(highlightPayload ?? EMPTY_PAYLOAD, network, budgets),
     [highlightPayload, network, budgets],
   );
+
+  const selectedBreakdown = useMemo(() => {
+    if (selectedNapId === null) return null;
+    const result = budgets.find((budget) => budget.nap_id === selectedNapId);
+    const nap = network.splitters.find((candidate) => candidate.id === selectedNapId);
+    if (result === undefined || nap === undefined) return null;
+    return formatBreakdown(result, nap.name);
+  }, [selectedNapId, budgets, network]);
 
   function handleTurnDone(payload: HighlightPayload) {
     if (payload.highlight.length > 0) {
@@ -67,7 +77,9 @@ export default function Copilot({ network, budgets }: CopilotProps) {
           </button>
         )}
 
-        {/* The budget breakdown for `selectedNapId` lands in task 5.2. */}
+        {selectedBreakdown !== null && (
+          <BudgetBreakdown breakdown={selectedBreakdown} onClose={() => setSelectedNapId(null)} />
+        )}
       </div>
 
       <div className="h-[45vh] w-full border-t border-zinc-200 md:h-full md:w-[400px] md:shrink-0 md:border-t-0 md:border-l dark:border-zinc-800">
