@@ -253,22 +253,22 @@ carga y validación estructural del dataset, y el flujo de OpenSpec andando de p
 - **El mapa** (`src/components/NetworkMap.tsx`, MapLibre GL sobre tiles de OpenFreeMap, sin clave
   ni cuenta) dibuja toda la red al abrir la página — OLT, 12 NAPs, 12 tendidos, 28 clientes — y
   cae a un fondo liso si el estilo base no carga.
-- **Dos helpers puros más, con tests** (`src/lib/map/`): `resolveHighlight` traduce el
-  `HighlightPayload` de un turno en qué NAP colorear, qué tendidos marcar y a dónde encuadrar —
-  sin recorrer el árbol de nuevo, usa los `hops` que ya trae cada `BudgetResult` — y
-  `formatBreakdown` da formato al desglose por NAP sin tocar ningún número. `networkToGeoJson`
-  (de la Fase 1) alimenta las capas del mapa.
+- **Tres helpers puros, con tests** (`src/lib/map/`): `networkToGeoJson` convierte la red en las
+  capas del mapa; `resolveHighlight` traduce el `HighlightPayload` de un turno en qué NAP
+  colorear, qué tendidos marcar y a dónde encuadrar —sin recorrer el árbol de nuevo: usa los
+  `hops` que ya trae cada `BudgetResult`—; y `formatBreakdown` da formato al desglose por NAP sin
+  tocar ningún número.
 - **`src/app/page.tsx` es ahora un server component**: carga la red y calcula los doce
   presupuestos una sola vez, server-side, y se los pasa a `Copilot` (client), que compone el mapa
   con `ChatPanel` — el chat de la Fase 1, sacado de la página sin cambiar su lógica. Ningún
   número en pantalla sale del modelo ni se recalcula en el navegador.
+- **El worker de MapLibre se copia a `public/maplibre/`** antes de `dev` y `build`
+  (`scripts/copy-maplibre-worker.mjs`). MapLibre 6 lo busca relativo a su propio bundle y
+  Turbopack no lo emite: sin la copia, el mapa nunca termina de cargar.
 
-⚠️ **La verificación en navegador de esta fase quedó pendiente.** El entorno de esta sesión no
-pudo renderizar MapLibre — el pane de preview reporta `document.hidden`, lo que congela el loop de
-`requestAnimationFrame` del que depende la carga del estilo, confirmado con una reproducción
-mínima fuera del componente. El código pasa `npm test`, `npm run lint`, `npx tsc --noEmit` y
-`npm run build`; lo que falta por confirmar a mano, en un navegador real, son los checks visuales
-del grupo 6 de `tasks.md` y la corrida real contra la API (tarea 7.1, como en las Fases 1 y 2).
+Los checks visuales se verificaron en el navegador reproduciendo turnos grabados, sin llamar a
+la API (grupo 6 de `tasks.md`). **Falta la corrida real contra la API** (tarea 7.1), como en las
+Fases 1 y 2; hasta entonces la fase no está cerrada.
 
 **222 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
 reales. Las conductas que ningún test puede cubrir se verificaron a mano una vez contra la API
@@ -280,7 +280,7 @@ real, para las fases ya cerradas:
   responda citando la fuente, que una pregunta en español recupere del corpus en inglés, que
   señale la contradicción de atenuación en vez de elegir un valor en silencio, y que siga
   declinando la sensibilidad de la ONT.
-- Fase 3: pendiente — ver el aviso de arriba.
+- Fase 3: pendiente — la corrida real contra la API (tarea 7.1).
 
 ⚠️ **Este proyecto no tiene evals.** Si alguna de esas conductas se rompe más adelante, nada
 lo va a detectar automáticamente. Está documentado a propósito, no olvidado.
@@ -295,8 +295,8 @@ Cuatro capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budge
 `network-assistant` y `documentation-search`. La quinta, `network-map`, vive en
 `openspec/changes/add-map-copilot/specs/` hasta que la fase se archive.
 
-**Lo próximo:** cerrar la Fase 3 — verificación en navegador y contra la API real, después
-archivar el cambio — y luego la Fase 4 (producción).
+**Lo próximo:** cerrar la Fase 3 — la corrida real contra la API y archivar el cambio — y luego
+la Fase 4 (producción).
 
 Los nombres importan más de lo que parece: el modelo elige qué herramienta llamar leyendo el
 nombre y la descripción, y nada más. `summarize_` y `detail_` nombran **la forma de la

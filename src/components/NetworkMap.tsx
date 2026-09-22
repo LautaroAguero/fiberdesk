@@ -17,9 +17,11 @@ import type { ExpressionSpecification, Map as MaplibreMap } from "maplibre-gl";
 import {
   FALLBACK_STYLE,
   FIBER_COLOR,
+  FIT_BOUNDS_MAX_ZOOM,
   FIT_BOUNDS_PADDING_PX,
   INITIAL_CENTER,
   INITIAL_ZOOM,
+  MAPLIBRE_WORKER_URL,
   MAP_STYLE_URL,
   NEUTRAL_NAP_COLOR,
   OLT_COLOR,
@@ -31,6 +33,8 @@ import type { ResolvedHighlight } from "@/lib/map/highlight";
 import type { Network } from "@/lib/network/types";
 
 const LABEL_COLOR = "#27272a"; // Tailwind zinc-800 — legible on the light Positron base.
+// A font OpenFreeMap serves; MapLibre's default ("Open Sans Regular") 404s there.
+const LABEL_FONT = ["Noto Sans Regular"];
 
 export interface NetworkMapProps {
   network: Network;
@@ -102,6 +106,7 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
     source: "naps",
     layout: {
       "text-field": ["get", "id"],
+      "text-font": LABEL_FONT,
       "text-size": 11,
       "text-offset": [0, 1.2],
       "text-anchor": "top",
@@ -121,6 +126,7 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
     source: "olt",
     layout: {
       "text-field": ["get", "id"],
+      "text-font": LABEL_FONT,
       "text-size": 12,
       "text-offset": [0, 1.4],
       "text-anchor": "top",
@@ -136,6 +142,8 @@ export default function NetworkMap({ network, highlight, onSelectNap }: NetworkM
   // it is safe to call setFeatureState. Toggling it again on every style
   // reload (including a fallback swap) is intentional, not just the first one.
   const [isReady, setIsReady] = useState(false);
+  // True until the view is deliberately moved; see the "resize" handler below.
+  const keepInitialViewRef = useRef(true);
   // A ref, not a `useEffect` dependency: the click handler is bound once,
   // below, and should always call whichever `onSelectNap` the latest render
   // passed without needing to rebind the map listener for it.
@@ -150,8 +158,10 @@ export default function NetworkMap({ network, highlight, onSelectNap }: NetworkM
     let cancelled = false;
 
     void (async () => {
-      const { Map, LngLatBounds } = await import("maplibre-gl");
+      const { Map, LngLatBounds, setWorkerUrl } = await import("maplibre-gl");
       if (cancelled || containerRef.current === null) return;
+
+      setWorkerUrl(MAPLIBRE_WORKER_URL);
 
       const geojson = networkToGeoJson(network);
 
@@ -179,28 +189,45 @@ export default function NetworkMap({ network, highlight, onSelectNap }: NetworkM
 
       // Spec: "The base map is unavailable" — if the OpenFreeMap style never
       // loads, fall back to a plain background rather than an empty map.
-      // Guarded so a later, unrelated runtime error (e.g. a missing tile)
-      // cannot re-trigger it once the style has already loaded once.
-      let fellBack = false;
+      // Keyed on the style having loaded, not on `isStyleLoaded()`: that one
+      // is also false while tiles or glyphs are still in flight, so a single
+      // 404'd tile would otherwise throw away a perfectly good base map.
+      let styleSettled = false; // a style (base or fallback) has loaded, or the fallback is on its way
       map.on("error", () => {
-        if (fellBack || map.isStyleLoaded()) return;
-        fellBack = true;
+        if (styleSettled) return;
+        styleSettled = true;
         map.setStyle(FALLBACK_STYLE as unknown as string);
       });
 
-      let initialViewSet = false;
+      // Initial view: the OLT and every NAP (spec: "The seed network appears").
+      const initialBounds = new LngLatBounds();
+      initialBounds.extend(geojson.olt.features[0].geometry.coordinates as [number, number]);
+      for (const feature of geojson.naps.features) {
+        initialBounds.extend(feature.geometry.coordinates as [number, number]);
+      }
+      const fitInitialView = () => {
+        map.fitBounds(initialBounds, { padding: FIT_BOUNDS_PADDING_PX, animate: false });
+      };
+
+      // A map created in a hidden tab gets a 0×0 container, and a later resize
+      // keeps that zoom rather than the bounds. So the initial fit is re-applied
+      // on every resize until the view has been deliberately moved — by the
+      // user, or by a highlight reframing it.
+      map.on("resize", () => {
+        if (keepInitialViewRef.current) fitInitialView();
+      });
+      map.on("movestart", (moveEvent) => {
+        if (moveEvent.originalEvent !== undefined) keepInitialViewRef.current = false;
+      });
+
+      let overlayAdded = false;
       map.on("style.load", () => {
+        styleSettled = true;
         addNetworkOverlay(map, geojson);
 
-        if (!initialViewSet) {
-          initialViewSet = true;
-          // Initial view: the OLT and every NAP (spec: "The seed network appears").
-          const bounds = new LngLatBounds();
-          bounds.extend(geojson.olt.features[0].geometry.coordinates as [number, number]);
-          for (const feature of geojson.naps.features) {
-            bounds.extend(feature.geometry.coordinates as [number, number]);
-          }
-          map.fitBounds(bounds, { padding: FIT_BOUNDS_PADDING_PX, animate: false });
+        if (!overlayAdded) {
+          overlayAdded = true;
+          fitInitialView();
         }
 
         setIsReady(true);
@@ -239,7 +266,8 @@ export default function NetworkMap({ network, highlight, onSelectNap }: NetworkM
     previousHighlightRef.current = { napIds: Object.keys(highlight.napStatus), runIds: highlight.runIds };
 
     if (highlight.bounds !== null) {
-      map.fitBounds(highlight.bounds, { padding: FIT_BOUNDS_PADDING_PX });
+      keepInitialViewRef.current = false;
+      map.fitBounds(highlight.bounds, { padding: FIT_BOUNDS_PADDING_PX, maxZoom: FIT_BOUNDS_MAX_ZOOM });
     }
   }, [highlight, isReady]);
 

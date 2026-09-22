@@ -190,6 +190,11 @@ points at its hosted `positron` style. If that style can't be reached, the map f
 plain background and keeps the network overlay interactive — the overlay is the product, the tiles
 are decoration.
 
+MapLibre 6 loads its web worker from a URL relative to its own bundle, and Turbopack does not emit
+that file. `npm run dev` and `npm run build` therefore run `scripts/copy-maplibre-worker.mjs`
+first, which copies the worker from `node_modules` into `public/maplibre/` (git-ignored), and the
+map points MapLibre at it with `setWorkerUrl`.
+
 **Every figure the map shows still comes from the server, unchanged.** `src/app/page.tsx` is a
 server component: it loads the network and computes every NAP's budget once, with the same
 `calculateBudget` engine described above, and hands both down as props. When a turn ends, the

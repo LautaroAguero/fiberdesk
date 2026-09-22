@@ -18,6 +18,13 @@ import type { BudgetStatus } from "@/lib/optical/budget";
 export const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/positron";
 
 /**
+ * Where MapLibre loads its web worker from. Turbopack does not emit the
+ * worker MapLibre resolves relative to its own bundle, so
+ * `scripts/copy-maplibre-worker.mjs` copies it here before `dev` and `build`.
+ */
+export const MAPLIBRE_WORKER_URL = "/maplibre/maplibre-gl-worker.mjs";
+
+/**
  * Used when the style above fails to load (spec: "The base map is
  * unavailable"). A single background layer, no tile source, so the network
  * overlay still renders on a plain surface instead of a blank error state.
@@ -40,8 +47,18 @@ export const INITIAL_CENTER: [number, number] = [-58.9866, -27.4512];
 /** Initial zoom: wide enough that every NAP in the seed network is in view. */
 export const INITIAL_ZOOM = 11;
 
-/** Padding, in pixels, applied on every `fitBounds` call so markers aren't clipped by the viewport edge. */
-export const FIT_BOUNDS_PADDING_PX = 48;
+/**
+ * Padding, in pixels, applied on every `fitBounds` call. Large enough that a
+ * marker at the edge keeps its label below it and clears the "Clear
+ * highlight" button in the top-left corner.
+ */
+export const FIT_BOUNDS_PADDING_PX = 72;
+
+/**
+ * Closest zoom a highlight may reframe to. A single NAP near the OLT has a tiny
+ * bounding box; without a cap the view dives to street level and loses context.
+ */
+export const FIT_BOUNDS_MAX_ZOOM = 14;
 
 /**
  * Colour for each budget classification, reused by the map's highlight layer

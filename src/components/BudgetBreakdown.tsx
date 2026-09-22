@@ -48,8 +48,8 @@ export default function BudgetBreakdown({ breakdown, onClose }: BudgetBreakdownP
 
       <table className="w-full text-xs">
         <thead>
-          <tr className="text-left text-zinc-500">
-            <th className="font-normal">Hop</th>
+          <tr className="text-right text-zinc-500">
+            <th className="text-left font-normal">Hop</th>
             <th className="font-normal">Fiber</th>
             <th className="font-normal">Splitter</th>
             <th className="font-normal">Conn.</th>
@@ -58,19 +58,24 @@ export default function BudgetBreakdown({ breakdown, onClose }: BudgetBreakdownP
         </thead>
         <tbody>
           {breakdown.hops.map((hop) => (
-            <tr key={hop.run_id} className="border-t border-zinc-100 dark:border-zinc-800">
+            <tr key={hop.run_id} className="border-t border-zinc-100 align-top dark:border-zinc-800">
+              {/* Each cell: what the hop has, then what it costs — two lines, so five columns fit the card. */}
               <td className="py-1">
-                {hop.run_id} ({hop.length_km} km)
+                {hop.run_id}
+                <div className="text-zinc-500">{hop.length_km} km</div>
               </td>
-              <td>{hop.fiber_db} dB</td>
-              <td>
-                {hop.splitter_ratio} ({hop.splitter_db} dB)
+              <td className="py-1 text-right">{hop.fiber_db} dB</td>
+              <td className="py-1 text-right">
+                {hop.splitter_ratio}
+                <div className="text-zinc-500">{hop.splitter_db} dB</div>
               </td>
-              <td>
-                {hop.connectors} × ({hop.connectors_db} dB)
+              <td className="py-1 text-right">
+                {hop.connectors} ×
+                <div className="text-zinc-500">{hop.connectors_db} dB</div>
               </td>
-              <td>
-                {hop.splices} × ({hop.splices_db} dB)
+              <td className="py-1 text-right">
+                {hop.splices} ×
+                <div className="text-zinc-500">{hop.splices_db} dB</div>
               </td>
             </tr>
           ))}

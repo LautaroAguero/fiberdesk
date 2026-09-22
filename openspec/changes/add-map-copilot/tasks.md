@@ -56,22 +56,22 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 4. Map
 
-- [ ] 4.1 Create `src/components/NetworkMap.tsx` ("use client"): create the map once in an effect with
+- [x] 4.1 Create `src/components/NetworkMap.tsx` ("use client"): create the map once in an effect with
       a ref guard and `map.remove()` cleanup, via dynamic `import("maplibre-gl")`; add the four
       GeoJSON sources from `networkToGeoJson` with `promoteId: "id"` and layers — runs (line),
       subscribers (small circle), NAPs (circle + text label with the id), OLT (larger circle +
       label) — using the colours from `config.ts`; initial view fits the OLT and all NAPs. Verify in
       the browser preview (`fiberdesk-dev`) that 12 NAP labels and the OLT are visible over
       Resistencia and the console shows no errors.
-- [ ] 4.2 Add the fallback: on a style load `error`, switch to the fallback background style and
+- [x] 4.2 Add the fallback: on a style load `error`, switch to the fallback background style and
       re-add the overlay. Verify in the browser by temporarily pointing the style URL at an
       unreachable host: the network still draws on a plain background; then restore the URL.
-- [ ] 4.3 Apply the resolved highlight: props `highlight` (a `resolveHighlight` result) drive
+- [x] 4.3 Apply the resolved highlight: props `highlight` (a `resolveHighlight` result) drive
       `setFeatureState` on NAPs (`status`) and runs (`onPath`, with the status colour of the NAP it
       leads to), resetting previous state first; paint expressions read feature state (neutral when
       unset, thicker line on path); call `fitBounds(bounds, { padding })` when `bounds` is non-null.
       Verify with the replay in 6.1.
-- [ ] 4.4 Make NAPs clickable (pointer cursor on hover, click → `onSelectNap(id)`). Verify in the
+- [x] 4.4 Make NAPs clickable (pointer cursor on hover, click → `onSelectNap(id)`). Verify in the
       browser: clicking NAP-12 selects it (visible once 5.2 lands; until then, via a temporary
       `console.log` removed before commit).
 
@@ -82,7 +82,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
       `resolveHighlight` with `useMemo`; import `maplibre-gl/dist/maplibre-gl.css`; layout per
       design.md decision 5 (map full height, chat right column ~400px on `md`+, stacked under `md`);
       a "Clear highlight" button visible only when a highlight is active.
-- [ ] 5.2 Add the breakdown card (inside `Copilot` or `src/components/BudgetBreakdown.tsx`) rendered
+- [x] 5.2 Add the breakdown card (inside `Copilot` or `src/components/BudgetBreakdown.tsx`) rendered
       from `formatBreakdown` for the selected NAP, with a status badge in the status colour and a
       close button. Verify in the browser: clicking NAP-12 shows 25.23 / 28.00 / 2.77 marginal and
       both hops; NAP-03 shows 7.98 / 20.02 pass — before any question is asked.
@@ -92,18 +92,18 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 6. Browser verification (replayed, no API)
 
-- [ ] 6.1 Replay the reference turn: in the preview, override `window.fetch` for `/api/chat` with a
+- [x] 6.1 Replay the reference turn: in the preview, override `window.fetch` for `/api/chat` with a
       recorded SSE body (a few `text` events + `done` with NAP-12 marginal 2.77, NAP-09 fail -1.40,
       `fit_bounds: true`, and `messages` echoing the question), submit "which NAPs fail the optical
       budget?", and verify: text streams into the panel, NAP-12 is amber, NAP-09 red, the other ten
       neutral, paths FR-03→FR-12 and FR-04→FR-09 marked, view reframed to them. Screenshot.
-- [ ] 6.2 Replay a second turn whose `done` payload is empty: verify the highlight and view are
+- [x] 6.2 Replay a second turn whose `done` payload is empty: verify the highlight and view are
       unchanged. Then "Clear highlight": verify all NAPs neutral, no path marked.
-- [ ] 6.3 Replay a payload containing `NAP-99` plus NAP-01 pass: verify NAP-01 is highlighted,
+- [x] 6.3 Replay a payload containing `NAP-99` plus NAP-01 pass: verify NAP-01 is highlighted,
       nothing appears for NAP-99, no console error.
-- [ ] 6.4 Resize to mobile (375×812): map and chat stack, no horizontal scroll; then reset the
+- [x] 6.4 Resize to mobile (375×812): map and chat stack, no horizontal scroll; then reset the
       viewport to desktop. Screenshot.
-- [ ] 6.5 Full check: `npm test`, `npm run lint`, `npx tsc --noEmit`, `npm run build` all pass; the
+- [x] 6.5 Full check: `npm test`, `npm run lint`, `npx tsc --noEmit`, `npm run build` all pass; the
       test count is 196 plus the new ones.
 
 ## 7. Real-API verification (by hand, not the loop)

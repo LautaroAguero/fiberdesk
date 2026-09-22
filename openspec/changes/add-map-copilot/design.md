@@ -131,6 +131,25 @@ reference payload (`NAP-12 marginal 2.77`, `NAP-09 fail -1.40`, `fit_bounds: tru
 exists for this; it is a debugging aid only. One real run against the API happens once, by hand, at
 the end, and is recorded in `verification.md` like Phases 1 and 2.
 
+### 8. Adjustments found during browser verification
+
+Recorded here rather than silently folded into the decisions above:
+
+- **The MapLibre worker is served from `public/maplibre/`.** MapLibre 6 resolves its worker as
+  `new URL("./maplibre-gl-worker.mjs", import.meta.url)`; Turbopack does not emit that file, so the
+  request got Next's HTML 404 and the map never loaded. `scripts/copy-maplibre-worker.mjs` copies
+  the worker and the shared chunk it imports before `dev` and `build`; `NetworkMap` calls
+  `setWorkerUrl`. The copy is git-ignored, so it always matches the installed version.
+- **The initial fit is re-applied on resize until the view is moved.** A map created in a hidden
+  tab starts at 0×0, and MapLibre keeps the zoom rather than the bounds when it grows.
+- **The fallback triggers only if no style has loaded.** `isStyleLoaded()` is also false while
+  tiles and glyphs are in flight, so keying on it replaced a good base map after one 404'd glyph.
+- **Labels use `Noto Sans Regular`**, which OpenFreeMap serves; MapLibre's default font 404s there.
+- **Reframing uses 72 px of padding and a max zoom of 14**, so edge labels and the "Clear
+  highlight" button do not collide, and a single NAP near the OLT keeps some context.
+- **`ResolvedHighlight` carries `runStatus`**, the status colour for each marked run: `runIds`
+  alone cannot say which NAP's colour a run takes.
+
 ## Risks / Trade-offs
 
 - **[OpenFreeMap down or rate-limited]** → fallback background style (decision 5); the overlay is
