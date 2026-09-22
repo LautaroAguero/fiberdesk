@@ -248,7 +248,7 @@ carga y validación estructural del dataset, y el flujo de OpenSpec andando de p
   sensibilidad del receptor de la ONT no está documentada) y una **contradicción** (un documento
   da una atenuación de fibra distinta a la de `src/lib/optical/constants.ts`).
 
-**Fase 3 implementada.** El mapa copiloto que reemplaza la página de chat plana:
+**Fase 3 cerrada.** El mapa copiloto que reemplaza la página de chat plana:
 
 - **El mapa** (`src/components/NetworkMap.tsx`, MapLibre GL sobre tiles de OpenFreeMap, sin clave
   ni cuenta) dibuja toda la red al abrir la página — OLT, 12 NAPs, 12 tendidos, 28 clientes — y
@@ -266,9 +266,8 @@ carga y validación estructural del dataset, y el flujo de OpenSpec andando de p
   (`scripts/copy-maplibre-worker.mjs`). MapLibre 6 lo busca relativo a su propio bundle y
   Turbopack no lo emite: sin la copia, el mapa nunca termina de cargar.
 
-Los checks visuales se verificaron en el navegador reproduciendo turnos grabados, sin llamar a
-la API (grupo 6 de `tasks.md`). **Falta la corrida real contra la API** (tarea 7.1), como en las
-Fases 1 y 2; hasta entonces la fase no está cerrada.
+Los checks visuales se verificaron en el navegador reproduciendo turnos grabados, sin llamar a la
+API (grupo 6 de `tasks.md`), y la corrida real se hizo una vez a mano, como en las Fases 1 y 2.
 
 **222 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
 reales. Las conductas que ningún test puede cubrir se verificaron a mano una vez contra la API
@@ -280,7 +279,8 @@ real, para las fases ya cerradas:
   responda citando la fuente, que una pregunta en español recupere del corpus en inglés, que
   señale la contradicción de atenuación en vez de elegir un valor en silencio, y que siga
   declinando la sensibilidad de la ONT.
-- Fase 3: pendiente — la corrida real contra la API (tarea 7.1).
+- Fase 3 (`openspec/changes/add-map-copilot/verification.md`): que el mapa marque las cajas de la
+  respuesta y reencuadre, y que siga declinando la sensibilidad de la ONT con el mapa delante.
 
 ⚠️ **Este proyecto no tiene evals.** Si alguna de esas conductas se rompe más adelante, nada
 lo va a detectar automáticamente. Está documentado a propósito, no olvidado.
@@ -295,8 +295,8 @@ Cuatro capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budge
 `network-assistant` y `documentation-search`. La quinta, `network-map`, vive en
 `openspec/changes/add-map-copilot/specs/` hasta que la fase se archive.
 
-**Lo próximo:** cerrar la Fase 3 — la corrida real contra la API y archivar el cambio — y luego
-la Fase 4 (producción).
+**Lo próximo:** archivar el cambio `add-map-copilot` —que mueve `network-map` a
+`openspec/specs/`— y después la Fase 4 (producción), que es opcional.
 
 Los nombres importan más de lo que parece: el modelo elige qué herramienta llamar leyendo el
 nombre y la descripción, y nada más. `summarize_` y `detail_` nombran **la forma de la

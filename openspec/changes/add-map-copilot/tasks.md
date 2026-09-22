@@ -108,7 +108,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 7. Real-API verification (by hand, not the loop)
 
-- [ ] 7.1 With `ANTHROPIC_API_KEY` set, ask "¿qué cajas no cierran el presupuesto óptico?" and
+- [x] 7.1 With `ANTHROPIC_API_KEY` set, ask "¿qué cajas no cierran el presupuesto óptico?" and
       confirm the map highlights NAP-09 (fail) and NAP-12 (marginal) and reframes; ask a question
       the data cannot answer (ONT receiver sensitivity) and confirm the assistant declines and the
       map does not change. Record both in `verification.md` in this change folder.
