@@ -26,6 +26,10 @@ documentation and cite what it finds, and can compare a documented figure agains
 own optical constants. No vector database, no second service — see *The documentation corpus*,
 below, for why.
 
+**Phase 3 — the map copilot — done.** The plain chat page is now a full-screen map with the chat
+as a side panel. Every NAP the assistant highlights is coloured and reframed on the map, and any
+NAP can be clicked for its optical budget breakdown — see *The map*, below.
+
 ## Getting started
 
 ```bash
@@ -34,8 +38,9 @@ cp .env.example .env.local   # then set ANTHROPIC_API_KEY
 npm run dev
 ```
 
-The app runs at [http://localhost:3000](http://localhost:3000). Without a key, the chat page still
-loads and reports the missing variable as soon as you ask a question — see *Failing loudly*, below.
+The app runs at [http://localhost:3000](http://localhost:3000): the map and the network draw
+immediately, key or not. Without a key, the chat panel still loads and reports the missing
+variable as soon as you ask a question — see *Failing loudly*, below.
 
 ```bash
 npm test          # run the suite once
@@ -175,6 +180,38 @@ evals; see the `design.md` of the `add-conversational-layer` and `add-documentat
 changes (under `openspec/changes/`, or `openspec/changes/archive/` once archived) for what that
 costs.
 
+## The map
+
+`src/components/NetworkMap.tsx` draws the whole synthetic network — the OLT, all 12 NAPs, every
+fiber run along its stored geometry, and all 28 subscribers — on a [MapLibre
+GL](https://maplibre.org/) map, the moment the page opens. Base tiles come from
+[OpenFreeMap](https://openfreemap.org/), which needs no API key and no account: `src/lib/map/config.ts`
+points at its hosted `positron` style. If that style can't be reached, the map falls back to a
+plain background and keeps the network overlay interactive — the overlay is the product, the tiles
+are decoration.
+
+MapLibre 6 loads its web worker from a URL relative to its own bundle, and Turbopack does not emit
+that file. `npm run dev` and `npm run build` therefore run `scripts/copy-maplibre-worker.mjs`
+first, which copies the worker from `node_modules` into `public/maplibre/` (git-ignored), and the
+map points MapLibre at it with `setWorkerUrl`.
+
+**Every figure the map shows still comes from the server, unchanged.** `src/app/page.tsx` is a
+server component: it loads the network and computes every NAP's budget once, with the same
+`calculateBudget` engine described above, and hands both down as props. When a turn ends, the
+assistant's `HighlightPayload` — the same one the route handler has always emitted — is resolved
+against that data by `src/lib/map/highlight.ts` (`resolveHighlight`), a pure, unit-tested function
+that decides which NAPs to colour, which fiber runs lie on their path back to the OLT, and where
+to fit the view. The map component only calls MapLibre's `setFeatureState` with that result; it
+never recolours, reclassifies or recomputes anything itself.
+
+**Clicking any NAP** — highlighted or not, before or after asking a question — opens its full
+optical budget breakdown: `src/lib/map/breakdown.ts` (`formatBreakdown`) formats a `BudgetResult`
+into display rows, each numeric string exactly `value.toFixed(2)` of the figure the engine
+produced. The panel displays; it does not add, subtract or round.
+
+On a desktop-width screen the map fills the viewport with the chat as a ~400px right-hand column;
+on a narrow screen they stack, map above chat, with no horizontal scrolling.
+
 ## The documentation corpus
 
 `corpus/*.md` holds the technical documentation the assistant can search and cite. Each file is
@@ -231,6 +268,7 @@ npx openspec view   # interactive dashboard
 
 ## Stack
 
-Next.js (App Router) · TypeScript · Tailwind CSS · Vitest · the Anthropic SDK. No database, no
-second service, no second language — documentation search is BM25 in the same process as
-everything else. Phase 3 adds MapLibre GL.
+Next.js (App Router) · TypeScript · Tailwind CSS · Vitest · the Anthropic SDK · MapLibre GL. No
+database, no second service, no second language — documentation search is BM25 in the same
+process as everything else, and the map's base tiles are the one thing that comes from outside
+the app, from OpenFreeMap, with no key required.

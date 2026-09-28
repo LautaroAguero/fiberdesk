@@ -24,6 +24,25 @@ export function decodeSseEvent(frame: string): AssistantEvent {
 }
 
 /**
+ * Splits an SSE byte stream into complete frames as they arrive, holding
+ * back a trailing partial frame until the rest of it shows up in a later
+ * chunk. A frame boundary is a blank line (`\n\n`); a chunk from `fetch`'s
+ * reader has no guaranteed relationship to frame boundaries, so this has to
+ * buffer rather than assume one chunk is one frame.
+ */
+export function createFrameSplitter() {
+  let buffer = "";
+  return {
+    push(chunk: string): string[] {
+      buffer += chunk;
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop() ?? "";
+      return parts.filter((frame) => frame.trim() !== "");
+    },
+  };
+}
+
+/**
  * Builds the `ReadableStream` an `/api/chat` response body returns.
  *
  * `run` receives an `emit` function and is expected to call it for every
