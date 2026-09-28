@@ -4,11 +4,12 @@ An AI copilot over an FTTH network: an interactive map plus technical documentat
 
 ![FiberDesk: asked which NAPs fail the optical budget, the assistant answers in the side panel while the map colours NAP-09 red and NAP-12 amber and traces each one's fiber path back to the OLT](docs/map-copilot.png)
 
-*Asked "¿qué cajas no cierran el presupuesto óptico?", the assistant surveys all twelve NAPs, then
-details only the two that need it, while the map colours them by classification — NAP-09 failing in
-red, NAP-12 marginal in amber — and traces each one's path back to the OLT. Every figure in that
-answer came from the budget engine, not from the model. The answer shown is the one from the
-recorded live run in `openspec/changes/archive/2026-09-22-add-map-copilot/verification.md`.*
+*Asked "which NAPs fail the optical budget?" — in Spanish, as the screenshot shows — the assistant
+surveys all twelve NAPs, then details only the two that need it, while the map colours them by
+classification — NAP-09 failing in red, NAP-12 marginal in amber — and traces each one's path back
+to the OLT. Every figure in that answer came from the budget engine, not from the model. The answer
+shown is the one from the recorded live run in
+`openspec/changes/archive/2026-09-22-add-map-copilot/verification.md`.*
 
 You see the fiber infrastructure drawn on a map — the OLT, the splitter enclosures (NAPs), the
 fiber runs, the subscribers — and ask questions in plain language. The assistant answers *and*
