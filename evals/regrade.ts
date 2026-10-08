@@ -4,7 +4,7 @@
  * Re-applies the current graders and case expectations to a recorded run,
  * offline: no model call, no API key. Writes <run>.regraded.json beside the
  * original and prints what flipped. See
- * openspec/changes/add-eval-harness/design.md, decision 15.
+ * openspec/changes/archive/2026-10-08-add-eval-harness/design.md, decision 15.
  */
 
 import { readFileSync, writeFileSync } from "node:fs";

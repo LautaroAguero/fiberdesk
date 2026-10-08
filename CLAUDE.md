@@ -282,13 +282,15 @@ real, para las fases ya cerradas:
 - Fase 3 (`openspec/changes/archive/2026-09-22-add-map-copilot/verification.md`): que el mapa marque las cajas de la
   respuesta y reencuadre, y que siga declinando la sensibilidad de la ONT con el mapa delante.
 
-**Evals (Fase 4, primer ítem: `add-eval-harness`).** Esas conductas ya no dependen sólo de la
+**Evals (Fase 4, primer ítem: `add-eval-harness`, archivado).** La Fase 4 sigue abierta y no es
+desplegable por sí sola todavía: no hay deploy, y faltan `reduce-cost-per-question` y las tres
+capacidades del handoff. Esas conductas ya no dependen sólo de la
 verificación a mano: `npm run eval` le hace 21 casos al modelo real y los califica con graders
 deterministas, bajo un tope de gasto obligatorio. Cada corrida queda en `evals/runs/` y se puede
 **re-calificar offline** (`npm run eval:regrade`), sin clave ni llamadas. El costo y la latencia de
 cada llamada se miden en código (`src/lib/assistant/pricing.ts`, `usage.ts`).
 
-**Baseline** (`claude-opus-5`, effort `low`, una corrida, $1,03): **15/21 (71,4%, IC 95% 50,0–86,2%)**;
+**Baseline** (`claude-opus-5`, effort `low`, una corrida, $1,03): **16/21 (76,2%, IC 95% 54,9–89,4%)**;
 costo por pregunta mediana $0,0376, p95 $0,0663; latencia p95 13,1 s. Lo que falla: el modelo hace
 cuentas en la prosa (19,8 km, 0,23 dB) y a veces se queda en el censo sin pedir el desglose. El
 grader de grounding se validó a mano sobre las 21 respuestas (`evals/grader-validation.md`).
@@ -301,8 +303,8 @@ sólo el chat lo necesita.
 **No hay base de datos.** La red se lee de `seed/network.json` y la documentación de `corpus/`,
 las dos desde disco. Ver la nota bajo la tabla de fases para por qué se descartó pgvector.
 
-Cinco capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
-`network-assistant`, `documentation-search` y `network-map`.
+Seis capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
+`network-assistant`, `documentation-search`, `network-map` y `assistant-evals`.
 
 **Lo próximo:** `reduce-cost-per-question` (bajar a la mitad el costo por pregunta, medido contra
 este baseline) y después las tres capacidades del handoff `docs/handoff/2026-10-07-map-user-capabilities.md`,

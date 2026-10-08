@@ -199,11 +199,11 @@ system does not model. It calls the API under a mandatory spend cap and is never
 
 | Area | Passed | Rate | 95% Wilson interval |
 |---|---|---|---|
-| Optical budget questions | 4/8 | 50.0% | 21.5%–78.5% |
+| Optical budget questions | 5/8 | 62.5% | 30.6%–86.3% |
 | Documentation | 5/5 | 100.0% | 56.6%–100.0% |
 | Declining what the system cannot answer | 5/5 | 100.0% | 56.6%–100.0% |
 | Multi-turn follow-ups | 1/3 | 33.3% | 6.1%–79.2% |
-| **Overall** | **15/21** | **71.4%** | **50.0%–86.2%** |
+| **Overall** | **16/21** | **76.2%** | **54.9%–89.4%** |
 
 Per question: median cost **$0.0376**, p95 **$0.0663**; p95 latency **13.1 s** (median 8.5 s).
 The whole run cost $1.03.
@@ -226,11 +226,15 @@ Read these numbers for what they are:
   of the same configuration disagree has not been measured yet; that second run is the first step
   of `reduce-cost-per-question`, before any configuration is compared against this one.
 - **The intervals are wide.** With 3–8 cases per area, a per-area rate is context, not a headline;
-  even the overall interval spans 36 points.
+  even the overall interval spans 35 points.
 - **The grounding grader checks membership, not attribution** — a real number attached to the
   wrong NAP passes — and counts written as words ("nueve restantes") are not checked. It was
   validated by hand on all 21 answers before being trusted: after one fix, zero false positives
   and zero false negatives.
+- **One case was corrected after the run.** `budget-limit-es` required a map highlight that its
+  question does not need, against the eval's own design; removing that expectation moved it from
+  fail to pass (15/21 → 16/21). Recorded, with the reasoning, in
+  [`evals/grader-validation.md`](evals/grader-validation.md).
 
 ## The map
 

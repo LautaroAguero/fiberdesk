@@ -3,7 +3,7 @@
  *
  * Lists every case whose outcome flipped between two run records. Offline:
  * reads two files, calls nothing. See
- * openspec/changes/add-eval-harness/design.md, decision 13.
+ * openspec/changes/archive/2026-10-08-add-eval-harness/design.md, decision 13.
  */
 
 import { readFileSync } from "node:fs";
