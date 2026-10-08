@@ -10,11 +10,15 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { MAX_TOKENS, THINKING } from "@/lib/assistant/config";
+import { SYSTEM_PROMPT } from "@/lib/assistant/system-prompt";
+import { buildToolDefinitions } from "@/lib/assistant/tool-definitions";
 import { loadCorpus } from "@/lib/corpus/load";
 import { buildSearchIndex } from "@/lib/corpus/search";
 import { loadCases } from "@/lib/evals/cases";
 import { compareRuns } from "@/lib/evals/compare";
 import { regradeRecord } from "@/lib/evals/regrade";
+import { promptHash } from "@/lib/evals/runner";
 import { formatComparison, formatSummary } from "@/lib/evals/report";
 import type { RunRecord } from "@/lib/evals/types";
 import { loadNetwork } from "@/lib/network/load";
@@ -27,6 +31,21 @@ if (!file) {
 
 const original = JSON.parse(readFileSync(file, "utf8")) as RunRecord;
 const network = loadNetwork();
+// The tool definitions are a grounding source, and re-grading uses today's. If the prompt or the
+// tools changed since the run, say so: figures the model was given then may differ from now.
+const currentHash = promptHash(SYSTEM_PROMPT, buildToolDefinitions(network), {
+  max_tokens: MAX_TOKENS,
+  thinking: THINKING,
+  effort: original.effort,
+});
+if (currentHash !== original.prompt_hash) {
+  console.warn(
+    "Warning: the system prompt or tool definitions changed since this run " +
+      `(recorded ${original.prompt_hash.slice(0, 12)}, now ${currentHash.slice(0, 12)}). ` +
+      "Grounding uses today's tool definitions.\n",
+  );
+}
+
 const { record, issues } = regradeRecord(original, loadCases(network), network, buildSearchIndex(loadCorpus()));
 
 const out = path.join(path.dirname(file), `${path.basename(file, ".json").replace(/\.regraded$/, "")}.regraded.json`);

@@ -136,8 +136,9 @@ oracle SHALL be written by hand in the case, never computed by the engine under 
 ### Requirement: The grounding grader checks every number against the tool results
 
 The grounding grader SHALL extract every number from the graded answer and pass only if each one
-equals a number present in a tool result visible in the conversation or in the user's own messages.
-A number found in no source SHALL be reported as ungrounded; the grader never assumes it is right.
+equals a number in a tool result visible in the conversation, in the tool definitions the model was
+given, or in the user's own messages. A number found in no source SHALL be reported as ungrounded;
+the grader never assumes it is right.
 
 #### Scenario: Figures reproduced exactly, in Spanish notation
 
@@ -162,6 +163,12 @@ A number found in no source SHALL be reported as ungrounded; the grader never as
 
 - **WHEN** the user asks "¿qué cajas quedan por debajo de 4 dB de margen?" and the answer repeats 4
 - **THEN** 4 counts as grounded
+
+#### Scenario: A threshold the tool definitions state
+
+- **WHEN** the answer cites "the 3.00 dB recommended minimum" after calling only the survey tool,
+  whose rows carry no threshold but whose definition states the 3.00 dB default
+- **THEN** 3.00 counts as grounded — code supplied it, the model did not invent it
 
 #### Scenario: A sign-only match is a warning, not a pass
 

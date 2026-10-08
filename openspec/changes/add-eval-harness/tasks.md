@@ -156,20 +156,20 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 10. Baseline (live, by hand)
 
-- [ ] 10.1 Smoke run: `npm run eval -- --cases 'budget-failing-*' --max-usd 0.5`. Verify both cases
+- [x] 10.1 Smoke run: `npm run eval -- --cases 'budget-failing-*' --max-usd 0.5`. Verify both cases
       complete, read their records' per-call tokens and cost, and estimate the full run's cost
       before going on. Do not commit this record.
-- [ ] 10.2 One baseline run on the current configuration (`claude-opus-5`, effort `low`) with a cap
+- [x] 10.2 One baseline run on the current configuration (`claude-opus-5`, effort `low`) with a cap
       sized from 10.1 (at most $10): `npm run eval -- --max-usd <cap>`. Verify the record is
       `complete` (no errors, no skips) and commit it. If it is not complete, fix the cause and
       re-run only the affected cases (`--cases`) before continuing.
-- [ ] 10.3 Validate the grounding grader by hand on at least 15 answers from that record (every
+- [x] 10.3 Validate the grounding grader by hand on at least 15 answers from that record (every
       area, every answer it flagged), number by number; write `evals/grader-validation.md` with
       flagged vs human-judged numbers, false positives and false negatives per answer. If any false
       positive is found, fix the grader (with a regression test reproducing it), re-grade the record
       offline with `npm run eval:regrade`, commit the re-graded record, and repeat until it records
       zero false positives. No new live run.
-- [ ] 10.4 Replace the README's "this project has no evals" paragraph with the baseline table — pass
+- [x] 10.4 Replace the README's "this project has no evals" paragraph with the baseline table — pass
       rate per area and overall with *n* and 95% Wilson interval, median and p95 cost per question,
       p95 latency, the grader's known limits, and a plain statement that this is a single run whose
       noise floor is measured in `reduce-cost-per-question` — every figure copied from the committed

@@ -184,13 +184,53 @@ The loop, the dispatcher, the highlight projection and the SSE encoding are all 
 the model itself is not. Some behaviours can't be tested this way at all — that the assistant
 surveys before it drills into detail, that it says "I don't know" instead of inventing an answer,
 that it cites what it retrieves, and that it surfaces rather than silently resolves a disagreement
-between a document and the constants — and are verified by hand instead. This project has no
-evals; see the `design.md` of the `add-conversational-layer` and `add-documentation-search`
-changes (under `openspec/changes/`, or `openspec/changes/archive/` once archived) for what that
-costs.
+between a document and the constants. Those are measured by the live eval suite instead.
 
-Those behaviours are what the live eval suite is for — `npm run eval`, which calls the real model
-under a mandatory spend cap and is never part of `npm test`. See [`evals/README.md`](evals/README.md).
+### Evals
+
+`npm run eval` asks the real model 21 cases (24 questions, counting follow-ups) and checks every
+answer with deterministic graders — which tools it called and in what order, which NAPs the map
+highlighted, whether every figure in the prose came from a tool, whether it declined what the
+system does not model. It calls the API under a mandatory spend cap and is never part of
+`npm test`. How it works, and what each grader does *not* check: [`evals/README.md`](evals/README.md).
+
+**Baseline** — `claude-opus-5`, effort `low`, from
+[`evals/runs/2026-10-08T03-32-06Z.regraded.json`](evals/runs/2026-10-08T03-32-06Z.regraded.json):
+
+| Area | Passed | Rate | 95% Wilson interval |
+|---|---|---|---|
+| Optical budget questions | 4/8 | 50.0% | 21.5%–78.5% |
+| Documentation | 5/5 | 100.0% | 56.6%–100.0% |
+| Declining what the system cannot answer | 5/5 | 100.0% | 56.6%–100.0% |
+| Multi-turn follow-ups | 1/3 | 33.3% | 6.1%–79.2% |
+| **Overall** | **15/21** | **71.4%** | **50.0%–86.2%** |
+
+Per question: median cost **$0.0376**, p95 **$0.0663**; p95 latency **13.1 s** (median 8.5 s).
+The whole run cost $1.03.
+
+What fails, read by hand in [`evals/grader-validation.md`](evals/grader-validation.md):
+
+- **The model does arithmetic in prose.** Three answers state a figure no tool returned — "casi 20
+  km", "~19.8 km" (11.2 + 8.6), "0.23 dB" (3.00 − 2.77). Correct sums, but the rule here is that
+  the model computes nothing, and the grounding grader holds it to that.
+- **It sometimes stops at the survey.** Asked "which NAPs fail the optical budget?" in English, it
+  answered from the survey and *offered* the breakdown instead of fetching it, so the map
+  highlighted nothing; the Spanish phrasing surveyed and then detailed both NAPs. Asked for the
+  power reaching NAP-09, it said the system does not model received power — it does
+  (`detail_optical_budget` returns −26.4 dBm) — a wrong decline.
+- Declining and documentation questions passed every case.
+
+Read these numbers for what they are:
+
+- **This is a single run.** Models cannot be sampled deterministically here, and how much two runs
+  of the same configuration disagree has not been measured yet; that second run is the first step
+  of `reduce-cost-per-question`, before any configuration is compared against this one.
+- **The intervals are wide.** With 3–8 cases per area, a per-area rate is context, not a headline;
+  even the overall interval spans 36 points.
+- **The grounding grader checks membership, not attribution** — a real number attached to the
+  wrong NAP passes — and counts written as words ("nueve restantes") are not checked. It was
+  validated by hand on all 21 answers before being trusted: after one fix, zero false positives
+  and zero false negatives.
 
 ## The map
 
