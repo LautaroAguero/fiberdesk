@@ -45,34 +45,34 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 3. Cases and their loader
 
-- [ ] 3.1 Add `src/lib/evals/types.ts` (case, expectation, grader result, outcome, run record) and
+- [x] 3.1 Add `src/lib/evals/types.ts` (case, expectation, grader result, outcome, run record) and
       `src/lib/evals/cases.ts` with `loadCases(dir, network)` (design.md, decision 6). Add
       `cases.test.ts` with temporary fixture files: a valid set loads; a duplicate id fails naming
       both files; an oracle id `NAP-13` fails naming the case; an unknown tool name, an unknown
       area, an empty `turns` and malformed JSON each fail naming the file.
-- [ ] 3.2 Add the oracle cross-check to `cases.test.ts`: every case in `evals/cases/` tagged
+- [x] 3.2 Add the oracle cross-check to `cases.test.ts`: every case in `evals/cases/` tagged
       `oracle: "non_passing"` lists exactly the NAPs not `pass` in `seed/expected-budgets.json`
       (today NAP-09 and NAP-12). It passes vacuously until group 8 writes the cases; verify it by
       temporarily pointing it at a fixture case listing only NAP-09 and seeing it fail.
 
 ## 4. Graders
 
-- [ ] 4.1 Add `src/lib/evals/numbers.ts`: extract numeric tokens from answer text (sign incl. `−`,
+- [x] 4.1 Add `src/lib/evals/numbers.ts`: extract numeric tokens from answer text (sign incl. `−`,
       `.` or `,` decimals, both readings of `1.650` / `1,650`), excluding identifiers, splitter
       ratios and line-start list markers; and collect source numbers from parsed tool results (JSON
       numbers at any depth), `search_result` text blocks, and user turns. Add `numbers.test.ts`:
       "NAP-09: margen −1,40 dB; NAP-12 2.77 dB, splitter 1:16" → [−1.40, 2.77]; "1. Primero" → [];
       "1.650 tokens" → one token with readings 1.65 and 1650; "FR-03" and "OLT-RES-01" → []; "1490 nm" → [1490].
-- [ ] 4.2 Add `src/lib/evals/graders/grounding.ts` (design.md, decision 8). Add tests for every
+- [x] 4.2 Add `src/lib/evals/graders/grounding.ts` (design.md, decision 8). Add tests for every
       grounding scenario in `specs/assistant-evals/spec.md`: exact Spanish-notation pass; 2.7 vs
       2.77 fails naming 2.7; 20.8 vs runs 12 and 8.8 fails naming 20.8; a user-supplied 4 passes;
       1.40 vs −1.40 passes with a `sign_only` entry; a figure from an earlier turn's tool result
       passes in a follow-up.
-- [ ] 4.3 Add `graders/trajectory.ts` (required, required-with-input-match, required-any,
+- [x] 4.3 Add `graders/trajectory.ts` (required, required-with-input-match, required-any,
       forbidden, ordered by iteration, non-empty search result) with tests: survey@1 then detail@2
       passes; detail@1 then survey@2 fails naming the order; both in one iteration fails an order
       constraint; `min_margin_db: 4` input match passes on 4 and fails on 3; a forbidden tool fails.
-- [ ] 4.4 Add `graders/highlight.ts` (`equals` / `contains` over payload ids), `graders/abstention.ts`
+- [x] 4.4 Add `graders/highlight.ts` (`equals` / `contains` over payload ids), `graders/abstention.ts`
       (empty payload and grounding pass), `graders/figures.ts` and `graders/citation.ts`, each with
       tests from the spec's scenarios: {09, 12} equals passes; {06, 09, 12} fails naming NAP-06;
       ONT decline citing a tool-returned 28 passes; "−28 dBm" with no source fails; any payload
