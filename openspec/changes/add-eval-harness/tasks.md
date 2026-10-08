@@ -81,18 +81,18 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 5. Statistics and comparison
 
-- [ ] 5.1 Add `src/lib/evals/stats.ts`: pass rate, 95% Wilson interval, median, nearest-rank p95
+- [x] 5.1 Add `src/lib/evals/stats.ts`: pass rate, 95% Wilson interval, median, nearest-rank p95
       (design.md, decision 12). Add `stats.test.ts`: 17/20 → 85.0%, 64.0%–94.8%; 68/80 →
       75.6%–91.2%; 0/5 and 5/5 stay within [0, 1]; costs 0.01…0.20 → median 0.105, p95 0.19;
       a single value is its own median and p95; empty input throws.
-- [ ] 5.2 Add `src/lib/evals/compare.ts` with `compareRuns(a, b)` (design.md, decision 13). Add
+- [x] 5.2 Add `src/lib/evals/compare.ts` with `compareRuns(a, b)` (design.md, decision 13). Add
       `compare.test.ts`: one pass→fail and one fail→pass reported as 1 / 1 and named unstable; a
       case errored in one run and a case present in only one run are listed apart and excluded from
       the counts.
 
 ## 6. Runner orchestration
 
-- [ ] 6.1 Add `src/lib/evals/runner.ts` with `runEvalSuite({ cases, client, network, searchIndex,
+- [x] 6.1 Add `src/lib/evals/runner.ts` with `runEvalSuite({ cases, client, network, searchIndex,
       config, maxUsd, onProgress })`: runs cases sequentially, each turn through `runAssistantLoop`
       with the metered client, carrying the real message array into the next turn, grading only
       the final turn, and classifying `pass` / `fail` / `error` (API error or `truncated`) /
@@ -100,7 +100,7 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
       two-turn case sends the first turn's tool_use/tool_result blocks in the second request and
       grades only the second answer; a thrown client error yields `error` and an `incomplete` run;
       a refusal stop reason is graded, not an error.
-- [ ] 6.2 Add the spend cap and record assembly to `runner.ts`, with `promptHash(system, tools,
+- [x] 6.2 Add the spend cap and record assembly to `runner.ts`, with `promptHash(system, tools,
       settings)` (SHA-256 over canonical JSON). Tests: cap $1.00, $0.90 spent, max case $0.15 →
       the next case and all later ones are `skipped_budget`, run `partial`; an unpriced model stops
       the run after its case, naming the model; a missing or non-positive cap throws before any
