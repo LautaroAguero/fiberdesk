@@ -110,14 +110,14 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 7. Entry points and documentation
 
-- [ ] 7.1 Add `evals/run.ts`: parse `--max-usd` (required), `--cases`, `--model`, `--effort`;
+- [x] 7.1 Add `evals/run.ts`: parse `--max-usd` (required), `--cases`, `--model`, `--effort`;
       load network, corpus and cases; build the real client; call `runEvalSuite`; write
       `evals/runs/<UTC timestamp>.json`; print the summary table. Add `evals/compare.ts`: read two
       records, print `compareRuns`. Verify without spending: `npm run eval` with no `--max-usd`
       exits non-zero naming the cap, and with a cap but no `ANTHROPIC_API_KEY` exits non-zero naming
       the variable, both before any request; `npm run eval:compare` on two hand-made fixture records
       prints the expected flips.
-- [ ] 7.2 Add `evals/README.md`: how to run, the cap, what each grader checks and does not check
+- [x] 7.2 Add `evals/README.md`: how to run, the cap, what each grader checks and does not check
       (membership, not attribution), where records go, how to compare two runs. Update the main
       README's "Tests never call the API" section to point to it, keeping the "no evals" sentence
       until group 9 replaces it with numbers. Verify the commands documented match `package.json`.
