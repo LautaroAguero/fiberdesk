@@ -12,7 +12,7 @@ import {
   loadCases,
   type ExpectedBudgets,
 } from "@/lib/evals/cases";
-import type { EvalCase } from "@/lib/evals/types";
+import { AREAS, type EvalCase } from "@/lib/evals/types";
 import { loadNetwork } from "@/lib/network/load";
 
 const network = loadNetwork();
@@ -134,5 +134,16 @@ describe("the non_passing oracle agrees with seed/expected-budgets.json", () => 
     if (!existsSync(CASES_DIR)) return;
     const cases = loadCases(network);
     expect(checkNonPassingOracles(cases, expected)).toEqual([]);
+  });
+});
+
+describe("the committed case set", () => {
+  test("loads, covers every area, and holds the reference question in both languages", () => {
+    const cases = loadCases(network);
+    for (const area of AREAS) {
+      expect(cases.filter((c) => c.area === area).length, area).toBeGreaterThan(0);
+    }
+    const tagged = cases.filter((c) => c.expect.highlight?.oracle === "non_passing").map((c) => c.id);
+    expect(tagged).toEqual(expect.arrayContaining(["budget-failing-en", "budget-failing-es"]));
   });
 });

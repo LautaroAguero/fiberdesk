@@ -124,11 +124,11 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 8. The baseline cases
 
-- [ ] 8.1 Write `evals/cases/budget.json` and `evals/cases/docs.json` with the cases in design.md,
+- [x] 8.1 Write `evals/cases/budget.json` and `evals/cases/docs.json` with the cases in design.md,
       decision 14, each with its `source` (the verification.md section it converts, or "new").
       Verify `loadCases` accepts them in a test and the oracle cross-check from 3.2 now checks
       `budget-failing-en` and `budget-failing-es` against the seed.
-- [ ] 8.2 Write `evals/cases/abstention.json` and `evals/cases/conversation.json` likewise. Verify
+- [x] 8.2 Write `evals/cases/abstention.json` and `evals/cases/conversation.json` likewise. Verify
       the loader accepts all four files: 21 cases, 4 areas, no duplicate ids.
 
 ## 9. Baseline runs (live, by hand)

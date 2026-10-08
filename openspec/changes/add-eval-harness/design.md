@@ -294,7 +294,7 @@ Areas and cases (the case files are the source of truth; this is the starting se
 | budget | `budget-why-nap12-es` | "¿por qué la NAP-12 está al límite?" | trajectory (detail NAP-12), highlight = {12}, grounding, figures 13.5 / 3.5 |
 | budget | `budget-detail-nap07` | "give me the loss breakdown for NAP-07" | trajectory (detail NAP-07), highlight = {07}, grounding |
 | budget | `budget-rx-nap09-es` | "¿con cuánta potencia llega la señal a la NAP-09?" | trajectory (detail NAP-09), highlight = {09}, grounding, figures −26.4 |
-| budget | `budget-margin-4db-es` | "¿qué cajas quedan por debajo de 4 dB de margen?" | trajectory (survey with `min_margin_db: 4`), grounding — *hard*: NAP-06 (3.44) joins |
+| budget | `budget-margin-4db-es` | "¿qué cajas quedan por debajo de 4 dB de margen?" | trajectory (survey with `min_margin_db: 4`), grounding, figures 3.44 — *hard*: NAP-06 (3.44) joins |
 | budget | `budget-nap01-ok-es` | "¿la NAP-01 cierra el presupuesto?" | trajectory (survey or detail), grounding |
 | docs | `docs-cascade-en` | "How does cascaded splitter loss affect a link budget?" | trajectory (search), citation, grounding, highlight empty |
 | docs | `docs-rain-es` | "¿por qué se cae la señal cuando llueve?" | trajectory (search, non-empty result), citation, grounding |

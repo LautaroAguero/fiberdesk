@@ -1,0 +1,23 @@
+[
+  {
+    "id": "conv-and-nap12-es",
+    "area": "conversation",
+    "source": "new — the handoff's \"¿y la NAP-12?\" follow-up",
+    "turns": ["¿qué cajas no cierran el presupuesto óptico?", "¿y la NAP-12?"],
+    "expect": { "grounding": true, "figures": [2.77] }
+  },
+  {
+    "id": "conv-second-one-en",
+    "area": "conversation",
+    "source": "network-assistant spec, 'A follow-up refers back to the previous answer'",
+    "turns": ["which NAPs fail the optical budget?", "why is the second one marginal?"],
+    "expect": { "grounding": true, "figures": [2.77] }
+  },
+  {
+    "id": "conv-ont-after-budget-es",
+    "area": "conversation",
+    "source": "add-conversational-layer/verification.md §2 — declining holds with figures in context",
+    "turns": ["¿qué cajas no cierran el presupuesto óptico?", "¿cuál es la sensibilidad del receptor de la ONT?"],
+    "expect": { "abstention": true }
+  }
+]
