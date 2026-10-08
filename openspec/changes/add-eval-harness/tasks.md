@@ -9,35 +9,35 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 
 ## 1. Setup
 
-- [ ] 1.1 Install `tsx` as a dev dependency; add `"eval": "tsx --env-file-if-exists=.env.local evals/run.ts"`
+- [x] 1.1 Install `tsx` as a dev dependency; add `"eval": "tsx --env-file-if-exists=.env.local evals/run.ts"`
       and `"eval:compare": "tsx evals/compare.ts"` to `package.json`; extend `eslint` and `tsconfig`
       coverage to `evals/` if they do not already reach it. Verify a two-line `evals/run.ts` stub that
       imports `@/lib/optical/constants` and prints `FIBER_DB_PER_KM` prints `0.25` under
       `npx tsx` (the path alias resolves), and `npm test` still passes with its existing count.
-- [ ] 1.2 Move `MODEL`, `MAX_TOKENS`, `EFFORT` from `src/app/api/chat/route.ts`, and the thinking
+- [x] 1.2 Move `MODEL`, `MAX_TOKENS`, `EFFORT` from `src/app/api/chat/route.ts`, and the thinking
       setting from `loop.ts`, into `src/lib/assistant/config.ts` (design.md, decision 2), each with
       a comment; the route and the loop import them. Values unchanged. Verify the existing loop
       test asserting the request's `thinking` still passes and `grep -n "claude-opus-5" src/app` finds nothing.
 
 ## 2. Usage and cost per model call (`network-assistant`)
 
-- [ ] 2.1 Add `src/lib/assistant/pricing.ts`: per-model input, output, cache-write (5 min) and
+- [x] 2.1 Add `src/lib/assistant/pricing.ts`: per-model input, output, cache-write (5 min) and
       cache-read rates in USD per million tokens for `claude-opus-5`, `claude-opus-5-5`,
       `claude-sonnet-5-5`, with `PRICES_VERIFIED_ON`, the source, and each derived rate marked as
       derived (design.md, decision 4); and `computeCost(model, usage)`. Add `pricing.test.ts`:
       Opus 5, 2,000 in / 500 out → `0.0225`; Opus 5, 1,000 in / 3,000 cache-read / 200 out →
       `0.0115`; cache-write tokens priced at 6.25; `null` usage fields treated as 0; an unlisted
       model → `null`.
-- [ ] 2.2 Add `iteration` (1-based model call index) to `ToolCallRecord` in `loop.ts`. Extend
+- [x] 2.2 Add `iteration` (1-based model call index) to `ToolCallRecord` in `loop.ts`. Extend
       `loop.test.ts`: a survey turn then a two-detail parallel turn yields iterations 1, 2, 2.
-- [ ] 2.3 Add `src/lib/assistant/usage.ts` with `withUsageMetering(client, onCall, clock?)` and
+- [x] 2.3 Add `src/lib/assistant/usage.ts` with `withUsageMetering(client, onCall, clock?)` and
       `summarizeTurn(calls, toolCalls)` (design.md, decision 3). Add `usage.test.ts` with the fake
       client and an injected clock: one record per call with the served `message.model`, the four
       token counts, latency and cost; a three-call turn summarizes to 3 iterations, summed tokens
       and cost, and the trajectory `summarize_optical_budgets`@1, `detail_optical_budget`@2 ×2;
       when the second call throws, the first call's record was still emitted; an unpriced model
       yields `cost: null` and a summary whose cost is `null` with the model named.
-- [ ] 2.4 Wrap the client in `route.ts` with `withUsageMetering` and log one
+- [x] 2.4 Wrap the client in `route.ts` with `withUsageMetering` and log one
       `console.info(JSON.stringify({ event: "assistant_turn", ... }))` line per turn with the
       summary and no message text. Verify by reading the diff that the SSE events and `done`
       payload are built exactly as before, and that `npm test` passes unchanged in count except for

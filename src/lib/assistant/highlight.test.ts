@@ -18,6 +18,7 @@ function record(name: string, input: unknown): ToolCallRecord {
     input,
     result: isError ? null : typeof content === "string" ? JSON.parse(content) : content,
     isError,
+    iteration: 1,
   };
 }
 
