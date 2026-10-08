@@ -1,0 +1,58 @@
+[
+  {
+    "id": "docs-cascade-en",
+    "area": "docs",
+    "source": "add-documentation-search/verification.md §1",
+    "turns": ["How does cascaded splitter loss affect a link budget?"],
+    "expect": {
+      "trajectory": { "required": ["search_documentation"] },
+      "highlight": { "mode": "equals", "ids": [] },
+      "citation": true,
+      "grounding": true
+    }
+  },
+  {
+    "id": "docs-rain-es",
+    "area": "docs",
+    "source": "add-documentation-search/verification.md §2",
+    "turns": ["¿por qué se cae la señal cuando llueve?"],
+    "expect": {
+      "trajectory": { "required": [{ "tool": "search_documentation", "nonempty_result": true }] },
+      "citation": true,
+      "grounding": true
+    }
+  },
+  {
+    "id": "docs-attenuation-en",
+    "area": "docs",
+    "source": "add-documentation-search/verification.md §3",
+    "turns": ["What fiber attenuation value at 1490nm should I assume?"],
+    "expect": {
+      "trajectory": { "required": ["search_documentation", "get_optical_constants"] },
+      "figures": [0.22, 0.25],
+      "grounding": true
+    }
+  },
+  {
+    "id": "docs-attenuation-es",
+    "area": "docs",
+    "source": "add-documentation-search/verification.md §3, in Spanish",
+    "turns": ["¿qué atenuación de fibra a 1490 nm tengo que asumir?"],
+    "expect": {
+      "trajectory": { "required": ["search_documentation", "get_optical_constants"] },
+      "figures": [0.22, 0.25],
+      "grounding": true
+    }
+  },
+  {
+    "id": "docs-connector-es",
+    "area": "docs",
+    "source": "new",
+    "turns": ["¿qué pérdida por conector usa el sistema para calcular?"],
+    "expect": {
+      "trajectory": { "required": ["get_optical_constants"] },
+      "figures": [0.4],
+      "grounding": true
+    }
+  }
+]

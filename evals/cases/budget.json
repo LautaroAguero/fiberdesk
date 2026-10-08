@@ -1,0 +1,98 @@
+[
+  {
+    "id": "budget-failing-en",
+    "area": "budget",
+    "source": "add-conversational-layer/verification.md §1",
+    "turns": ["which NAPs fail the optical budget?"],
+    "expect": {
+      "trajectory": {
+        "required": ["summarize_optical_budgets", "detail_optical_budget"],
+        "order": [["summarize_optical_budgets", "detail_optical_budget"]]
+      },
+      "highlight": { "mode": "equals", "ids": ["NAP-09", "NAP-12"], "oracle": "non_passing" },
+      "grounding": true
+    }
+  },
+  {
+    "id": "budget-failing-es",
+    "area": "budget",
+    "source": "add-map-copilot/verification.md §1",
+    "turns": ["¿qué cajas no cierran el presupuesto óptico?"],
+    "expect": {
+      "trajectory": {
+        "required": ["summarize_optical_budgets", "detail_optical_budget"],
+        "order": [["summarize_optical_budgets", "detail_optical_budget"]]
+      },
+      "highlight": { "mode": "equals", "ids": ["NAP-09", "NAP-12"], "oracle": "non_passing" },
+      "grounding": true
+    }
+  },
+  {
+    "id": "budget-limit-es",
+    "area": "budget",
+    "source": "new",
+    "turns": ["¿hay alguna caja al límite del margen?"],
+    "expect": {
+      "trajectory": { "required": ["summarize_optical_budgets"] },
+      "highlight": { "mode": "contains", "ids": ["NAP-12"] },
+      "grounding": true,
+      "figures": [2.77]
+    }
+  },
+  {
+    "id": "budget-why-nap12-es",
+    "area": "budget",
+    "source": "new — the cascade explanation of CLAUDE.md's reference flow, step 4",
+    "turns": ["¿por qué la NAP-12 está al límite?"],
+    "expect": {
+      "trajectory": { "required": [{ "tool": "detail_optical_budget", "input": { "nap_id": "NAP-12" } }] },
+      "highlight": { "mode": "equals", "ids": ["NAP-12"] },
+      "grounding": true,
+      "figures": [13.5, 3.5]
+    }
+  },
+  {
+    "id": "budget-detail-nap07",
+    "area": "budget",
+    "source": "new",
+    "turns": ["give me the loss breakdown for NAP-07"],
+    "expect": {
+      "trajectory": { "required": [{ "tool": "detail_optical_budget", "input": { "nap_id": "NAP-07" } }] },
+      "highlight": { "mode": "equals", "ids": ["NAP-07"] },
+      "grounding": true
+    }
+  },
+  {
+    "id": "budget-rx-nap09-es",
+    "area": "budget",
+    "source": "new",
+    "turns": ["¿con cuánta potencia llega la señal a la NAP-09?"],
+    "expect": {
+      "trajectory": { "required": [{ "tool": "detail_optical_budget", "input": { "nap_id": "NAP-09" } }] },
+      "highlight": { "mode": "equals", "ids": ["NAP-09"] },
+      "grounding": true,
+      "figures": [-26.4]
+    }
+  },
+  {
+    "id": "budget-margin-4db-es",
+    "area": "budget",
+    "source": "new — hard: at a 4 dB threshold NAP-06 (3.44 dB) joins NAP-09 and NAP-12",
+    "turns": ["¿qué cajas quedan por debajo de 4 dB de margen?"],
+    "expect": {
+      "trajectory": { "required": [{ "tool": "summarize_optical_budgets", "input": { "min_margin_db": 4 } }] },
+      "grounding": true,
+      "figures": [3.44]
+    }
+  },
+  {
+    "id": "budget-nap01-ok-es",
+    "area": "budget",
+    "source": "new",
+    "turns": ["¿la NAP-01 cierra el presupuesto?"],
+    "expect": {
+      "trajectory": { "required_any": ["summarize_optical_budgets", "detail_optical_budget"] },
+      "grounding": true
+    }
+  }
+]

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 
+import { THINKING } from "@/lib/assistant/config";
 import { runAssistantLoop } from "@/lib/assistant/loop";
 import { buildToolDefinitions, DETAIL_TOOL_NAME, SUMMARIZE_TOOL_NAME } from "@/lib/assistant/tool-definitions";
 import { buildSearchIndex } from "@/lib/corpus/search";
@@ -106,6 +107,50 @@ describe("4.1 the manual loop", () => {
 
     expect(result.toolCalls[0].isError).toBe(true);
     expect(result.stopReason).toBe("end_turn");
+  });
+});
+
+describe("the request settings", () => {
+  test("every request carries the shared thinking setting from config", async () => {
+    const { client, requests } = createFakeModelClient([
+      { message: makeFixtureMessage({ content: [textBlock("hi")], stop_reason: "end_turn" }) },
+    ]);
+
+    await runAssistantLoop(baseParams(client, "hi"));
+
+    expect(requests[0].thinking).toEqual(THINKING);
+    expect(requests[0].thinking).toEqual({ type: "adaptive", display: "summarized" });
+  });
+});
+
+describe("tool calls record their iteration", () => {
+  test("a survey turn then a two-detail parallel turn yields iterations 1, 2, 2", async () => {
+    const { client } = createFakeModelClient([
+      {
+        message: makeFixtureMessage({
+          content: [toolUseBlock("toolu_1", SUMMARIZE_TOOL_NAME, {})],
+          stop_reason: "tool_use",
+        }),
+      },
+      {
+        message: makeFixtureMessage({
+          content: [
+            toolUseBlock("toolu_2", DETAIL_TOOL_NAME, { nap_id: "NAP-09" }),
+            toolUseBlock("toolu_3", DETAIL_TOOL_NAME, { nap_id: "NAP-12" }),
+          ],
+          stop_reason: "tool_use",
+        }),
+      },
+      { message: makeFixtureMessage({ content: [textBlock("done")], stop_reason: "end_turn" }) },
+    ]);
+
+    const result = await runAssistantLoop(baseParams(client, "which fail?"));
+
+    expect(result.toolCalls.map((call) => [call.name, call.iteration])).toEqual([
+      [SUMMARIZE_TOOL_NAME, 1],
+      [DETAIL_TOOL_NAME, 2],
+      [DETAIL_TOOL_NAME, 2],
+    ]);
   });
 });
 

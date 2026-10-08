@@ -189,6 +189,9 @@ evals; see the `design.md` of the `add-conversational-layer` and `add-documentat
 changes (under `openspec/changes/`, or `openspec/changes/archive/` once archived) for what that
 costs.
 
+Those behaviours are what the live eval suite is for — `npm run eval`, which calls the real model
+under a mandatory spend cap and is never part of `npm test`. See [`evals/README.md`](evals/README.md).
+
 ## The map
 
 `src/components/NetworkMap.tsx` draws the whole synthetic network — the OLT, all 12 NAPs, every

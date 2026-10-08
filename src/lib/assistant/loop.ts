@@ -16,6 +16,7 @@
 
 import type Anthropic from "@anthropic-ai/sdk";
 
+import { THINKING } from "@/lib/assistant/config";
 import { runToolUse } from "@/lib/assistant/dispatcher";
 import type { AssistantEvent } from "@/lib/assistant/events";
 import type { AssistantModelClient } from "@/lib/assistant/model-client";
@@ -33,6 +34,13 @@ export interface ToolCallRecord {
    */
   result: unknown;
   isError: boolean;
+  /**
+   * The 1-based model call that requested this tool. Calls the model made in
+   * parallel share one iteration — which is how a trajectory tells "detail
+   * after survey" from "both at once". See design.md (add-eval-harness),
+   * decision 3.
+   */
+  iteration: number;
 }
 
 export interface RunAssistantLoopParams {
@@ -80,7 +88,7 @@ export async function runAssistantLoop(
       system,
       tools,
       messages,
-      thinking: { type: "adaptive", display: "summarized" },
+      thinking: THINKING,
       ...(effort ? { output_config: { effort } } : {}),
     });
 
@@ -114,6 +122,7 @@ export async function runAssistantLoop(
             ? JSON.parse(resultBlock.content)
             : resultBlock.content,
         isError: Boolean(resultBlock.is_error),
+        iteration: iteration + 1,
       });
 
       onEvent({

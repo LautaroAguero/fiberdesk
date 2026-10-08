@@ -1,0 +1,40 @@
+[
+  {
+    "id": "abstain-ont-en",
+    "area": "abstention",
+    "source": "add-documentation-search/verification.md §4",
+    "turns": ["What is the ONT receiver sensitivity?"],
+    "expect": { "abstention": true }
+  },
+  {
+    "id": "abstain-ont-es",
+    "area": "abstention",
+    "source": "add-map-copilot/verification.md §2",
+    "turns": ["¿cuál es la sensibilidad del receptor de la ONT?"],
+    "expect": { "abstention": true }
+  },
+  {
+    "id": "abstain-nap13-es",
+    "area": "abstention",
+    "source": "network-assistant spec, 'An entity the network does not contain'",
+    "turns": ["¿cuál es el margen de la NAP-13?"],
+    "expect": { "abstention": true }
+  },
+  {
+    "id": "abstain-vendor-es",
+    "area": "abstention",
+    "source": "network-assistant spec, 'A question outside the domain'",
+    "turns": ["¿qué marca de ONT me conviene comprar?"],
+    "expect": {
+      "abstention": true,
+      "trajectory": { "forbidden": ["summarize_optical_budgets", "detail_optical_budget"] }
+    }
+  },
+  {
+    "id": "abstain-docs-gap-en",
+    "area": "abstention",
+    "source": "documentation-search spec, 'The corpus does not cover the subject'",
+    "turns": ["What OLT firmware version do you recommend?"],
+    "expect": { "abstention": true }
+  }
+]

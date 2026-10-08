@@ -10,24 +10,17 @@
 
 import type Anthropic from "@anthropic-ai/sdk";
 
+import { EFFORT, MAX_TOKENS, MODEL } from "@/lib/assistant/config";
 import { runAssistantLoop } from "@/lib/assistant/loop";
 import { createAnthropicClient, createModelClient } from "@/lib/assistant/model-client";
 import { projectHighlight } from "@/lib/assistant/highlight";
 import { createSseStream } from "@/lib/assistant/stream";
+import { summarizeTurn, withUsageMetering, type ModelCallRecord } from "@/lib/assistant/usage";
 import { SYSTEM_PROMPT } from "@/lib/assistant/system-prompt";
 import { buildToolDefinitions } from "@/lib/assistant/tool-definitions";
 import { buildSearchIndex } from "@/lib/corpus/search";
 import { loadCorpus } from "@/lib/corpus/load";
 import { loadNetwork } from "@/lib/network/load";
-
-const MODEL = "claude-opus-5";
-
-// Streaming, so the effort and thinking-display settings below are actually
-// visible to the user rather than arriving as one silent pause. See
-// design.md, decision 7 — these three settings exist for the thirty-second
-// demo, not for output quality.
-const MAX_TOKENS = 4096;
-const EFFORT = "low" as const;
 
 interface ChatRequestBody {
   messages: Anthropic.MessageParam[];
@@ -78,21 +71,36 @@ export async function POST(request: Request): Promise<Response> {
   const tools = buildToolDefinitions(network);
   const messages = body.messages;
 
-  const stream = createSseStream(async (emit) => {
-    const result = await runAssistantLoop({
-      client,
-      model: MODEL,
-      maxTokens: MAX_TOKENS,
-      system: SYSTEM_PROMPT,
-      tools,
-      network,
-      searchIndex,
-      messages,
-      effort: EFFORT,
-      onEvent: emit,
-    });
+  // Every model call this turn makes is metered, and the turn's sum is logged
+  // once, server-side, after the turn ends — whether it finished or threw. The
+  // log carries no conversation text. See design.md (add-eval-harness),
+  // decision 3; the user-facing stream is untouched.
+  const calls: ModelCallRecord[] = [];
+  const meteredClient = withUsageMetering(client, (record) => calls.push(record));
 
-    emit({ type: "done", payload: projectHighlight(result.toolCalls), messages: result.messages });
+  const stream = createSseStream(async (emit) => {
+    let toolCalls: Parameters<typeof summarizeTurn>[1] = [];
+    try {
+      const result = await runAssistantLoop({
+        client: meteredClient,
+        model: MODEL,
+        maxTokens: MAX_TOKENS,
+        system: SYSTEM_PROMPT,
+        tools,
+        network,
+        searchIndex,
+        messages,
+        effort: EFFORT,
+        onEvent: emit,
+      });
+      toolCalls = result.toolCalls;
+
+      emit({ type: "done", payload: projectHighlight(result.toolCalls), messages: result.messages });
+    } finally {
+      console.info(
+        JSON.stringify({ event: "assistant_turn", requested_model: MODEL, ...summarizeTurn(calls, toolCalls) }),
+      );
+    }
   });
 
   return new Response(stream, {
