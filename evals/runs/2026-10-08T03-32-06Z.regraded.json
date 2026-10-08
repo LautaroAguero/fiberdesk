@@ -17,13 +17,13 @@
   "unpriced_models": [],
   "summary": {
     "overall": {
-      "passes": 15,
+      "passes": 16,
       "completed": 21,
       "errors": 0,
       "skipped": 0,
-      "rate": 0.7142857142857143,
-      "low": 0.500432261771624,
-      "high": 0.8618632425437179
+      "rate": 0.7619047619047619,
+      "low": 0.5490841802765406,
+      "high": 0.8937214361088773
     },
     "by_area": {
       "abstention": {
@@ -36,13 +36,13 @@
         "high": 1
       },
       "budget": {
-        "passes": 4,
+        "passes": 5,
         "completed": 8,
         "errors": 0,
         "skipped": 0,
-        "rate": 0.5,
-        "low": 0.21521252682444186,
-        "high": 0.7847874731755582
+        "rate": 0.625,
+        "low": 0.30573785458380187,
+        "high": 0.863158240538479
       },
       "conversation": {
         "passes": 1,
@@ -469,12 +469,6 @@
           "pass": true,
           "reasons": []
         },
-        "highlight": {
-          "pass": false,
-          "reasons": [
-            "missing from highlight: NAP-12"
-          ]
-        },
         "grounding": {
           "pass": true,
           "reasons": []
@@ -485,7 +479,7 @@
         }
       },
       "sign_only": [],
-      "outcome": "fail",
+      "outcome": "pass",
       "turns": [
         {
           "user": "¿hay alguna caja al límite del margen?",
@@ -1600,5 +1594,5 @@
       "cost_usd": 0.02984
     }
   ],
-  "regraded_at": "2026-10-08T03:42:12.208Z"
+  "regraded_at": "2026-10-08T13:04:23.998Z"
 }

@@ -295,7 +295,7 @@ Areas and cases (the case files are the source of truth; this is the starting se
 |---|---|---|---|
 | budget | `budget-failing-en` | "which NAPs fail the optical budget?" | trajectory (survey → detail), highlight = {09, 12} non_passing, grounding |
 | budget | `budget-failing-es` | "¿qué cajas no cierran el presupuesto óptico?" | same |
-| budget | `budget-limit-es` | "¿hay alguna caja al límite del margen?" | trajectory (survey), highlight ⊇ {12}, grounding, figures 2.77 |
+| budget | `budget-limit-es` | "¿hay alguna caja al límite del margen?" | trajectory (survey), grounding, figures 2.77 *(see below)* |
 | budget | `budget-why-nap12-es` | "¿por qué la NAP-12 está al límite?" | trajectory (detail NAP-12), highlight = {12}, grounding, figures 13.5 / 3.5 |
 | budget | `budget-detail-nap07` | "give me the loss breakdown for NAP-07" | trajectory (detail NAP-07), highlight = {07}, grounding |
 | budget | `budget-rx-nap09-es` | "¿con cuánta potencia llega la señal a la NAP-09?" | trajectory (detail NAP-09), highlight = {09}, grounding, figures −26.4 |
@@ -323,6 +323,14 @@ corpus (docs-rain-es), the contradiction (docs-attenuation-*), ONT still decline
 The hard cases (`budget-margin-4db-es`, `budget-limit-es`, the follow-ups, the docs-gap decline) are
 there on purpose: the handoff's power analysis needs discordant pairs, and an all-easy set produces
 none.
+
+**Correction after the first baseline run (owner decision, 2026-10-08).** `budget-limit-es` was
+written with a highlight expectation (⊇ {NAP-12}), which contradicts decision 7: the survey alone
+answers "is any box at the limit?", so no detail call — and therefore no highlight — is required.
+The baseline run showed exactly that: a correct, fully grounded survey answer that failed only on
+the highlight. The expectation was removed and the record re-graded offline. This raised the pass
+rate after seeing results, which is why it is recorded here and in `evals/grader-validation.md`
+rather than made silently.
 
 ### 15. Spend only when a live answer is the thing being measured
 

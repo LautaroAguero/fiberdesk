@@ -72,3 +72,16 @@ as failures on purpose.
   detail was offered rather than fetched, so the map highlighted nothing. The Spanish phrasing
   surveyed and then detailed both NAPs. The Phase 1 hand verification shows the same English
   behaviour.
+
+## Case correction — `budget-limit-es` (owner decision, 2026-10-08)
+
+Not a grader error but a case error, found while reading the same run. `budget-limit-es` ("¿hay
+alguna caja al límite del margen?") required the highlight to contain NAP-12, which contradicts
+design decision 7 — highlight is graded only where the reference behaviour needs a detail call,
+and the survey alone answers this question. Its recorded answer named NAP-12 (2.77 dB, marginal),
+NAP-06 and NAP-09, every figure grounded; it failed only on the highlight.
+
+The expectation was removed and the record re-graded offline (no model call). It moves the case
+from fail to pass and the overall rate from 15/21 to 16/21. Because it raised the pass rate after
+seeing results, the owner made the call explicitly, and it is recorded here and in design.md
+(decision 14) rather than made silently. No other case was touched.

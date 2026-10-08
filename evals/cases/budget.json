@@ -30,11 +30,10 @@
   {
     "id": "budget-limit-es",
     "area": "budget",
-    "source": "new",
+    "source": "new — no highlight expectation: the survey alone answers it (design.md, decision 14)",
     "turns": ["¿hay alguna caja al límite del margen?"],
     "expect": {
       "trajectory": { "required": ["summarize_optical_budgets"] },
-      "highlight": { "mode": "contains", "ids": ["NAP-12"] },
       "grounding": true,
       "figures": [2.77]
     }

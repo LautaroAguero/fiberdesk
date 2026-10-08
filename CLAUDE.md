@@ -288,7 +288,7 @@ deterministas, bajo un tope de gasto obligatorio. Cada corrida queda en `evals/r
 **re-calificar offline** (`npm run eval:regrade`), sin clave ni llamadas. El costo y la latencia de
 cada llamada se miden en código (`src/lib/assistant/pricing.ts`, `usage.ts`).
 
-**Baseline** (`claude-opus-5`, effort `low`, una corrida, $1,03): **15/21 (71,4%, IC 95% 50,0–86,2%)**;
+**Baseline** (`claude-opus-5`, effort `low`, una corrida, $1,03): **16/21 (76,2%, IC 95% 54,9–89,4%)**;
 costo por pregunta mediana $0,0376, p95 $0,0663; latencia p95 13,1 s. Lo que falla: el modelo hace
 cuentas en la prosa (19,8 km, 0,23 dB) y a veces se queda en el censo sin pedir el desglose. El
 grader de grounding se validó a mano sobre las 21 respuestas (`evals/grader-validation.md`).
