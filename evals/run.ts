@@ -6,7 +6,7 @@
  *
  * Pure wiring, like the chat route: everything that decides anything lives
  * in src/lib/evals/ and is unit-tested there. See
- * openspec/changes/add-eval-harness/design.md, decision 5.
+ * openspec/changes/archive/2026-10-08-add-eval-harness/design.md, decision 5.
  */
 
 import { execFileSync } from "node:child_process";

@@ -1,7 +1,7 @@
 # Grounding grader — hand validation
 
 The grounding grader is only trusted once a person has checked its verdicts against real answers,
-number by number (`openspec/changes/add-eval-harness/design.md`, decision 8; tasks 10.3).
+number by number (`openspec/changes/archive/2026-10-08-add-eval-harness/design.md`, decision 8; tasks 10.3).
 
 ## Round 1 — `evals/runs/2026-10-08T03-32-06Z.json`
 

@@ -282,7 +282,9 @@ real, para las fases ya cerradas:
 - Fase 3 (`openspec/changes/archive/2026-09-22-add-map-copilot/verification.md`): que el mapa marque las cajas de la
   respuesta y reencuadre, y que siga declinando la sensibilidad de la ONT con el mapa delante.
 
-**Evals (Fase 4, primer ítem: `add-eval-harness`).** Esas conductas ya no dependen sólo de la
+**Evals (Fase 4, primer ítem: `add-eval-harness`, archivado).** La Fase 4 sigue abierta y no es
+desplegable por sí sola todavía: no hay deploy, y faltan `reduce-cost-per-question` y las tres
+capacidades del handoff. Esas conductas ya no dependen sólo de la
 verificación a mano: `npm run eval` le hace 21 casos al modelo real y los califica con graders
 deterministas, bajo un tope de gasto obligatorio. Cada corrida queda en `evals/runs/` y se puede
 **re-calificar offline** (`npm run eval:regrade`), sin clave ni llamadas. El costo y la latencia de
@@ -301,8 +303,8 @@ sólo el chat lo necesita.
 **No hay base de datos.** La red se lee de `seed/network.json` y la documentación de `corpus/`,
 las dos desde disco. Ver la nota bajo la tabla de fases para por qué se descartó pgvector.
 
-Cinco capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
-`network-assistant`, `documentation-search` y `network-map`.
+Seis capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
+`network-assistant`, `documentation-search`, `network-map` y `assistant-evals`.
 
 **Lo próximo:** `reduce-cost-per-question` (bajar a la mitad el costo por pregunta, medido contra
 este baseline) y después las tres capacidades del handoff `docs/handoff/2026-10-07-map-user-capabilities.md`,

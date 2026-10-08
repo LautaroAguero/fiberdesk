@@ -5,7 +5,7 @@ engine, the loop, the graders themselves — and never call the API. The evals a
 model** the questions users ask, and check what it did with deterministic graders. They spend
 money, so they run by hand, never in CI.
 
-Spec: `openspec/changes/add-eval-harness/` (or `openspec/specs/assistant-evals/` once archived).
+Spec: `openspec/specs/assistant-evals/`; proposal, design and tasks in `openspec/changes/archive/2026-10-08-add-eval-harness/`.
 
 ## Running
 
