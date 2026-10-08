@@ -10,7 +10,9 @@ import {
   type FixtureTurn,
 } from "@/lib/assistant/test-fixtures";
 import { buildToolDefinitions, DETAIL_TOOL_NAME, SUMMARIZE_TOOL_NAME } from "@/lib/assistant/tool-definitions";
+import { dispatchTool } from "@/lib/assistant/dispatcher";
 import { network, searchIndex } from "@/lib/evals/graders/test-helpers";
+import { sha256Json } from "@/lib/evals/hash";
 import { promptHash, runEvalSuite, type EvalConfig } from "@/lib/evals/runner";
 import type { LoadedCase } from "@/lib/evals/types";
 
@@ -101,6 +103,15 @@ describe("6.1 running cases", () => {
     expect(result.turns[0].calls).toHaveLength(3);
     expect(result.cost_usd).toBeCloseTo((3000 * 5) / 1_000_000, 12);
     expect(record.status).toBe("complete");
+  });
+
+  test("each trajectory step records the hash of the result the model saw", async () => {
+    const { client } = createFakeModelClient(surveyThenDetail("NAP-09 fails at −1.40 dB; NAP-12 is marginal at 2.77 dB."));
+    const record = await runEvalSuite({ cases: [failingCase], client, network, searchIndex, config, maxUsd: 5 });
+
+    const step = record.cases[0].turns[0].trajectory[1];
+    const fresh = dispatchTool(DETAIL_TOOL_NAME, { nap_id: "NAP-09" }, network, searchIndex);
+    expect(step.result_sha256).toBe(sha256Json(JSON.parse(fresh.content as string)));
   });
 
   test("one failing grader fails the case, keeping every grader's result", async () => {

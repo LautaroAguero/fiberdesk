@@ -277,9 +277,26 @@ excluded from the counts.
 
 #### Scenario: Noise between two runs of the same configuration
 
-- **WHEN** two baseline runs of the same configuration differ on `budget-marginal-es` (pass, then
+- **WHEN** two runs of the same configuration differ on `budget-limit-es` (pass, then
   fail) and `docs-rain-es` (fail, then pass)
 - **THEN** the comparison reports 1 case pass→fail and 1 case fail→pass, naming both as unstable
+
+### Requirement: A recorded run can be re-graded without calling the model
+
+The system SHALL re-grade a committed run record with the current graders and case expectations
+without any model call, rebuilding each graded turn's tool results from the recorded tool calls.
+It SHALL refuse to re-grade a case whose rebuilt results differ from those the model saw.
+
+#### Scenario: A grader fix costs nothing
+
+- **WHEN** a case's expectations gain a required figure 99 that its recorded answer does not state
+- **THEN** re-grading the record turns that case from pass to fail
+- **AND** no request is sent to the model
+
+#### Scenario: Results the model never saw are not graded
+
+- **WHEN** a recorded tool result's hash no longer matches what the tool returns today
+- **THEN** that case is not re-graded and the mismatch is reported, naming the case and the tool
 
 ### Requirement: The grounding grader is validated by hand before it is trusted
 

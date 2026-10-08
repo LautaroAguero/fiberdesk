@@ -1,9 +1,9 @@
 # Tasks — eval harness
 
-As in every phase so far, **no task in groups 1–8 may call the Anthropic API** — not from tests,
+As in every phase so far, **no task in groups 1–9 may call the Anthropic API** — not from tests,
 not from a script. Everything there is verified against `createFakeModelClient` fixtures, the seed
-and the corpus. Group 9 is the only live work: the two baseline runs and the hand validation, done
-by hand under a spend cap.
+and the corpus. Group 10 is the only live work: a two-case smoke run and one baseline run, done by
+hand under a spend cap. The hand validation that follows re-grades offline (design.md, decision 15).
 
 Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass before it is ticked.
 
@@ -131,27 +131,55 @@ Every task ends green: `npm test`, `npm run lint` and `npx tsc --noEmit` pass be
 - [x] 8.2 Write `evals/cases/abstention.json` and `evals/cases/conversation.json` likewise. Verify
       the loader accepts all four files: 21 cases, 4 areas, no duplicate ids.
 
-## 9. Baseline runs (live, by hand)
+## 9. Offline re-grading (design.md, decision 15)
 
-- [ ] 9.1 First baseline run on the current configuration (`claude-opus-5`, effort `low`) with a
-      cap of $10: `npm run eval -- --max-usd 10`. Verify the record is `complete` (no errors, no
-      skips) and commit it. If it is not complete, fix the cause and re-run before continuing.
-- [ ] 9.2 Validate the grounding grader by hand on at least 15 answers from that record (every area,
-      every answer it flagged), number by number; write `evals/grader-validation.md` with flagged vs
-      human-judged numbers, false positives and false negatives per answer. If any false positive is
-      found, fix the grader (with a regression test reproducing it), re-grade the same answers
-      offline from the committed record, and repeat until it records zero false positives.
-- [ ] 9.3 Second baseline run, same configuration and cap; commit the record. Run
-      `npm run eval:compare` on the two records and record the flip counts and the unstable cases.
-- [ ] 9.4 Replace the README's "this project has no evals" paragraph with the baseline table — pass
+- [x] 9.1 Move the per-case grading out of `runner.ts` into `src/lib/evals/grade.ts` (no behaviour
+      change; the runner tests pass unchanged), and record a `result_sha256` (SHA-256 of the
+      canonical JSON of the parsed result; `null` for an errored call) on every trajectory step.
+      Extend `runner.test.ts`: a recorded detail step's hash equals the hash of a fresh
+      `dispatchTool` of the same input.
+- [x] 9.2 Add `src/lib/evals/regrade.ts` with `regradeRecord(record, cases, network, searchIndex)`:
+      rebuilds each completed case's graded turn from the record (answer, cited sources, user
+      turns, re-dispatched tool calls for the final and earlier turns, projected payload), checks
+      every rebuilt result against its hash, re-grades with the cases' current expectations,
+      recomputes the summary, and marks the record as re-graded. Add `regrade.test.ts`, all with
+      the fake client for the original run and no client at all for the re-grade: a record
+      survives a JSON round trip and re-grades to the same outcomes; adding required figure 99
+      to a case turns it from pass to fail; a tampered hash leaves the case untouched and reports
+      the case and tool; `error` and `skipped_budget` cases pass through unchanged; a case id no
+      longer on disk is reported, not dropped.
+- [x] 9.3 Add `evals/regrade.ts` and `"eval:regrade": "tsx evals/regrade.ts"`: reads a record,
+      writes `<name>.regraded.json` beside it, prints the new summary and what flipped against
+      the original (`compareRuns`). Document it in `evals/README.md`. Verify offline on a record
+      produced by a fake-client run written to the scratchpad: the command runs without
+      `ANTHROPIC_API_KEY` and reports zero flips.
+
+## 10. Baseline (live, by hand)
+
+- [ ] 10.1 Smoke run: `npm run eval -- --cases 'budget-failing-*' --max-usd 0.5`. Verify both cases
+      complete, read their records' per-call tokens and cost, and estimate the full run's cost
+      before going on. Do not commit this record.
+- [ ] 10.2 One baseline run on the current configuration (`claude-opus-5`, effort `low`) with a cap
+      sized from 10.1 (at most $10): `npm run eval -- --max-usd <cap>`. Verify the record is
+      `complete` (no errors, no skips) and commit it. If it is not complete, fix the cause and
+      re-run only the affected cases (`--cases`) before continuing.
+- [ ] 10.3 Validate the grounding grader by hand on at least 15 answers from that record (every
+      area, every answer it flagged), number by number; write `evals/grader-validation.md` with
+      flagged vs human-judged numbers, false positives and false negatives per answer. If any false
+      positive is found, fix the grader (with a regression test reproducing it), re-grade the record
+      offline with `npm run eval:regrade`, commit the re-graded record, and repeat until it records
+      zero false positives. No new live run.
+- [ ] 10.4 Replace the README's "this project has no evals" paragraph with the baseline table — pass
       rate per area and overall with *n* and 95% Wilson interval, median and p95 cost per question,
-      p95 latency, the noise floor between the two runs, the unstable cases, and the grader's known
-      limits — every figure copied from a committed record's stored summary. Update `CLAUDE.md`'s
-      status section to match. Verify each README figure against the record by reading both.
+      p95 latency, the grader's known limits, and a plain statement that this is a single run whose
+      noise floor is measured in `reduce-cost-per-question` — every figure copied from the committed
+      (re-graded, if 10.3 re-graded it) record's stored summary. Update `CLAUDE.md`'s status section
+      to match. Verify each README figure against the record by reading both.
 
 ## Workflow follow-up
 
 - After review, archive the change; note that it is the first item of Phase 4 and that Phase 4 is
   not yet deployable on its own.
-- `reduce-cost-per-question` starts from the two committed baseline records and the noise floor
-  recorded in 9.3.
+- `reduce-cost-per-question` starts with the deferred second run of the baseline configuration,
+  `npm run eval:compare` against the committed baseline, and the flip counts and unstable cases
+  as its noise floor — before any candidate configuration is run.

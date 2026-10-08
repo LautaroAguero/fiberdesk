@@ -83,6 +83,12 @@ export interface RecordedToolCall {
   input: unknown;
   iteration: number;
   is_error: boolean;
+  /**
+   * SHA-256 of the canonical JSON of the parsed result; `null` for an errored
+   * call. Lets offline re-grading prove a re-dispatched result is the one the
+   * model saw. See design.md, decision 15.
+   */
+  result_sha256: string | null;
 }
 
 export interface TurnRecord {
@@ -152,4 +158,6 @@ export interface RunRecord {
   unpriced_models: string[];
   summary: RunSummary;
   cases: CaseRecord[];
+  /** Set when the graders were re-applied offline after the run. See design.md, decision 15. */
+  regraded_at?: string;
 }

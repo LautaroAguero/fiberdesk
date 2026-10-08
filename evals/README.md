@@ -14,7 +14,12 @@ npm run eval -- --max-usd 10                    # every case, on the app's own m
 npm run eval -- --max-usd 2 --cases 'budget-*'  # a subset, by case id
 npm run eval -- --max-usd 10 --model claude-opus-5-5 --effort medium   # a candidate configuration
 npm run eval:compare -- evals/runs/A.json evals/runs/B.json            # which cases flipped
+npm run eval:regrade -- evals/runs/A.json                              # re-grade offline, free
 ```
+
+**Only `npm run eval` spends money.** Comparing, re-grading and every unit test run offline, with
+no API key. Before paying for a full run, measure the real cost on two cases:
+`npm run eval -- --cases 'budget-failing-*' --max-usd 0.5`.
 
 - **`--max-usd` is required.** Before each case the runner stops if what it has spent plus the most
   expensive case so far would exceed the cap; the remaining cases are recorded as
@@ -62,6 +67,22 @@ The grounding grader is not trusted until it has been checked by hand against re
 A case passes only if every grader it declares passes. A model error after the SDK's retries, or a
 loop that hits its iteration cap, is an `error`: excluded from pass rates, counted beside them, and
 it marks the run `incomplete`.
+
+## Re-grading without a new run
+
+A graded answer does not have to be bought twice. `npm run eval:regrade -- <run.json>` re-applies
+the *current* graders and case expectations to a recorded run and writes `<run>.regraded.json`
+beside it, printing what flipped. It needs no API key and makes no model call.
+
+It works because every tool call in a record carries a SHA-256 of its result. The tools are
+deterministic, so re-dispatching the recorded calls against the seed and corpus rebuilds exactly
+what the model saw — and the hash proves it. If the seed, the corpus or the engine changed since
+the run, the hash no longer matches and that case is reported and kept as recorded rather than
+graded against results the model never saw. A case whose turns were reworded is kept as recorded
+too; its answers no longer answer it.
+
+So fixing a grader, or tightening a case's expectations, costs nothing. Changing the prompt, the
+tools or the model does need a new run — that is what is being measured.
 
 ## Run records
 

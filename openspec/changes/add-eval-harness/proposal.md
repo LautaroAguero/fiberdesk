@@ -38,11 +38,17 @@ recorded cost per question to exist before it can be applied. So the eval comes 
 - **Run records committed** to `evals/runs/<timestamp>.json`: model, a hash of the prompt and tool
   definitions, per-case pass/fail per grader, final answer text, trajectory, tokens, cost, latency.
 - **A comparison of two run records** that lists the cases whose outcome flipped. Run on two
-  baseline runs of the same configuration, it gives the pure-noise level of discordance and flags
-  unstable cases.
-- **The baseline, run twice**, on today's model (`claude-opus-5`, effort `low`). The README's "this
-  project has no evals" line is replaced by its numbers: pass rate per area with *n* and a 95%
-  Wilson interval, median and p95 cost per question, p95 latency.
+  runs of the same configuration, it gives the pure-noise level of discordance and flags unstable
+  cases.
+- **Offline re-grading of a recorded run.** Graders change; answers do not have to be bought again.
+  A committed record carries enough to re-grade it without calling the model, so fixing a grader
+  costs nothing.
+- **The baseline, run once**, on today's model (`claude-opus-5`, effort `low`), after a two-case
+  smoke run that measures the real cost per question first. The README's "this project has no
+  evals" line is replaced by its numbers: pass rate per area with *n* and a 95% Wilson interval,
+  median and p95 cost per question, p95 latency. The second run of the same configuration — the
+  noise floor — is deferred to `reduce-cost-per-question`, the only change that needs it (owner
+  decision, 2026-10-08: no live call before it is needed).
 - Every summary statistic (pass rate, interval, median, percentile, cost) is computed by
   deterministic, unit-tested TypeScript — never by the model.
 
@@ -88,6 +94,7 @@ recorded cost per question to exist before it can be applied. So the eval comes 
 - **Dependencies:** adds `tsx` (dev only) to run the TypeScript entry points with the project's
   path aliases. No runtime dependency, no new service.
 - **Cost:** every `npm run eval` spends real money against `ANTHROPIC_API_KEY`, bounded by the cap.
-  The two baseline runs are the first spend.
+  The smoke run and the single baseline run are the only spend in this change; re-grading,
+  comparing and every test are free.
 - **README:** the "this project has no evals" paragraph is replaced by the baseline table and how to
   run the suite.

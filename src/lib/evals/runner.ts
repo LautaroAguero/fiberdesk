@@ -13,8 +13,6 @@
  * graded.
  */
 
-import { createHash } from "node:crypto";
-
 import type Anthropic from "@anthropic-ai/sdk";
 
 import { projectHighlight } from "@/lib/assistant/highlight";
@@ -23,18 +21,13 @@ import type { AssistantModelClient } from "@/lib/assistant/model-client";
 import { withUsageMetering, type ModelCallRecord } from "@/lib/assistant/usage";
 import type { SearchIndex } from "@/lib/corpus/search";
 import type { Network } from "@/lib/network/types";
-import { gradeAbstention } from "@/lib/evals/graders/abstention";
-import { gradeCitation } from "@/lib/evals/graders/citation";
-import { gradeFigures } from "@/lib/evals/graders/figures";
-import { gradeGrounding } from "@/lib/evals/graders/grounding";
-import { gradeHighlight, highlightIds } from "@/lib/evals/graders/highlight";
+import { gradeCase } from "@/lib/evals/grade";
+import { highlightIds } from "@/lib/evals/graders/highlight";
 import type { GradedTurn } from "@/lib/evals/graders/input";
-import { gradeTrajectory } from "@/lib/evals/graders/trajectory";
+import { sha256Json } from "@/lib/evals/hash";
 import { summarizeRun } from "@/lib/evals/stats";
 import type {
   CaseRecord,
-  GraderName,
-  GraderResult,
   LoadedCase,
   RunRecord,
   RunStatus,
@@ -70,27 +63,12 @@ export interface RunEvalSuiteParams {
   onProgress?: (progress: { index: number; total: number; record: CaseRecord; spentUsd: number }) => void;
 }
 
-/** Sorts object keys recursively, so the hash does not depend on key order. */
-function canonical(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(canonical);
-  if (typeof value === "object" && value !== null) {
-    return Object.fromEntries(
-      Object.keys(value)
-        .sort()
-        .map((key) => [key, canonical((value as Record<string, unknown>)[key])]),
-    );
-  }
-  return value;
-}
-
 /**
  * SHA-256 over the system prompt, the tool definitions and the request
  * settings other than the model, which is recorded beside it.
  */
 export function promptHash(system: string, tools: Anthropic.Tool[], settings: Record<string, unknown>): string {
-  return createHash("sha256")
-    .update(JSON.stringify(canonical({ system, tools, settings })))
-    .digest("hex");
+  return sha256Json({ system, tools, settings });
 }
 
 /** Sum of known costs, and whether any call was unpriced. */
@@ -122,25 +100,6 @@ function readAnswer(appended: Anthropic.MessageParam[]): { answer: string; cited
     }
   }
   return { answer: texts.join("\n"), citedSources: [...cited] };
-}
-
-function grade(evalCase: LoadedCase, turn: GradedTurn) {
-  const graders: Partial<Record<GraderName, GraderResult>> = {};
-  const { expect } = evalCase;
-  let signOnly: number[] = [];
-
-  if (expect.trajectory) graders.trajectory = gradeTrajectory(turn, expect.trajectory);
-  if (expect.highlight) graders.highlight = gradeHighlight(turn, expect.highlight);
-  if (expect.grounding || expect.abstention) {
-    const { sign_only, ...result } = gradeGrounding(turn);
-    signOnly = sign_only;
-    if (expect.grounding) graders.grounding = result;
-  }
-  if (expect.abstention) graders.abstention = gradeAbstention(turn);
-  if (expect.figures) graders.figures = gradeFigures(turn, expect.figures);
-  if (expect.citation) graders.citation = gradeCitation(turn);
-
-  return { graders, signOnly };
 }
 
 /** Runs one case's turns live, then grades the last. Never throws: a failure becomes `error`. */
@@ -199,6 +158,7 @@ async function runCase(
           input: call.input,
           iteration: call.iteration,
           is_error: call.isError,
+          result_sha256: call.isError ? null : sha256Json(call.result),
         })),
         highlight_ids: highlightIds(payload),
         calls: turnCalls,
@@ -233,8 +193,7 @@ async function runCase(
     };
   }
 
-  const { graders, signOnly } = grade(evalCase, lastGraded!);
-  const pass = Object.values(graders).every((result) => result.pass);
+  const { graders, signOnly, pass } = gradeCase(evalCase.expect, lastGraded!);
   return {
     record: { ...base, outcome: pass ? "pass" : "fail", graders, sign_only: signOnly, turns, cost_usd: costOf(allCalls).total },
     calls: allCalls,

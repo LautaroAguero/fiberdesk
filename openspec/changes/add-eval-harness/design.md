@@ -21,7 +21,8 @@ See proposal.md — Why. The state this design builds on, checked in the code:
 - `seed/expected-budgets.json` is the hand-derived optical oracle: NAP-09 fails (−1.4 dB), NAP-12 is
   marginal (2.77 dB), the other ten pass; NAP-06 is the tightest pass at 3.44 dB.
 - Models cannot be sampled deterministically: Opus 5 rejects `temperature`. Two runs of the same
-  configuration can disagree, which is why the baseline runs twice.
+  configuration can disagree. Measuring how much needs two runs of the same configuration; that
+  second run is deferred to `reduce-cost-per-question` (Decision 15).
 
 ## Goals / Non-Goals
 
@@ -279,8 +280,9 @@ stored summary; no figure is computed anywhere else.
 
 `compareRuns(a, b)` pairs cases by id and lists: pass→fail, fail→pass, cases present in only one
 run, and cases errored or skipped in either. Only cases completed in both runs enter the two
-counts. Over the two baseline runs, the flipped cases are the noise floor and are listed as
-unstable in the README; statistical testing on these counts belongs to `reduce-cost-per-question`.
+counts. Over two runs of the same configuration, the flipped cases are the noise floor and are
+listed as unstable; statistical testing on these counts belongs to `reduce-cost-per-question`, which
+also makes that second run (Decision 15).
 
 ### 14. The ~20 baseline cases
 
@@ -319,6 +321,27 @@ The hard cases (`budget-margin-4db-es`, `budget-limit-es`, the follow-ups, the d
 there on purpose: the handoff's power analysis needs discordant pairs, and an all-easy set produces
 none.
 
+### 15. Spend only when a live answer is the thing being measured
+
+Owner decision, 2026-10-08: avoid every model call that is not strictly needed. Three consequences:
+
+- **Re-grading is offline.** Each trajectory step in a run record carries a SHA-256 of its tool
+  result. `regradeRecord(record, cases, network, searchIndex)` rebuilds each graded turn by
+  re-dispatching the recorded tool calls against the seed and corpus — the tools are deterministic —
+  checks every rebuilt result against its hash, and re-runs the graders with the cases' *current*
+  expectations. A hash mismatch (the seed, corpus or engine changed since the run) refuses to
+  re-grade that case rather than grading against results the model never saw. `npm run
+  eval:regrade -- <run.json>` writes `<run>.regraded.json` beside it and prints what flipped. Fixing
+  a grader, or tightening a case's expectations, therefore never needs a new run.
+  *Alternative: store full tool results in the record.* Simpler, but it multiplies the committed
+  file size by the search passages and budget breakdowns of every turn; re-dispatch plus a hash
+  gives the same guarantee for a few bytes per call.
+- **A smoke run first.** Two cases under a $0.50 cap measure the real cost per question before the
+  full run is paid for.
+- **One baseline run, not two.** The noise floor only matters when two configurations are compared,
+  which first happens in `reduce-cost-per-question`; its first live task is the second run of the
+  baseline configuration. If that change never happens, the run is never paid for.
+
 ## Risks / Trade-offs
 
 - **[Grounding false positives make the grader worse than none]** → hand validation on ≥15 answers
@@ -329,8 +352,9 @@ none.
   change.
 - **[n ≈ 20 per area gives intervals ±15 points wide]** → reported with *n* and interval, never as a
   headline; per-area numbers are context, the overall rate is the one compared.
-- **[Live non-determinism makes one run unrepresentative]** → baseline run twice; flipped cases
-  listed as unstable; change 0b reads its noise floor from that comparison.
+- **[Live non-determinism makes one run unrepresentative]** → the README states the baseline is a
+  single run; the second run, its comparison and the unstable list come with
+  `reduce-cost-per-question`, before any configuration is judged against the baseline.
 - **[Abstention grader too weak: "NAP-13 has 2.77 dB margin" passes]** → known; the highlight half
   still catches a decline that reached a detail call; documented as the trigger for a calibrated
   judge in a later change.
