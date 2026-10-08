@@ -176,6 +176,7 @@ async function runCase(
         toolCalls: result.toolCalls,
         priorToolCalls: [...priorToolCalls],
         userMessages: [...userMessages],
+        toolDefinitions: config.tools,
         payload,
       };
       priorToolCalls.push(...result.toolCalls);

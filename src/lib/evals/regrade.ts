@@ -12,6 +12,7 @@
 import { dispatchTool } from "@/lib/assistant/dispatcher";
 import { projectHighlight } from "@/lib/assistant/highlight";
 import type { ToolCallRecord } from "@/lib/assistant/loop";
+import { buildToolDefinitions } from "@/lib/assistant/tool-definitions";
 import type { SearchIndex } from "@/lib/corpus/search";
 import type { Network } from "@/lib/network/types";
 import { gradeCase } from "@/lib/evals/grade";
@@ -68,6 +69,7 @@ function regradeCase(
     toolCalls,
     priorToolCalls: toolCallsByTurn.slice(0, last).flat(),
     userMessages: turns.map((turn) => turn.user),
+    toolDefinitions: buildToolDefinitions(network),
     payload: projectHighlight(toolCalls),
   };
 

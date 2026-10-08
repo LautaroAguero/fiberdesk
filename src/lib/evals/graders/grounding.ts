@@ -18,9 +18,15 @@ export interface GroundingResult extends GraderResult {
   sign_only: number[];
 }
 
-/** Every number the answer may legitimately state. The system prompt is deliberately not a source. */
+/**
+ * Every number the answer may legitimately state: tool results, the tool
+ * definitions (which code wrote — the survey's 3.00 dB default threshold
+ * lives only there), and the user's own messages. The system prompt is
+ * deliberately not a source.
+ */
 export function groundingSources(turn: GradedTurn): NumberSet {
   const sources = new NumberSet();
+  numbersInValue(turn.toolDefinitions).forEach((n) => sources.add(n));
   for (const call of [...turn.priorToolCalls, ...turn.toolCalls]) {
     if (!call.isError) numbersInValue(call.result).forEach((n) => sources.add(n));
   }

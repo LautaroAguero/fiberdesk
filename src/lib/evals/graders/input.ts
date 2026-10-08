@@ -3,6 +3,8 @@
  * live turn, or by a test from fixtures — graders never call anything.
  */
 
+import type Anthropic from "@anthropic-ai/sdk";
+
 import type { HighlightPayload } from "@/lib/assistant/events";
 import type { ToolCallRecord } from "@/lib/assistant/loop";
 
@@ -17,6 +19,8 @@ export interface GradedTurn {
   priorToolCalls: ToolCallRecord[];
   /** Every user message so far, this turn's included. */
   userMessages: string[];
+  /** The tool definitions the model was given — written by code, so a figure they state is grounded. */
+  toolDefinitions: Anthropic.Tool[];
   /** The payload the server projected for this turn. */
   payload: HighlightPayload;
 }

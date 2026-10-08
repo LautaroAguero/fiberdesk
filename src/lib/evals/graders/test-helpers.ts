@@ -33,6 +33,7 @@ export function turn(overrides: Partial<GradedTurn> & { answer: string }): Grade
     citedSources: [],
     priorToolCalls: [],
     userMessages: [],
+    toolDefinitions: [],
     payload: projectHighlight(toolCalls),
     ...overrides,
     toolCalls,
