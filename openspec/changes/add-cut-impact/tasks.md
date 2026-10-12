@@ -7,7 +7,7 @@ pass before it is ticked.
 
 ## 1. The cut traversal (`cut-impact`)
 
-- [ ] 1.1 Write `seed/expected-cut-impacts.json` by hand from the tree (design.md, decision 8):
+- [x] 1.1 Write `seed/expected-cut-impacts.json` by hand from the tree (design.md, decision 8):
       - a `_note` like the other fixtures;
       - one entry per fiber run and per NAP (24), each with `kind`, `naps_out_of_service`,
         `subscribers_out_of_service`, `runs_out_of_service` (sorted ids) and `counts`.
