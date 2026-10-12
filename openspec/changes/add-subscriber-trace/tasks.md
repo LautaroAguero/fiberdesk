@@ -171,7 +171,7 @@ pass before it is ticked.
 
 ## 6. Docs
 
-- [ ] 6.1 Update the README:
+- [x] 6.1 Update the README:
       - a subscriber-trace section, with SUB-025 as the worked example, every figure copied from
         the oracle;
       - the two drop constants listed as assumptions beside the others;
