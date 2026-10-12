@@ -97,7 +97,7 @@ pass before it is ticked.
       - FR-03's result, with `counts.subscribers` 5;
       - OLT-RES-01 and FR-99 give error results with their messages;
       - the payload for a dispatched FR-12 cut.
-- [ ] 3.3 Update `src/lib/assistant/system-prompt.ts`:
+- [x] 3.3 Update `src/lib/assistant/system-prompt.ts`:
       - one paragraph on when to call `list_cut_impact`, and to cite its counts;
       - add an OLT cut and an element id the network lacks to the "cannot answer" list.
 
