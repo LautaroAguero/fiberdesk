@@ -38,7 +38,7 @@ pass before it is ticked.
 
       Also verify that exactly SUB-011, SUB-012 and SUB-013 have a status different from their
       `nap_status`.
-- [ ] 1.4 Extend `src/lib/optical/constants.test.ts` to compare the frozen copy in
+- [x] 1.4 Extend `src/lib/optical/constants.test.ts` to compare the frozen copy in
       `seed/expected-traces.json` with `DROP_SLACK_FACTOR`, `DROP_CONNECTORS`, `FIBER_DB_PER_KM` and
       `CONNECTOR_DB`, as it does for `expected-budgets.json`. Verify that the test fails when one
       value in the fixture is edited, then restore it.

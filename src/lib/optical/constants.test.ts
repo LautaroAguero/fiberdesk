@@ -38,6 +38,19 @@ const fixture: ExpectedBudgetsFixture = JSON.parse(
   readFileSync(path.join(process.cwd(), "seed", "expected-budgets.json"), "utf8"),
 );
 
+interface ExpectedTracesFixture {
+  loss_model: {
+    drop_slack_factor: number;
+    drop_connectors: number;
+    fiber_db_per_km: number;
+    connector_db: number;
+  };
+}
+
+const tracesFixture: ExpectedTracesFixture = JSON.parse(
+  readFileSync(path.join(process.cwd(), "seed", "expected-traces.json"), "utf8"),
+);
+
 describe("1.3 the constants module matches the frozen fixture", () => {
   test("fiber attenuation per kilometre", () => {
     expect(FIBER_DB_PER_KM).toBe(fixture.loss_model.fiber_db_per_km);
@@ -69,5 +82,23 @@ describe("1.2 the drop constants", () => {
   test("slack factor and connectors per drop are exported with the owner's values", () => {
     expect(DROP_SLACK_FACTOR).toBe(1.3);
     expect(DROP_CONNECTORS).toBe(2);
+  });
+});
+
+describe("1.4 the constants module matches the frozen copy in expected-traces.json", () => {
+  test("drop slack factor", () => {
+    expect(DROP_SLACK_FACTOR).toBe(tracesFixture.loss_model.drop_slack_factor);
+  });
+
+  test("connectors per drop", () => {
+    expect(DROP_CONNECTORS).toBe(tracesFixture.loss_model.drop_connectors);
+  });
+
+  test("fiber attenuation per kilometre", () => {
+    expect(FIBER_DB_PER_KM).toBe(tracesFixture.loss_model.fiber_db_per_km);
+  });
+
+  test("connector loss", () => {
+    expect(CONNECTOR_DB).toBe(tracesFixture.loss_model.connector_db);
   });
 });
