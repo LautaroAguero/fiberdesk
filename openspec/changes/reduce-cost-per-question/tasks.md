@@ -78,7 +78,7 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
 
 ## 4. The decision rule (`assistant-evals`)
 
-- [ ] 4.1 Add `src/lib/evals/decide.ts` with a pure `decide({ baseline, replicate, candidate })`
+- [x] 4.1 Add `src/lib/evals/decide.ts` with a pure `decide({ baseline, replicate, candidate })`
       over three `RunRecord`s. It recomputes each summary from case data with `summarizeRun` and
       returns `verdict` (`accept_provisional` | `reject` | `no_verdict`), `reasons[]` and `toRead[]`
       (cases whose outcome differs from either baseline), plus the McNemar result against
