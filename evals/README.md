@@ -112,5 +112,5 @@ reads as writes, so the figure does not depend on traffic having warmed the cach
 always provisional until a person has read every case the output lists, and the exact McNemar test
 is reported beside the verdict without deciding it. Records that are partial, have errored cases, or
 come from baselines that differ in model, effort or prompt hash get no verdict. The rule and its
-scenarios are in `openspec/changes/reduce-cost-per-question/specs/assistant-evals/spec.md`; the
-reasoning for 21 cases is in that change's `design.md`, decision 4.
+scenarios are in `openspec/specs/assistant-evals/spec.md`; the reasoning for 21 cases is in
+`openspec/changes/archive/2026-10-12-reduce-cost-per-question/design.md`, decision 4.

@@ -296,7 +296,7 @@ por el grader de grounding). Lo que falla: el modelo hace cuentas en la prosa (1
 veces se queda en el censo sin pedir el desglose. El grader de grounding se validó a mano sobre las
 21 respuestas (`evals/grader-validation.md`).
 
-**Segundo ítem: `reduce-cost-per-question`, implementado (falta archivar).** El objetivo era bajar a
+**Segundo ítem: `reduce-cost-per-question`, archivado.** El objetivo era bajar a
 la mitad el costo por pregunta **en frío** (≤ $0,0188), juzgado por una regla fija de antemano
 (`npm run eval:decide`, con veto si un grader estable de grounding o abstención falla). **Ningún
 candidato pasó:** Sonnet 5.5 en `low` (17/21, frío 27,4% del baseline) y en `medium` (15/21, frío
@@ -317,9 +317,9 @@ las dos desde disco. Ver la nota bajo la tabla de fases para por qué se descart
 Seis capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
 `network-assistant`, `documentation-search`, `network-map` y `assistant-evals`.
 
-**Lo próximo:** archivar `reduce-cost-per-question` y después `add-subscriber-trace`, la primera de
-las tres capacidades del handoff `docs/handoff/2026-10-07-map-user-capabilities.md`, con sus propios
-casos de eval juzgados contra los registros finales de este cambio. Queda pendiente, como cambio
+**Lo próximo:** `add-subscriber-trace`, la primera de las tres capacidades del handoff
+`docs/handoff/2026-10-07-map-user-capabilities.md`, con sus propios casos de eval juzgados contra
+los registros finales de `reduce-cost-per-question`. Queda pendiente, como cambio
 aparte, el trabajo de prompt para que el modelo deje de hacer cuentas en la prosa. Es lo que frenó
 a Sonnet, y la misma regla puede volver a juzgarlo después.
 

@@ -1,7 +1,7 @@
 # Decision log — reduce-cost-per-question
 
 The record of every judgment made in the OpenSpec change `reduce-cost-per-question`
-(`openspec/changes/reduce-cost-per-question/`, design.md decisions 1 and 4). It holds the noise
+(`openspec/changes/archive/2026-10-12-reduce-cost-per-question/`, design.md decisions 1 and 4). It holds the noise
 floor between two runs of the baseline configuration, and, for each candidate run, the
 `eval:decide` verdict and the hand reading of every case it lists. Figures are copied from the
 records and the tool output, never computed by hand.
