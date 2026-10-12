@@ -181,7 +181,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
       - the payloads hold the point and the candidates.
 
       Read the follow-up `feas-second-option-es` by hand. Commit the record.
-- [ ] 6.2 Full run: `npm run eval -- --max-usd 2.50`. Commit the record, re-grade it, and run
+- [x] 6.2 Full run: `npm run eval -- --max-usd 2.50`. Commit the record, re-grade it, and run
       `npm run eval:compare` against add-cut-impact's run of record (prompt hash `30844d48a2b6`).
       Write `openspec/changes/add-feasibility/verification.md` with:
       - the `feasibility` area's pass rate and interval;

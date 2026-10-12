@@ -86,3 +86,71 @@ Read by hand:
   answer also opens with "I need the map point" before calling the tool, although a point was
   selected. `evals/decision-log.md` already records that no grader checks the language of an
   answer. This change adds no grader for it.
+
+## Task 6.2 — full runs, read against the run of record
+
+The comparison base is add-cut-impact's run of record,
+`evals/runs/2026-10-12T17-12-15Z.regraded.json` (prompt `30844d48a2b6`, 30/34). Every flip below
+was read by hand. Two nearly identical runs move the older cases by about three, so a single flip
+is weak evidence on its own.
+
+### First full run: `evals/runs/2026-10-12T18-57-01Z.json`
+
+Prompt `5bb26aa37361`, $0.8940. It passed 37/42 (88.1%, Wilson 75.0–94.8%), and `feasibility` 8/8.
+
+Against the run of record, there were two pass → fail flips and one fail → pass flip:
+
+- **`trace-by-name-es`, pass → fail. This was a regression, and it was fixed.** The case had
+  passed in all three runs since `add-subscriber-trace`. The answer wrote "0.498 km (383 m en
+  línea recta × factor de holgura 1.3)", converting the trace's 0.383 km into metres. No tool
+  returned 383. The likely trigger is this change: the new tool states distances in metres, and
+  the prompt paragraph says so.
+  - The fix (commit `cc779bf`) gives the shared drop `straight_line_m` and `length_m`, the
+    reported km restated. The rule of design.md, decision 3, "both units, so the model never
+    converts", now covers the trace too. No figure changed. The feasibility oracle gained only the
+    two fields, and the prompt is unchanged.
+- **`trace-cascade-es`, pass → fail.** The answer says "casi 20 km de fibra", which sums FR-03 and
+  FR-12 in prose. This is the known weakness, and the case had already failed once before, in
+  `2026-10-12T13-59-34Z`.
+- **`budget-failing-es`, fail → pass.** The answer called the detail tool this time. The case was
+  already unstable.
+
+### Second full run, after the fix: `evals/runs/2026-10-12T19-04-33Z.json` (run of record)
+
+Prompt `5bb26aa37361` (tool definitions and prompt unchanged), $0.9167. Results:
+
+| Area | Passed | Rate | 95% Wilson interval |
+|---|---|---|---|
+| abstention | 5/5 | 100.0% | 56.6–100.0% |
+| budget | 4/8 | 50.0% | 21.5–78.5% |
+| conversation | 2/3 | 66.7% | 20.8–93.9% |
+| cut | 6/6 | 100.0% | 61.0–100.0% |
+| docs | 5/5 | 100.0% | 56.6–100.0% |
+| feasibility | 8/8 | 100.0% | 67.6–100.0% |
+| trace | 7/7 | 100.0% | 64.6–100.0% |
+| **overall** | 37/42 | 88.1% | 75.0–94.8% |
+
+Cost per question, measured: median $0.0176, p95 $0.0322. Cold: median $0.0482. Latency p95 is
+10.7 s.
+
+- **Trace is back to 7/7.** `trace-by-name-es` now writes the drop as the tool states it.
+- **Against the run of record** (34 shared cases), there is one pass → fail flip and McNemar
+  p = 1.0:
+  - **`budget-margin-4db-es`.** It had passed in the eight runs before. The answer lists NAP-09,
+    NAP-12 and NAP-06 correctly, then adds "las otras nueve NAPs superan los 10 dB de margen". That
+    is a threshold the model drew in prose: no tool returned 10. Only the survey was called, and the
+    answer touches nothing of this change, neither the new tool nor distances nor metres. It is
+    the known weakness, arithmetic in prose. It is recorded rather than fixed here, and belongs to
+    the pending prompt-work change.
+- **The other failures** are the same known cases as before:
+  - `budget-failing-en` and `budget-failing-es` stop at the survey;
+  - `budget-why-nap12-es` and `conv-second-one-en` write "20" (19.8 km rounded) in prose.
+- **Between the two full runs** (42 cases), two cases flipped each way. That is inside the known
+  noise.
+- **Older records no longer re-grade eleven cases.** Re-grading the run of record now keeps 11
+  cases as recorded and names them. Their tool results no longer hash the same:
+  - the four docs cases that call `get_optical_constants`, since task 1.2 added
+    `max_drop_route_m`;
+  - the seven trace cases, since `cc779bf` added the metres to the drop.
+
+  This run is the new base for both groups.
