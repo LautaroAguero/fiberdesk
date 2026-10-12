@@ -14,11 +14,11 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
 
 ## 1. Noise floor (live, before any code change)
 
-- [ ] 1.1 On a tree with no change under `src/` since the baseline commit, run the baseline
+- [x] 1.1 On a tree with no change under `src/` since the baseline commit, run the baseline
       configuration a second time: `npm run eval -- --max-usd 1.5`. Verify that the record's `model`
       (`claude-opus-5`), `effort` (`low`) and `prompt_hash` equal those of
       `evals/runs/2026-10-08T03-32-06Z.regraded.json`, that its status is `complete`, and commit it.
-- [ ] 1.2 Re-grade it offline (`npm run eval:regrade`) and run
+- [x] 1.2 Re-grade it offline (`npm run eval:regrade`) and run
       `npm run eval:compare -- evals/runs/2026-10-08T03-32-06Z.regraded.json <B2>.regraded.json`.
       Record in `evals/decision-log.md` (new file, opened with a short header that points to this
       change) the cases that flipped (unstable), the cases that pass in both runs (stable), and per
