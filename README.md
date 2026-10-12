@@ -378,7 +378,7 @@ The first full run with feasibility caught one regression worth fixing. A trace 
 are in the `verification.md` of each change:
 [`add-subscriber-trace`](openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md),
 [`add-cut-impact`](openspec/changes/archive/2026-10-12-add-cut-impact/verification.md) and
-`add-feasibility`.
+[`add-feasibility`](openspec/changes/archive/2026-10-12-add-feasibility/verification.md).
 
 **Can a cheaper model do this?** Not yet. The change `reduce-cost-per-question` tried to halve the
 cost per question. Every configuration was judged by a rule fixed before any of them ran
