@@ -117,7 +117,7 @@ pass before it is ticked.
       `list_cut_impact` call names a valid element, that no call names the OLT or a substitute, and
       that payloads hold the cut entries. Read the declines of `cut-unknown-es` and `cut-olt-es` by
       hand. Commit the record.
-- [ ] 5.2 Full run: `npm run eval -- --max-usd 2.00`. Commit the record, re-grade it, and run
+- [x] 5.2 Full run: `npm run eval -- --max-usd 2.00`. Commit the record, re-grade it, and run
       `npm run eval:compare` against `evals/runs/2026-10-12T14-05-31Z.regraded.json`. Write
       `openspec/changes/add-cut-impact/verification.md` with:
       - the `cut` area's pass rate and interval;
@@ -127,7 +127,7 @@ pass before it is ticked.
 
       A stable case that regresses through the cut tool or its prompt paragraph is fixed before
       group 6, and a fix that changes the prompt means a new run.
-- [ ] 5.3 In the app (`fiberdesk-dev` preview), ask "¿qué pasa si se corta el tendido FR-03?".
+- [x] 5.3 In the app (`fiberdesk-dev` preview), ask "¿qué pasa si se corta el tendido FR-03?".
       Verify that the answer streams and states 5 subscribers, that FR-03 is painted cut and the
       subtree out of service, that the view reframes, and that the server log shows the call.
       Record it in `verification.md`, with a screenshot.
