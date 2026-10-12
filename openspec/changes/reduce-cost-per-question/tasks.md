@@ -103,7 +103,7 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
 
 ## 5. Candidates (live, by hand)
 
-- [ ] 5.1 Smoke run of the first candidate:
+- [x] 5.1 Smoke run of the first candidate:
       `npm run eval -- --cases 'budget-failing-*' --model claude-sonnet-5-5 --effort low --max-usd 0.25`.
       Verify in the record:
       (a) the first call of the first case reports cache-write tokens of about 2,400 or more;
