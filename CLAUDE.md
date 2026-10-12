@@ -331,7 +331,7 @@ por la cascada, NAP-12: 5 abonados, aunque NAP-03 atiende a uno solo. Que se cai
 su tendido de entrada da lo mismo; sólo cambia qué figura como cortado. El OLT no se puede cortar
 (no está en el enum). Oráculo escrito a mano: `seed/expected-cut-impacts.json` (24 elementos).
 **Sexta herramienta:** `list_cut_impact`. **El payload suma dos estados**, `cut` y
-`out_of_service`, sin margen, y uno solo orden de severidad: cut > out_of_service > fail > marginal >
+`out_of_service`, sin margen, y un solo orden de severidad: cut > out_of_service > fail > marginal >
 pass. En el mapa, el corte va en magenta y lo sin servicio en gris pizarra oscuro (en el navegador hubo
 que engrosar los tramos apagados: al 40% de opacidad se confundían con los neutros). Corrida en vivo
 (`30844d48a2b6`): **30/34 (88,2%), `cut` 6/6, `trace` 7/7**; los cuatro fallos son casos viejos
