@@ -9,7 +9,9 @@
  * runs are entries of their own, so this module derives no path and walks no
  * tree. The status shown is always the payload's own; the map colours only what
  * the payload names and reclassifies nothing. The one thing it decides is the
- * colour of a run that two entries mark differently: the worse one wins.
+ * colour of an element that two entries mark differently: the more severe
+ * status wins, an outage over any classification (add-cut-impact, decision 5).
+ * A cut run is bounded like any other run, so a reframe on a cut contains it.
  */
 
 import { toLngLat } from "@/lib/map/geojson";
@@ -49,23 +51,26 @@ export function resolveHighlight(payload: HighlightPayload, network: Network): R
   const runStatus: Record<string, HighlightStatus> = {};
   const unknownIds: string[] = [];
 
+  // Two entries naming one element keep the more severe status, in the shared
+  // order (`cut`, `out_of_service`, `fail`, `marginal`, `pass`).
+  const merge = (statuses: Record<string, HighlightStatus>, id: string, status: HighlightStatus) => {
+    const existing = statuses[id];
+    statuses[id] = existing === undefined ? status : worseStatus(existing, status);
+  };
+
   for (const entry of payload.highlight) {
     switch (entry.kind) {
       case "nap":
-        if (napById.has(entry.id)) napStatus[entry.id] = entry.status;
+        if (napById.has(entry.id)) merge(napStatus, entry.id, entry.status);
         else unknownIds.push(entry.id);
         break;
       case "subscriber":
-        if (subscriberById.has(entry.id)) subscriberStatus[entry.id] = entry.status;
+        if (subscriberById.has(entry.id)) merge(subscriberStatus, entry.id, entry.status);
         else unknownIds.push(entry.id);
         break;
       case "run":
-        if (runById.has(entry.id)) {
-          const existing = runStatus[entry.id];
-          runStatus[entry.id] = existing === undefined ? entry.status : worseStatus(existing, entry.status);
-        } else {
-          unknownIds.push(entry.id);
-        }
+        if (runById.has(entry.id)) merge(runStatus, entry.id, entry.status);
+        else unknownIds.push(entry.id);
         break;
     }
   }
