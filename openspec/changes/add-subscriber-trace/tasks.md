@@ -180,7 +180,7 @@ pass before it is ticked.
       - the eval table with the `trace` area, from the committed record.
 
       Verify each figure against its source by reading both.
-- [ ] 6.2 Update the status section of `CLAUDE.md`:
+- [x] 6.2 Update the status section of `CLAUDE.md`:
       - five tools;
       - the payload by kind;
       - the new test count and eval result;

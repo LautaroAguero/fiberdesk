@@ -255,8 +255,8 @@ carga y validación estructural del dataset, y el flujo de OpenSpec andando de p
   cae a un fondo liso si el estilo base no carga.
 - **Tres helpers puros, con tests** (`src/lib/map/`): `networkToGeoJson` convierte la red en las
   capas del mapa; `resolveHighlight` traduce el `HighlightPayload` de un turno en qué NAP
-  colorear, qué tendidos marcar y a dónde encuadrar —sin recorrer el árbol de nuevo: usa los
-  `hops` que ya trae cada `BudgetResult`—; y `formatBreakdown` da formato al desglose por NAP sin
+  y qué abonados colorear, qué tendidos marcar y a dónde encuadrar —sin recorrer el árbol: el
+  payload ya nombra los tendidos (desde `add-subscriber-trace`)—; y `formatBreakdown` da formato al desglose por NAP sin
   tocar ningún número.
 - **`src/app/page.tsx` es ahora un server component**: carga la red y calcula los doce
   presupuestos una sola vez, server-side, y se los pasa a `Copilot` (client), que compone el mapa
@@ -269,7 +269,7 @@ carga y validación estructural del dataset, y el flujo de OpenSpec andando de p
 Los checks visuales se verificaron en el navegador reproduciendo turnos grabados, sin llamar a la
 API (grupo 6 de `tasks.md`), y la corrida real se hizo una vez a mano, como en las Fases 1 y 2.
 
-**383 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
+**438 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
 reales. Las conductas que ningún test puede cubrir se verificaron a mano una vez contra la API
 real, para las fases ya cerradas:
 
@@ -283,8 +283,8 @@ real, para las fases ya cerradas:
   respuesta y reencuadre, y que siga declinando la sensibilidad de la ONT con el mapa delante.
 
 **Evals (Fase 4, primer ítem: `add-eval-harness`, archivado).** La Fase 4 sigue abierta y no es
-desplegable por sí sola todavía: no hay deploy, y faltan las tres capacidades del handoff. Esas conductas ya no dependen sólo de la
-verificación a mano: `npm run eval` le hace 21 casos al modelo real y los califica con graders
+desplegable por sí sola todavía: no hay deploy, y de las tres capacidades del handoff falta terminar dos (la primera, `add-subscriber-trace`, está implementada). Esas conductas ya no dependen sólo de la
+verificación a mano: `npm run eval` le hace 28 casos al modelo real y los califica con graders
 deterministas, bajo un tope de gasto obligatorio. Cada corrida queda en `evals/runs/` y se puede
 **re-calificar offline** (`npm run eval:regrade`), sin clave ni llamadas. El costo y la latencia de
 cada llamada se miden en código (`src/lib/assistant/pricing.ts`, `usage.ts`).
@@ -308,6 +308,21 @@ ningún byte de lo que lee el modelo, y en las corridas de Sonnet 84 de 85 llama
 prefijo de caché. Tabla completa en el README; cada veredicto y cada lectura a mano, en
 `evals/decision-log.md`.
 
+**Tercer ítem: `add-subscriber-trace`, implementado (falta archivar).** El asistente traza el
+enlace de **un abonado** de punta a punta: el presupuesto de su NAP tal cual lo da el motor, más la
+**acometida** modelada (línea recta por haversine × 1,3 de holgura, más 2 conectores; las dos
+constantes nuevas, pendientes de validación). Ejemplo: SUB-025 queda en 26,15 dB, margen 1,85 dB,
+marginal, −23,15 dBm estimados en la ONT. El oráculo `seed/expected-traces.json` lo genera un script
+de Python independiente del motor. **Quinta herramienta:** `trace_subscriber_link`, con el id como
+enum de los 28 abonados. **El payload del mapa ahora va por tipo de entidad** (`nap`, `subscriber`,
+`run`): el código nombra los tendidos explícitamente, y un tendido compartido toma el peor estado.
+Hallazgo del dataset: **NAP-06 pasa (3,44 dB) pero sus tres abonados quedan marginales (2,52 dB)**
+con la acometida. Corrida en vivo (`c20ecc7407bf`): **23/28 (82,1%), `trace` 7/7**; los fallos
+son todos cuentas en la prosa sobre casos viejos. Entre dos corridas casi iguales, los 21 casos
+viejos se movieron tres (19/21 y 16/21): una sola corrida mide grueso. Para `add-feasibility`:
+todos los abonados del seed están a 346–383 m de su NAP, más que los ~300 m máximos que sugiere
+el handoff. Lectura completa en `openspec/changes/add-subscriber-trace/verification.md`.
+
 Correr la app requiere `ANTHROPIC_API_KEY` — ver `.env.example`. El mapa y la red se ven sin ella;
 sólo el chat lo necesita.
 
@@ -317,9 +332,9 @@ las dos desde disco. Ver la nota bajo la tabla de fases para por qué se descart
 Seis capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
 `network-assistant`, `documentation-search`, `network-map` y `assistant-evals`.
 
-**Lo próximo:** `add-subscriber-trace`, la primera de las tres capacidades del handoff
-`docs/handoff/2026-10-07-map-user-capabilities.md`, con sus propios casos de eval juzgados contra
-los registros finales de `reduce-cost-per-question`. Queda pendiente, como cambio
+**Lo próximo:** archivar `add-subscriber-trace` y después `add-cut-impact`, la segunda de las tres
+capacidades del handoff `docs/handoff/2026-10-07-map-user-capabilities.md`, que reusa el payload
+por tipo para marcar el subárbol afectado. Queda pendiente, como cambio
 aparte, el trabajo de prompt para que el modelo deje de hacer cuentas en la prosa. Es lo que frenó
 a Sonnet, y la misma regla puede volver a juzgarlo después.
 
