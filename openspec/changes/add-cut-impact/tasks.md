@@ -15,7 +15,7 @@ pass before it is ticked.
       Verify by reading it against design.md's Context table. FR-03 and NAP-03 must give 2 NAPs and
       5 subscribers with FR-12 dark; FR-04 and NAP-04 must give 2 and 5 with FR-09 dark; FR-12 and
       NAP-12 must give 1 and 4.
-- [ ] 1.2 Add `src/lib/topology/cut.ts` with `cutImpact(network, elementId)` and the `CutImpact`
+- [x] 1.2 Add `src/lib/topology/cut.ts` with `cutImpact(network, elementId)` and the `CutImpact`
       type (design.md, decisions 1–3). It is pure, with no literals from the seed and a step bound
       on the walk. Tests in `cut.test.ts`, one per spec scenario:
       (a) FR-03: NAP-03 and NAP-12; SUB-006 and SUB-025–028; count 5; FR-12 dark;
