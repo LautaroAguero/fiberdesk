@@ -113,7 +113,7 @@ pass before it is ticked.
 
 ## 3. The tool (`network-assistant`)
 
-- [ ] 3.1 Add `trace_subscriber_link` to `src/lib/assistant/tool-definitions.ts` (design.md,
+- [x] 3.1 Add `trace_subscriber_link` to `src/lib/assistant/tool-definitions.ts` (design.md,
       decision 6): `strict: true`, with `subscriber_id` an enum of the network's subscriber ids, and
       the description as specified. Tests:
       - the enum equals the 28 seed ids;

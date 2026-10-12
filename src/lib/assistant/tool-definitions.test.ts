@@ -6,6 +6,7 @@ import {
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
   SEARCH_DOCUMENTATION_TOOL_NAME,
   SUMMARIZE_TOOL_NAME,
+  TRACE_TOOL_NAME,
 } from "@/lib/assistant/tool-definitions";
 import { loadNetwork } from "@/lib/network/load";
 
@@ -15,6 +16,7 @@ const summarize = tools.find((t) => t.name === SUMMARIZE_TOOL_NAME)!;
 const detail = tools.find((t) => t.name === DETAIL_TOOL_NAME)!;
 const searchDocs = tools.find((t) => t.name === SEARCH_DOCUMENTATION_TOOL_NAME)!;
 const getConstants = tools.find((t) => t.name === GET_OPTICAL_CONSTANTS_TOOL_NAME)!;
+const trace = tools.find((t) => t.name === TRACE_TOOL_NAME)!;
 
 describe("2.4 strict schemas and the identifier enum", () => {
   test("both tools declare strict: true", () => {
@@ -92,5 +94,36 @@ describe("5.2 the optical constants tool", () => {
 
   test("the description distinguishes it from a NAP's own budget tools", () => {
     expect(getConstants.description!.toLowerCase()).toContain("not a specific nap's measurements");
+  });
+});
+
+describe("3.1 the subscriber trace tool", () => {
+  test("is the fifth tool, and there are five", () => {
+    expect(tools).toHaveLength(5);
+    expect(trace.name).toBe("trace_subscriber_link");
+  });
+
+  test("declares strict: true and forbids additional properties", () => {
+    expect(trace.strict).toBe(true);
+    expect(trace.input_schema.additionalProperties).toBe(false);
+  });
+
+  test("requires subscriber_id, an enum of exactly the 28 seed identifiers", () => {
+    expect(trace.input_schema.required).toEqual(["subscriber_id"]);
+    const properties = trace.input_schema.properties as { subscriber_id: { enum: string[] } };
+    expect(properties.subscriber_id.enum).toHaveLength(28);
+    expect([...properties.subscriber_id.enum].sort()).toEqual(network.subscribers.map((s) => s.id).sort());
+    expect(properties.subscriber_id.enum).not.toContain("SUB-099");
+    expect(Object.keys(properties)).toEqual(["subscriber_id"]);
+  });
+
+  test("the description names the SUB-014 and Subscriber 014 correspondence", () => {
+    expect(trace.description).toContain("SUB-014");
+    expect(trace.description).toContain("Subscriber 014");
+  });
+
+  test("the description says a passing NAP does not vouch for its subscribers, and the drop is modelled", () => {
+    expect(trace.description!.toLowerCase()).toContain("passing nap does not mean");
+    expect(trace.description!.toLowerCase()).toContain("modelled estimate");
   });
 });
