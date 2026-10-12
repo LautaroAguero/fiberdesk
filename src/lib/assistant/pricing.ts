@@ -9,18 +9,19 @@
  * Rates are explicit per model rather than one multiplier applied to the
  * input price, because the source already shows they differ: Opus 5.5's
  * cache read is 0.05 × input, not the 0.1 × that holds for the others. A rate
- * the source does not state directly is marked DERIVED, with the rule that
- * produced it, so it can be checked and replaced.
+ * the source states only as a rule over the input price says which rule; the
+ * cache rules were confirmed in reduce-cost-per-question, task 2.1.
  */
 
 import type Anthropic from "@anthropic-ai/sdk";
 
 /** When the rates below were last checked against their source. */
-export const PRICES_VERIFIED_ON = "2026-10-08";
+export const PRICES_VERIFIED_ON = "2026-10-12";
 
 /** Where the rates below came from. */
 export const PRICES_SOURCE =
-  "claude-api skill, 'Current Models' table and per-model notes (cached 2026-10-06)";
+  "claude-api skill, 'Current Models' table and per-model notes, and its prompt-caching " +
+  "reference, 'Economics' (cached 2026-10-06)";
 
 /** All rates in US dollars per million tokens. */
 export interface ModelPrice {
@@ -38,20 +39,20 @@ export const MODEL_PRICES: Readonly<Record<string, ModelPrice>> = {
   "claude-opus-5": {
     input: 5.0, // USD/MTok — stated
     output: 25.0, // USD/MTok — stated
-    cache_write_5m: 6.25, // USD/MTok — DERIVED: 1.25 × input (5-minute cache write rule)
-    cache_read: 0.5, // USD/MTok — DERIVED: 0.1 × input (cache read rule)
+    cache_write_5m: 6.25, // USD/MTok — stated rule: 5-minute cache writes cost 1.25 × input
+    cache_read: 0.5, // USD/MTok — stated rule: cache reads cost 0.1 × input
   },
   "claude-opus-5-5": {
     input: 4.0, // USD/MTok — stated
     output: 20.0, // USD/MTok — stated
-    cache_write_5m: 5.0, // USD/MTok — DERIVED: 1.25 × input (5-minute cache write rule)
-    cache_read: 0.2, // USD/MTok — stated ("cache reads $0.20")
+    cache_write_5m: 5.0, // USD/MTok — stated rule: 5-minute cache writes cost 1.25 × input
+    cache_read: 0.2, // USD/MTok — stated ("cache reads $0.20"); 0.05 × input
   },
   "claude-sonnet-5-5": {
     input: 2.0, // USD/MTok — stated
     output: 10.0, // USD/MTok — stated
-    cache_write_5m: 2.5, // USD/MTok — DERIVED: 1.25 × input (5-minute cache write rule)
-    cache_read: 0.2, // USD/MTok — stated ("cache reads $0.20")
+    cache_write_5m: 2.5, // USD/MTok — stated rule: 5-minute cache writes cost 1.25 × input
+    cache_read: 0.2, // USD/MTok — stated ("cache reads $0.20"); 0.1 × input
   },
 };
 

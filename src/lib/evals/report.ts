@@ -5,6 +5,7 @@
  */
 
 import type { RunComparison } from "@/lib/evals/compare";
+import { promptCachingOn } from "@/lib/evals/record";
 import type { RateSummary, RunRecord } from "@/lib/evals/types";
 
 const percent = (x: number | null) => (x === null ? "—" : `${(x * 100).toFixed(1)}%`);
@@ -22,7 +23,8 @@ function rateRow(label: string, rate: RateSummary): string {
 export function formatSummary(record: RunRecord): string {
   const { summary } = record;
   const lines = [
-    `Run ${record.started_at} — ${record.model}, effort ${record.effort}, prompt ${record.prompt_hash.slice(0, 12)}`,
+    `Run ${record.started_at} — ${record.model}, effort ${record.effort}, ` +
+      `caching ${promptCachingOn(record) ? "on" : "off"}, prompt ${record.prompt_hash.slice(0, 12)}`,
     `Status: ${record.status}${record.stopped_reason ? ` (${record.stopped_reason})` : ""}. ` +
       `Spent ${usd(record.spent_usd)} of a $${record.max_usd} cap.`,
     "",
@@ -31,8 +33,10 @@ export function formatSummary(record: RunRecord): string {
     ...Object.entries(summary.by_area).map(([area, rate]) => rateRow(area, rate)),
     rateRow("**overall**", summary.overall),
     "",
-    `Cost per question (n=${summary.cost_per_question.n}): median ${usd(summary.cost_per_question.median)}, ` +
-      `p95 ${usd(summary.cost_per_question.p95)}`,
+    `Cost per question, measured (n=${summary.cost_per_question.n}): median ` +
+      `${usd(summary.cost_per_question.median)}, p95 ${usd(summary.cost_per_question.p95)}`,
+    `Cost per question, cold (n=${summary.cold_cost_per_question.n}): median ` +
+      `${usd(summary.cold_cost_per_question.median)}, p95 ${usd(summary.cold_cost_per_question.p95)}`,
     `Latency per question (n=${summary.latency_ms_per_question.n}): median ` +
       `${seconds(summary.latency_ms_per_question.median)}, p95 ${seconds(summary.latency_ms_per_question.p95)}`,
   ];
@@ -62,6 +66,7 @@ export function formatComparison(comparison: RunComparison): string {
     `pass → fail: ${comparison.pass_to_fail.length} (${list(comparison.pass_to_fail)})`,
     `fail → pass: ${comparison.fail_to_pass.length} (${list(comparison.fail_to_pass)})`,
     `Unstable: ${list(comparison.unstable)}`,
+    `McNemar exact p (two-sided): ${comparison.mcnemar_p.toFixed(4)}`,
   ];
   if (comparison.excluded.length > 0) {
     lines.push(`Excluded: ${comparison.excluded.map((e) => `${e.id} (${e.a} / ${e.b})`).join(", ")}`);

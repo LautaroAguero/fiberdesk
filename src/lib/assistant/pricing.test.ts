@@ -29,6 +29,12 @@ describe("computeCost", () => {
     expect(computeCost("claude-opus-5", usage({ cacheWrite: 1_000_000 }))).toBeCloseTo(6.25, 12);
   });
 
+  test("Opus 5, 1,000 in / 2,500 cache-write / 200 out → $0.025625", () => {
+    expect(
+      computeCost("claude-opus-5", usage({ input: 1000, cacheWrite: 2500, output: 200 })),
+    ).toBeCloseTo(0.025625, 12);
+  });
+
   test("null cache fields count as zero", () => {
     expect(
       computeCost("claude-opus-5", usage({ input: 1_000_000, cacheWrite: null, cacheRead: null })),

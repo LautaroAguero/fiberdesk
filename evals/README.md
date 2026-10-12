@@ -15,6 +15,7 @@ npm run eval -- --max-usd 2 --cases 'budget-*'  # a subset, by case id
 npm run eval -- --max-usd 10 --model claude-opus-5-5 --effort medium   # a candidate configuration
 npm run eval:compare -- evals/runs/A.json evals/runs/B.json            # which cases flipped
 npm run eval:regrade -- evals/runs/A.json                              # re-grade offline, free
+npm run eval:decide -- evals/runs/B1.json evals/runs/B2.json evals/runs/C.json   # judge a candidate, free
 ```
 
 **Only `npm run eval` spends money.** Comparing, re-grading and every unit test run offline, with
@@ -96,3 +97,20 @@ The summary — pass rate per area with a 95% Wilson interval, median and 95th-p
 latency per question (per user turn) — is computed in `src/lib/evals/stats.ts`, never by a model.
 `eval:compare` pairs two records by case id and names every case that flipped; over two runs of
 the same configuration, that is the noise floor.
+
+## Deciding whether a cheaper configuration may replace the baseline
+
+`npm run eval:decide -- <baseline> <replicate> <candidate>` applies a rule fixed in advance to three
+run records: the published baseline, a second run of the same configuration (which measures the
+noise between identical runs), and the candidate. It re-grades all three in memory with today's
+graders, calls no model, needs no API key and writes nothing. A candidate is rejected when a
+grounding or abstention grader that passed on a case in both baseline runs fails there, when it
+passes fewer than the lower baseline count minus one, when two stable cases of one area fail, when
+its median **cold** cost per question exceeds half the baseline's, or when it ran with prompt
+caching on and never read from the cache. Cold cost re-prices each question's first-call cache
+reads as writes, so the figure does not depend on traffic having warmed the cache. An accept is
+always provisional until a person has read every case the output lists, and the exact McNemar test
+is reported beside the verdict without deciding it. Records that are partial, have errored cases, or
+come from baselines that differ in model, effort or prompt hash get no verdict. The rule and its
+scenarios are in `openspec/changes/reduce-cost-per-question/specs/assistant-evals/spec.md`; the
+reasoning for 21 cases is in that change's `design.md`, decision 4.

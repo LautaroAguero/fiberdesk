@@ -45,6 +45,8 @@ export interface EvalConfig {
   thinking: unknown;
   system: string;
   tools: Anthropic.Tool[];
+  /** Cache markers on every request. Billing only, so kept out of the prompt hash. */
+  promptCaching: boolean;
   overridden: { model: boolean; effort: boolean };
 }
 
@@ -142,6 +144,7 @@ async function runCase(
         searchIndex,
         messages: [...messages, { role: "user", content: userText }],
         effort: config.effort,
+        promptCaching: config.promptCaching,
         onEvent: () => {},
       });
       messages = result.messages;
@@ -267,6 +270,7 @@ export async function runEvalSuite(params: RunEvalSuiteParams): Promise<RunRecor
     model: config.model,
     effort: config.effort,
     overridden: config.overridden,
+    prompt_caching: config.promptCaching,
     prompt_hash: promptHash(config.system, config.tools, {
       max_tokens: config.maxTokens,
       thinking: config.thinking,

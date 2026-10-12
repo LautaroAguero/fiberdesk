@@ -194,46 +194,71 @@ highlighted, whether every figure in the prose came from a tool, whether it decl
 system does not model. It calls the API under a mandatory spend cap and is never part of
 `npm test`. How it works, and what each grader does *not* check: [`evals/README.md`](evals/README.md).
 
-**Baseline** — `claude-opus-5`, effort `low`, from
-[`evals/runs/2026-10-08T03-32-06Z.regraded.json`](evals/runs/2026-10-08T03-32-06Z.regraded.json):
+**Can a cheaper model do this?** Not yet. The change `reduce-cost-per-question` tried to halve the
+cost per question. Every configuration was judged by a rule fixed before any of them ran
+(`npm run eval:decide`; the rule and every reading are in
+[`evals/decision-log.md`](evals/decision-log.md)):
 
-| Area | Passed | Rate | 95% Wilson interval |
-|---|---|---|---|
-| Optical budget questions | 5/8 | 62.5% | 30.6%–86.3% |
-| Documentation | 5/5 | 100.0% | 56.6%–100.0% |
-| Declining what the system cannot answer | 5/5 | 100.0% | 56.6%–100.0% |
-| Multi-turn follow-ups | 1/3 | 33.3% | 6.1%–79.2% |
-| **Overall** | **16/21** | **76.2%** | **54.9%–89.4%** |
+| Configuration | Run | Passed (95% interval) | Cost / question, cold: median · p95 | Measured: median · p95 | p95 latency | McNemar vs B1 | Verdict |
+|---|---|---|---|---|---|---|---|
+| `claude-opus-5`, `low`, no caching | B1, [record](evals/runs/2026-10-08T03-32-06Z.regraded.json) | 16/21, 76.2% (54.9–89.4%) | $0.0376 · $0.0663 | $0.0376 · $0.0663 | 13.1 s | — | baseline |
+| `claude-opus-5`, `low`, no caching | B2, [record](evals/runs/2026-10-12T11-08-31Z.regraded.json) | 17/21, 81.0% (60.0–92.3%) | $0.0361 · $0.0653 | $0.0361 · $0.0653 | 15.6 s | 0 → / 1 ←, p = 1.00 | second baseline run |
+| `claude-sonnet-5-5`, `low`, caching | [record](evals/runs/2026-10-12T11-33-18Z.json) | 17/21, 81.0% (60.0–92.3%) | $0.0103 · $0.0172 | $0.0046 · $0.0117 | 6.3 s | 1 → / 2 ←, p = 1.00 | **reject**: grounding veto on 2 stable cases |
+| `claude-sonnet-5-5`, `medium`, caching | [record](evals/runs/2026-10-12T11-36-14Z.json) | 15/21, 71.4% (50.0–86.2%) | $0.0121 · $0.0184 | $0.0064 · $0.0127 | 7.3 s | 2 → / 1 ←, p = 1.00 | **reject**: grounding veto on 3 stable cases |
+| `claude-opus-5-5`, caching | not run | — | projected 71% of B1 | — | — | — | not run: its projected cold cost cannot meet the 50% target |
 
-Per question: median cost **$0.0376**, p95 **$0.0663**; p95 latency **13.1 s** (median 8.5 s).
-The whole run cost $1.03.
+How to read the table:
 
-What fails, read by hand in [`evals/grader-validation.md`](evals/grader-validation.md):
+- **"Cold" is the cost of a question that arrives alone**, with nothing in the prompt cache. The
+  eval runs its cases back to back, so the cache stays warm. The measured column shows that warm
+  figure. A real demo question usually arrives alone, so the target is the cold median: at most
+  50% of B1, $0.0188.
+- **McNemar** counts the cases that went pass → fail and fail → pass against B1. It is reported
+  for context and decides nothing. With so few disagreeing cases, nothing could be significant.
+- **The Opus 5.5 projection** re-prices B1's own token counts at Opus 5.5 rates with caching.
+  Reaching 50% would take about 30% fewer tokens per question, and it thinks more per effort
+  level, not less.
+
+**Both Sonnet configurations meet the cost target with room to spare, and both fail on the
+project's hardest rule.** In several answers the model wrote a number no tool returned: "the other
+9 NAPs" (12 − 3), "de las 12 cajas" (a count of the survey's rows), "disagree by 0.03 dB/km"
+(0.25 − 0.22). Opus 5 does this kind of arithmetic too, but less often. On these cases it wrote no
+count at all, or a 12 that passed only because the same number appears in a detail result it had
+fetched. One more regression has no grader: at effort `low`, Sonnet answered an English question in
+Spanish.
+
+So the assistant stays on `claude-opus-5` at effort `low`. What did ship is **prompt caching**. It
+changes no byte the model reads, so it needs no quality gate. Across the two Sonnet runs, 84 of 85
+model calls read the ~2,400-token prefix from the cache. The next lever is the prompt, not the model:
+stop the arithmetic in prose, then judge the cheaper configurations again under the same rule.
+
+What fails on the baseline, read by hand in [`evals/grader-validation.md`](evals/grader-validation.md):
 
 - **The model does arithmetic in prose.** Three answers state a figure no tool returned — "casi 20
   km", "~19.8 km" (11.2 + 8.6), "0.23 dB" (3.00 − 2.77). Correct sums, but the rule here is that
   the model computes nothing, and the grounding grader holds it to that.
 - **It sometimes stops at the survey.** Asked "which NAPs fail the optical budget?" in English, it
   answered from the survey and *offered* the breakdown instead of fetching it, so the map
-  highlighted nothing; the Spanish phrasing surveyed and then detailed both NAPs. Asked for the
-  power reaching NAP-09, it said the system does not model received power — it does
-  (`detail_optical_budget` returns −26.4 dBm) — a wrong decline.
+  highlighted nothing. Asked for the power reaching NAP-09, it said the system does not model
+  received power, which is wrong: `detail_optical_budget` returns −26.4 dBm.
 - Declining and documentation questions passed every case.
 
 Read these numbers for what they are:
 
-- **This is a single run.** Models cannot be sampled deterministically here, and how much two runs
-  of the same configuration disagree has not been measured yet; that second run is the first step
-  of `reduce-cost-per-question`, before any configuration is compared against this one.
-- **The intervals are wide.** With 3–8 cases per area, a per-area rate is context, not a headline;
-  even the overall interval spans 35 points.
+- **Two runs of the same configuration disagree on one case in 21.** B1 and B2 differ only on
+  `conv-and-nap12-es`, through the grounding grader. That is the noise floor every comparison
+  above is judged against. A grader that already flips between B1 and B2 cannot veto a
+  candidate.
+- **21 cases cannot show that a cheaper model is "no worse".** One case is 4.8 points, and the
+  overall interval spans about 35. The veto and the hand reading of every case that changed carry
+  the weight a significance test cannot.
 - **The grounding grader checks membership, not attribution** — a real number attached to the
   wrong NAP passes — and counts written as words ("nueve restantes") are not checked. It was
-  validated by hand on all 21 answers before being trusted: after one fix, zero false positives
-  and zero false negatives.
-- **One case was corrected after the run.** `budget-limit-es` required a map highlight that its
-  question does not need, against the eval's own design; removing that expectation moved it from
-  fail to pass (15/21 → 16/21). Recorded, with the reasoning, in
+  validated by hand on all 21 baseline answers before being trusted: after one fix, zero false
+  positives and zero false negatives.
+- **One case was corrected after the first run.** `budget-limit-es` required a map highlight that
+  its question does not need, against the eval's own design. Removing that expectation moved it
+  from fail to pass (15/21 → 16/21). Recorded, with the reasoning, in
   [`evals/grader-validation.md`](evals/grader-validation.md).
 
 ## The map

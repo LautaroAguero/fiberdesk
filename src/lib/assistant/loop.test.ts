@@ -1,10 +1,13 @@
 import { describe, expect, test } from "vitest";
 
+import type Anthropic from "@anthropic-ai/sdk";
+
 import { THINKING } from "@/lib/assistant/config";
 import { runAssistantLoop } from "@/lib/assistant/loop";
 import { buildToolDefinitions, DETAIL_TOOL_NAME, SUMMARIZE_TOOL_NAME } from "@/lib/assistant/tool-definitions";
 import { buildSearchIndex } from "@/lib/corpus/search";
 import { loadNetwork } from "@/lib/network/load";
+import { SYSTEM_PROMPT } from "@/lib/assistant/system-prompt";
 import { createFakeModelClient, makeFixtureMessage, textBlock, toolUseBlock } from "@/lib/assistant/test-fixtures";
 
 const network = loadNetwork();
@@ -195,5 +198,93 @@ describe("4.3 the iteration cap", () => {
     expect(result.truncated).toBe(true);
     expect(result.stopReason).toBeNull();
     expect(events).toContain("error");
+  });
+});
+
+describe("prompt caching (reduce-cost-per-question, task 2.2)", () => {
+  /** A survey, then an answer: two requests, so the second carries a grown `messages`. */
+  function surveyThenAnswer() {
+    return createFakeModelClient([
+      {
+        message: makeFixtureMessage({
+          content: [toolUseBlock("toolu_1", SUMMARIZE_TOOL_NAME, {})],
+          stop_reason: "tool_use",
+        }),
+      },
+      { message: makeFixtureMessage({ content: [textBlock("NAP-09 fails.")], stop_reason: "end_turn" }) },
+    ]);
+  }
+
+  async function requestsFor(promptCaching: boolean | undefined) {
+    const { client, requests } = surveyThenAnswer();
+    await runAssistantLoop({
+      ...baseParams(client, "which fail?"),
+      system: SYSTEM_PROMPT,
+      effort: "low",
+      ...(promptCaching === undefined ? {} : { promptCaching }),
+    });
+    return requests;
+  }
+
+  /** The request with every cache marker removed: what the model reads. */
+  function stripMarkers(request: Anthropic.MessageStreamParams) {
+    const rest: Partial<Anthropic.MessageStreamParams> = { ...request };
+    delete rest.cache_control;
+    const { system } = request;
+    const text = Array.isArray(system) ? system.map((block) => block.text).join("") : system;
+    return { ...rest, system: text };
+  }
+
+  test("(a) with caching on, every request marks the end of the system prompt and the tail", async () => {
+    const requests = await requestsFor(true);
+
+    expect(requests).toHaveLength(2);
+    for (const request of requests) {
+      expect(request.system).toEqual([
+        { type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
+      ]);
+      expect(request.cache_control).toEqual({ type: "ephemeral" });
+    }
+  });
+
+  test("(b) with caching off, the request is byte-identical to the uncached one", async () => {
+    const off = await requestsFor(false);
+    const omitted = await requestsFor(undefined);
+
+    const expectedFirst = {
+      model: "claude-opus-5",
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      tools,
+      messages: [{ role: "user", content: "which fail?" }],
+      thinking: THINKING,
+      output_config: { effort: "low" },
+    };
+    expect(JSON.stringify(off[0])).toBe(JSON.stringify(expectedFirst));
+    expect(JSON.stringify(off)).toBe(JSON.stringify(omitted));
+    for (const request of off) {
+      expect(request).not.toHaveProperty("cache_control");
+      expect(typeof request.system).toBe("string");
+    }
+  });
+
+  test("(c) with markers stripped, cached and uncached requests are deep-equal", async () => {
+    const cached = await requestsFor(true);
+    const uncached = await requestsFor(false);
+
+    expect(cached.map(stripMarkers)).toEqual(uncached.map(stripMarkers));
+    expect(cached.map(stripMarkers)).toEqual(uncached);
+  });
+
+  test("(d) no marker goes inside messages, and the messages passed in are not mutated", async () => {
+    const { client, requests } = surveyThenAnswer();
+    const input: Anthropic.MessageParam[] = [{ role: "user", content: "which fail?" }];
+    const snapshot = structuredClone(input);
+
+    await runAssistantLoop({ ...baseParams(client, "which fail?"), messages: input, promptCaching: true });
+
+    expect(input).toEqual(snapshot);
+    expect(input).toHaveLength(1);
+    expect(JSON.stringify(requests.map((request) => request.messages))).not.toContain("cache_control");
   });
 });

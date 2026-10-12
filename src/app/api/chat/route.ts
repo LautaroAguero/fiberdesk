@@ -10,7 +10,7 @@
 
 import type Anthropic from "@anthropic-ai/sdk";
 
-import { EFFORT, MAX_TOKENS, MODEL } from "@/lib/assistant/config";
+import { EFFORT, MAX_TOKENS, MODEL, PROMPT_CACHING } from "@/lib/assistant/config";
 import { runAssistantLoop } from "@/lib/assistant/loop";
 import { createAnthropicClient, createModelClient } from "@/lib/assistant/model-client";
 import { projectHighlight } from "@/lib/assistant/highlight";
@@ -91,6 +91,7 @@ export async function POST(request: Request): Promise<Response> {
         searchIndex,
         messages,
         effort: EFFORT,
+        promptCaching: PROMPT_CACHING,
         onEvent: emit,
       });
       toolCalls = result.toolCalls;

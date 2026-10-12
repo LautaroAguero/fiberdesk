@@ -14,7 +14,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
 
-import { EFFORT, MAX_TOKENS, MODEL, THINKING } from "@/lib/assistant/config";
+import { EFFORT, MAX_TOKENS, MODEL, PROMPT_CACHING, THINKING } from "@/lib/assistant/config";
 import { getAnthropicApiKey } from "@/lib/assistant/env";
 import { createAnthropicClient, createModelClient } from "@/lib/assistant/model-client";
 import { SYSTEM_PROMPT } from "@/lib/assistant/system-prompt";
@@ -96,6 +96,7 @@ async function main(): Promise<void> {
       thinking: THINKING,
       system: SYSTEM_PROMPT,
       tools: buildToolDefinitions(network),
+      promptCaching: PROMPT_CACHING,
       overridden: { model: values.model !== undefined, effort: values.effort !== undefined },
     },
     maxUsd,

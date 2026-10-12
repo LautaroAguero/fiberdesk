@@ -136,6 +136,12 @@ export interface RunSummary {
   by_area: Record<string, RateSummary>;
   /** Per question = per user turn. US dollars. */
   cost_per_question: { n: number; median: number | null; p95: number | null };
+  /**
+   * The same, with each question's first-call cache reads re-priced as writes: the cost had no
+   * earlier question warmed the cache. Computed by `summarizeRun`; absent from older stored
+   * summaries, which is why `decide` recomputes summaries instead of reading them.
+   */
+  cold_cost_per_question: { n: number; median: number | null; p95: number | null };
   latency_ms_per_question: { n: number; median: number | null; p95: number | null };
 }
 
@@ -149,6 +155,11 @@ export interface RunRecord {
   model: string;
   effort: string;
   overridden: { model: boolean; effort: boolean };
+  /**
+   * Whether the run sent prompt-cache markers. Absent from records written before
+   * reduce-cost-per-question: read it through `promptCachingOn`, never directly.
+   */
+  prompt_caching?: boolean;
   prompt_hash: string;
   max_usd: number;
   spent_usd: number;

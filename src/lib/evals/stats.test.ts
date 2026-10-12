@@ -1,7 +1,11 @@
 import { describe, expect, test } from "vitest";
 
-import { median, p95, summarizeRun, wilsonInterval } from "@/lib/evals/stats";
-import type { CaseRecord, TurnRecord } from "@/lib/evals/types";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
+import type { ModelCallRecord } from "@/lib/assistant/usage";
+import { coldCost, mcnemarExact, median, p95, summarizeRun, wilsonInterval } from "@/lib/evals/stats";
+import type { CaseRecord, RunRecord, TurnRecord } from "@/lib/evals/types";
 
 const pct = (x: number) => Math.round(x * 1000) / 10;
 
@@ -97,5 +101,121 @@ describe("summarizeRun", () => {
     const summary = summarizeRun([caseRecord("e", "docs", "skipped_budget", [])]);
     expect(summary.by_area.docs).toMatchObject({ rate: null, low: null, high: null });
     expect(summary.cost_per_question).toEqual({ n: 0, median: null, p95: null });
+    expect(summary.cold_cost_per_question).toEqual({ n: 0, median: null, p95: null });
+  });
+});
+
+describe("coldCost (reduce-cost-per-question, task 3.2)", () => {
+  const call = (model: string, over: Partial<ModelCallRecord> = {}): ModelCallRecord => ({
+    model,
+    input_tokens: 100,
+    output_tokens: 100,
+    cache_creation_input_tokens: 0,
+    cache_read_input_tokens: 0,
+    latency_ms: 1000,
+    cost_usd: 0.001,
+    stop_reason: "end_turn",
+    ...over,
+  });
+  const turn = (cost: number | null, calls: ModelCallRecord[]): Pick<TurnRecord, "cost_usd" | "calls"> => ({
+    cost_usd: cost,
+    calls,
+  });
+
+  test("re-prices the first call's reads: $0.0100 and 2,400 reads on Sonnet 5.5 gives $0.01552", () => {
+    const cold = coldCost(turn(0.01, [call("claude-sonnet-5-5", { cache_read_input_tokens: 2400 })]));
+    expect(cold).toBeCloseTo(0.01552, 12);
+  });
+
+  test("without cache activity, cold equals measured", () => {
+    const calls = [call("claude-opus-5"), call("claude-opus-5")];
+    expect(coldCost(turn(0.0376, calls))).toBe(0.0376);
+  });
+
+  test("a second call's 3,000 reads stay at the read rate", () => {
+    const calls = [
+      call("claude-sonnet-5-5", { cache_creation_input_tokens: 2400 }),
+      call("claude-sonnet-5-5", { cache_read_input_tokens: 3000 }),
+    ];
+    expect(coldCost(turn(0.01, calls))).toBe(0.01);
+  });
+
+  test("only the first call is re-priced when both read", () => {
+    const calls = [
+      call("claude-sonnet-5-5", { cache_read_input_tokens: 2400 }),
+      call("claude-sonnet-5-5", { cache_read_input_tokens: 3000 }),
+    ];
+    expect(coldCost(turn(0.01, calls))).toBeCloseTo(0.01552, 12);
+  });
+
+  test("an unpriced model gives null, never an estimate", () => {
+    const calls = [
+      call("claude-sonnet-5-5", { cache_read_input_tokens: 2400 }),
+      call("claude-unpriced-test", { cost_usd: null }),
+    ];
+    expect(coldCost(turn(null, calls))).toBeNull();
+    // Even a stated cost does not rescue a call whose model has no listed rates.
+    expect(coldCost(turn(0.01, [call("claude-unpriced-test", { cost_usd: 0.01 })]))).toBeNull();
+  });
+
+  test("a table passed by the caller is the one used for the re-pricing", () => {
+    const prices = { m: { input: 1, output: 1, cache_write_5m: 2, cache_read: 0.5 } };
+    expect(coldCost(turn(1, [call("m", { cache_read_input_tokens: 1_000_000 })]), prices)).toBeCloseTo(2.5, 12);
+  });
+
+  test("summarizeRun leaves a question with an unknown cold cost out of the distribution", () => {
+    const base = { user: "q", answer: "a", cited_sources: [], stop_reason: "end_turn", trajectory: [], highlight_ids: [], latency_ms: 1 };
+    const priced: TurnRecord = { ...base, ...turn(0.01, [call("claude-opus-5")]) };
+    const unpriced: TurnRecord = { ...base, ...turn(null, [call("claude-unpriced-test", { cost_usd: null })]) };
+    const summary = summarizeRun([
+      { id: "a", area: "budget", outcome: "pass", graders: {}, sign_only: [], turns: [priced, unpriced], cost_usd: null },
+    ]);
+    expect(summary.cold_cost_per_question).toEqual({ n: 1, median: 0.01, p95: 0.01 });
+  });
+
+  test("over the baseline record, which had no caching, the cold median equals the measured $0.037605", () => {
+    const baseline = JSON.parse(
+      readFileSync(path.join(process.cwd(), "evals", "runs", "2026-10-08T03-32-06Z.regraded.json"), "utf8"),
+    ) as RunRecord;
+    const summary = summarizeRun(baseline.cases);
+    expect(summary.cost_per_question.n).toBe(24);
+    expect(summary.cold_cost_per_question.n).toBe(24);
+    expect(summary.cold_cost_per_question.median).toBe(summary.cost_per_question.median);
+    expect(summary.cold_cost_per_question.median).toBeCloseTo(0.037605, 6);
+  });
+});
+
+describe("mcnemarExact (reduce-cost-per-question, task 3.3)", () => {
+  test("5 pass-to-fail against 1 fail-to-pass gives 0.21875", () => {
+    expect(mcnemarExact(5, 1)).toBe(0.21875);
+  });
+
+  test("10 against 2 gives 0.0386 to four decimals", () => {
+    expect(mcnemarExact(10, 2)).toBeCloseTo(0.0386, 4);
+  });
+
+  test("no discordant cases gives 1", () => {
+    expect(mcnemarExact(0, 0)).toBe(1);
+  });
+
+  test("the test is symmetric in b and c", () => {
+    for (const [b, c] of [[5, 1], [10, 2], [0, 7], [3, 9]]) {
+      expect(mcnemarExact(b, c)).toBe(mcnemarExact(c, b));
+    }
+  });
+
+  test("the result never exceeds 1: (3, 3) gives 1", () => {
+    expect(mcnemarExact(3, 3)).toBe(1);
+    expect(mcnemarExact(1, 1)).toBe(1);
+    expect(mcnemarExact(10, 11)).toBe(1);
+  });
+
+  test("all discordant cases in one direction", () => {
+    expect(mcnemarExact(6, 0)).toBe(0.03125);
+  });
+
+  test("negative or fractional counts are refused", () => {
+    expect(() => mcnemarExact(-1, 2)).toThrow();
+    expect(() => mcnemarExact(1.5, 2)).toThrow();
   });
 });

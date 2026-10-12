@@ -269,7 +269,7 @@ carga y validación estructural del dataset, y el flujo de OpenSpec andando de p
 Los checks visuales se verificaron en el navegador reproduciendo turnos grabados, sin llamar a la
 API (grupo 6 de `tasks.md`), y la corrida real se hizo una vez a mano, como en las Fases 1 y 2.
 
-**326 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
+**383 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
 reales. Las conductas que ningún test puede cubrir se verificaron a mano una vez contra la API
 real, para las fases ya cerradas:
 
@@ -283,19 +283,30 @@ real, para las fases ya cerradas:
   respuesta y reencuadre, y que siga declinando la sensibilidad de la ONT con el mapa delante.
 
 **Evals (Fase 4, primer ítem: `add-eval-harness`, archivado).** La Fase 4 sigue abierta y no es
-desplegable por sí sola todavía: no hay deploy, y faltan `reduce-cost-per-question` y las tres
-capacidades del handoff. Esas conductas ya no dependen sólo de la
+desplegable por sí sola todavía: no hay deploy, y faltan las tres capacidades del handoff. Esas conductas ya no dependen sólo de la
 verificación a mano: `npm run eval` le hace 21 casos al modelo real y los califica con graders
 deterministas, bajo un tope de gasto obligatorio. Cada corrida queda en `evals/runs/` y se puede
 **re-calificar offline** (`npm run eval:regrade`), sin clave ni llamadas. El costo y la latencia de
 cada llamada se miden en código (`src/lib/assistant/pricing.ts`, `usage.ts`).
 
-**Baseline** (`claude-opus-5`, effort `low`, una corrida, $1,03): **16/21 (76,2%, IC 95% 54,9–89,4%)**;
-costo por pregunta mediana $0,0376, p95 $0,0663; latencia p95 13,1 s. Lo que falla: el modelo hace
-cuentas en la prosa (19,8 km, 0,23 dB) y a veces se queda en el censo sin pedir el desglose. El
-grader de grounding se validó a mano sobre las 21 respuestas (`evals/grader-validation.md`).
-⚠️ Es **una sola corrida**: el ruido entre dos corridas iguales se mide al arrancar
-`reduce-cost-per-question`.
+**Baseline** (`claude-opus-5`, effort `low`, dos corridas): **B1 16/21 (76,2%, IC 95% 54,9–89,4%)**,
+costo por pregunta mediana $0,0376, p95 $0,0663, latencia p95 13,1 s; **B2 17/21 (81,0%)**, mediana
+$0,0361, latencia p95 15,6 s. **Ruido entre dos corridas iguales: un caso de 21** (`conv-and-nap12-es`,
+por el grader de grounding). Lo que falla: el modelo hace cuentas en la prosa (19,8 km, 0,23 dB) y a
+veces se queda en el censo sin pedir el desglose. El grader de grounding se validó a mano sobre las
+21 respuestas (`evals/grader-validation.md`).
+
+**Segundo ítem: `reduce-cost-per-question`, implementado (falta archivar).** El objetivo era bajar a
+la mitad el costo por pregunta **en frío** (≤ $0,0188), juzgado por una regla fija de antemano
+(`npm run eval:decide`, con veto si un grader estable de grounding o abstención falla). **Ningún
+candidato pasó:** Sonnet 5.5 en `low` (17/21, frío 27,4% del baseline) y en `medium` (15/21, frío
+32,1%) cumplen el costo con holgura, pero los dos caen por **veto de grounding**: escriben en la prosa
+cuentas que ninguna herramienta devolvió ("los otros 9", "de las 12 cajas", "difieren en 0,03").
+Opus 5.5 no se corrió: proyecta 71% en frío. **El modelo sigue siendo `claude-opus-5`, effort
+`low`.** Lo que sí se envió es el **prompt caching** (`PROMPT_CACHING` en `config.ts`): no cambia
+ningún byte de lo que lee el modelo, y en las corridas de Sonnet 84 de 85 llamadas leyeron el
+prefijo de caché. Tabla completa en el README; cada veredicto y cada lectura a mano, en
+`evals/decision-log.md`.
 
 Correr la app requiere `ANTHROPIC_API_KEY` — ver `.env.example`. El mapa y la red se ven sin ella;
 sólo el chat lo necesita.
@@ -306,9 +317,11 @@ las dos desde disco. Ver la nota bajo la tabla de fases para por qué se descart
 Seis capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
 `network-assistant`, `documentation-search`, `network-map` y `assistant-evals`.
 
-**Lo próximo:** `reduce-cost-per-question` (bajar a la mitad el costo por pregunta, medido contra
-este baseline) y después las tres capacidades del handoff `docs/handoff/2026-10-07-map-user-capabilities.md`,
-cada una con sus propios casos de eval.
+**Lo próximo:** archivar `reduce-cost-per-question` y después `add-subscriber-trace`, la primera de
+las tres capacidades del handoff `docs/handoff/2026-10-07-map-user-capabilities.md`, con sus propios
+casos de eval juzgados contra los registros finales de este cambio. Queda pendiente, como cambio
+aparte, el trabajo de prompt para que el modelo deje de hacer cuentas en la prosa. Es lo que frenó
+a Sonnet, y la misma regla puede volver a juzgarlo después.
 
 Los nombres importan más de lo que parece: el modelo elige qué herramienta llamar leyendo el
 nombre y la descripción, y nada más. `summarize_` y `detail_` nombran **la forma de la
