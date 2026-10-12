@@ -23,6 +23,10 @@ describe("extractNumbers", () => {
     expect(readings("FR-03, OLT-RES-01 and SUB-014")).toEqual([]);
   });
 
+  test("a subscriber's seed name is an identifier, not a figure", () => {
+    expect(readings("el cliente Subscriber 014 tiene 11.40 dB")).toEqual([[11.4]]);
+  });
+
   test("a wavelength is a figure like any other", () => {
     expect(readings("1490 nm")).toEqual([[1490]]);
   });

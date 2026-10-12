@@ -20,11 +20,14 @@ export interface NumberToken {
 
 /**
  * Spans that contain digits but are not figures: entity identifiers
- * (`NAP-12`, `FR-03`, `OLT-RES-01`, `SUB-014`), splitter ratios (`1:16`), and
- * ordered-list markers at the start of a line (`1.`, `2)`).
+ * (`NAP-12`, `FR-03`, `OLT-RES-01`, `SUB-014`), a subscriber's seed name
+ * (`Subscriber 014`, the same identifier in another form; add-subscriber-trace),
+ * splitter ratios (`1:16`), and ordered-list markers at the start of a line
+ * (`1.`, `2)`).
  */
 const NOT_FIGURES = [
   /\b\p{L}+(?:-\p{L}+)*-\d+\b/gu,
+  /\bSubscriber \d+\b/g,
   /\b\d+:\d+\b/g,
   /^[ \t]*(?:[-*+][ \t]+)?\d+[.)](?=[ \t])/gm,
 ];

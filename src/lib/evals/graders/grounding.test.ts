@@ -76,10 +76,9 @@ describe("the tool definitions are a source (hand validation of the first baseli
     expect(result).toEqual({ pass: true, reasons: [], sign_only: [] });
   });
 
-  test("the definitions ground only the 3.00 dB default and the 014 of the subscriber example — a new figure there should be a deliberate choice", () => {
-    // The 14 is deliberate: trace_subscriber_link's description names the correspondence
-    // between "SUB-014" and the subscriber called "Subscriber 014" (add-subscriber-trace,
-    // design.md decision 6). The identifier form is masked as a non-figure; the name is not.
-    expect([...new Set(numbersInValue(buildToolDefinitions(network)))]).toEqual([3, 14]);
+  test("the definitions ground only the 3.00 dB default — a new figure there should be a deliberate choice", () => {
+    // trace_subscriber_link's description names "SUB-014" and "Subscriber 014". Both are
+    // identifiers and masked as non-figures, so neither grounds a bare 14.
+    expect([...new Set(numbersInValue(buildToolDefinitions(network)))]).toEqual([3]);
   });
 });
