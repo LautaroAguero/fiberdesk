@@ -269,7 +269,7 @@ carga y validación estructural del dataset, y el flujo de OpenSpec andando de p
 Los checks visuales se verificaron en el navegador reproduciendo turnos grabados, sin llamar a la
 API (grupo 6 de `tasks.md`), y la corrida real se hizo una vez a mano, como en las Fases 1 y 2.
 
-**483 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
+**584 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
 reales. Las conductas que ningún test puede cubrir se verificaron a mano una vez contra la API
 real, para las fases ya cerradas:
 
@@ -283,8 +283,10 @@ real, para las fases ya cerradas:
   respuesta y reencuadre, y que siga declinando la sensibilidad de la ONT con el mapa delante.
 
 **Evals (Fase 4, primer ítem: `add-eval-harness`, archivado).** La Fase 4 sigue abierta y no es
-desplegable por sí sola todavía: no hay deploy, y de las tres capacidades del handoff falta terminar una: `add-feasibility` (`add-subscriber-trace` y `add-cut-impact` están archivadas). Esas conductas ya no dependen sólo de la
-verificación a mano: `npm run eval` le hace 34 casos al modelo real y los califica con graders
+desplegable por sí sola todavía: no hay deploy. Las tres capacidades del handoff están hechas
+(`add-subscriber-trace` y `add-cut-impact` archivadas, `add-feasibility` implementada y por archivar).
+Esas conductas ya no dependen sólo de la verificación a mano: `npm run eval` le hace 42 casos al
+modelo real y los califica con graders
 deterministas, bajo un tope de gasto obligatorio. Cada corrida queda en `evals/runs/` y se puede
 **re-calificar offline** (`npm run eval:regrade`), sin clave ni llamadas. El costo y la latencia de
 cada llamada se miden en código (`src/lib/assistant/pricing.ts`, `usage.ts`).
@@ -338,6 +340,39 @@ que engrosar los tramos apagados: al 40% de opacidad se confundían con los neut
 (dos se quedan en el censo, dos hacen cuentas en la prosa). Lectura en
 `openspec/changes/archive/2026-10-12-add-cut-impact/verification.md`.
 
+**Quinto ítem: `add-feasibility`, implementado, falta archivar.** El asistente responde **"¿puedo
+conectar un cliente acá?"** sobre un punto marcado en el mapa. `evaluateConnection`
+(`src/lib/feasibility/`) evalúa siempre **las 3 NAPs más cercanas** al punto y les aplica tres
+chequeos:
+
+- acometida de hasta **600 m de tendido**;
+- puertos libres: salidas − abonados − NAPs hijas;
+- presupuesto proyectado del abonado nuevo, que no falle.
+
+Cada NAP vuelve con su veredicto y **todos** sus motivos (`too_far`, `no_free_ports`,
+`budget_fail`). Primero van las factibles, y el resultado nombra la mejor y cuántas son factibles.
+**Decisiones del dueño (2026-10-12):** el máximo pasa a 600 m (operativo, pendiente de validación) y
+no se tocan ni el seed ni la holgura; siempre se devuelven las 3 más cercanas. El modelo de
+acometida es **uno solo**, compartido con la traza, y da las longitudes en km y en metros.
+
+**El punto viaja en el request, no en el prompt.** `map_context.selected_point` se valida en la
+ruta (400 si cae fuera de Resistencia) y sólo lo lee la herramienta. **Séptima herramienta:**
+`list_connection_candidates`, **sin argumentos**: el modelo nunca copia una coordenada, y el
+prefijo cacheado no cambia con cada clic. Sin punto, la herramienta devuelve un error que le indica
+pedir el clic. Coordenadas escritas en el chat: pide el clic y no llama a nada. **El payload suma
+dos tipos**: `point` y `candidate` (rango y factibilidad). En el mapa, un clic en espacio vacío
+marca el punto, y las candidatas llevan anillos: verde azulado si es factible, amarillo si es
+factible pero marginal, gris oscuro si no; más una línea de acometida a la mejor. En el navegador
+hubo que oscurecer el anillo de "no factible", porque se perdía contra el relleno neutro.
+Oráculo: `seed/expected-feasibility.json`, de un script de Python independiente. Ese oráculo
+encontró un error del plan: 3253 m donde iba 3252.
+
+Corrida en vivo de registro (`5bb26aa37361`): **37/42 (88,1%), `feasibility` 8/8, `trace` 7/7,
+`cut` 6/6**. La primera corrida completa mostró una regresión en un caso estable: la traza convirtió
+0,383 km en "383 m". Se corrigió dando las dos unidades en la acometida. Los cinco fallos son casos
+viejos de presupuesto y conversación: dos se quedan en el censo y cuatro escriben cifras que ninguna
+herramienta devolvió. Lectura en `openspec/changes/add-feasibility/verification.md`.
+
 Correr la app requiere `ANTHROPIC_API_KEY` — ver `.env.example`. El mapa y la red se ven sin ella;
 sólo el chat lo necesita.
 
@@ -345,15 +380,15 @@ sólo el chat lo necesita.
 las dos desde disco. Ver la nota bajo la tabla de fases para por qué se descartó pgvector.
 
 Siete capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
-`network-assistant`, `documentation-search`, `network-map`, `assistant-evals` y `cut-impact`.
+`network-assistant`, `documentation-search`, `network-map`, `assistant-evals` y `cut-impact`. Al
+archivar `add-feasibility` se suma la octava, `connection-feasibility`.
 
-**Lo próximo:** `add-feasibility`, la última de las tres
-capacidades del handoff `docs/handoff/2026-10-07-map-user-capabilities.md`. Arranca con un hallazgo
-de `add-subscriber-trace`: todos los abonados del seed están a 346–383 m de su NAP, más que los ~300 m
-de acometida máxima que sugiere el handoff, así que hay que decidir qué se mueve (el máximo, la
-holgura o el seed). Queda pendiente, como cambio
-aparte, el trabajo de prompt para que el modelo deje de hacer cuentas en la prosa. Es lo que frenó
-a Sonnet, y la misma regla puede volver a juzgarlo después.
+**Lo próximo:** archivar `add-feasibility`, que cierra las tres capacidades del handoff
+`docs/handoff/2026-10-07-map-user-capabilities.md`. Después, como cambio aparte, el trabajo de prompt
+para que el modelo deje de hacer cuentas en la prosa. Es lo que frenó a Sonnet, la misma regla puede
+volver a juzgarlo después, y es también el origen de los fallos que quedan en los casos viejos. Ahí
+mismo conviene mirar el idioma: el modelo a veces abre en inglés una respuesta en español, y ningún
+grader lo controla. El resto de la Fase 4 (deploy, observabilidad) sigue siendo opcional.
 
 Los nombres importan más de lo que parece: el modelo elige qué herramienta llamar leyendo el
 nombre y la descripción, y nada más. `summarize_` y `detail_` nombran **la forma de la

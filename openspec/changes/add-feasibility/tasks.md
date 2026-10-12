@@ -198,7 +198,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 
 ## 7. Docs
 
-- [ ] 7.1 Update the README:
+- [x] 7.1 Update the README:
       - a feasibility section with point E as the worked example, figures copied from the oracle;
       - the 600 m maximum named as an assumption, pending validation, with the 346–383 m finding
         that set it;
@@ -208,7 +208,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
       - the eval table with the `feasibility` area, from the committed record.
 
       Verify each figure against its source.
-- [ ] 7.2 Update the status section of `CLAUDE.md`:
+- [x] 7.2 Update the status section of `CLAUDE.md`:
       - seven tools;
       - the map context;
       - the new test count and eval result;
