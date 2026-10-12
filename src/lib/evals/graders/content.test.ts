@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import type { HighlightPayload } from "@/lib/assistant/events";
 import {
+  CONNECTION_CANDIDATES_TOOL_NAME,
   DETAIL_TOOL_NAME,
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
   SEARCH_DOCUMENTATION_TOOL_NAME,
@@ -100,6 +101,22 @@ describe("gradeHighlight", () => {
       ids: ["FR-03", "NAP-03", "NAP-12", "SUB-006", "SUB-025", "SUB-026", "SUB-027", "SUB-028"],
     };
     expect(gradeHighlight(turn({ answer: "", payload }), oracle)).toEqual({ pass: true, reasons: [] });
+  });
+
+  test("candidates are compared, the point is not", () => {
+    const candidates = turn({
+      answer: "",
+      toolCalls: [call(CONNECTION_CANDIDATES_TOOL_NAME, {}, 1, { selected_point: { lat: -27.4165, lon: -59.018 } })],
+    });
+
+    expect(highlightIds(candidates.payload)).toEqual(["NAP-03", "NAP-08", "NAP-12"]);
+    expect(gradeHighlight(candidates, { mode: "equals", ids: ["NAP-03", "NAP-08", "NAP-12"] })).toEqual({
+      pass: true,
+      reasons: [],
+    });
+    expect(gradeHighlight(candidates, { mode: "equals", ids: ["NAP-03", "NAP-08"] }).reasons).toEqual([
+      "unexpected in highlight: NAP-12",
+    ]);
   });
 
   test("contains tolerates extras but not omissions", () => {

@@ -13,6 +13,7 @@ import path from "node:path";
 
 import { buildToolDefinitions } from "@/lib/assistant/tool-definitions";
 import type { Network } from "@/lib/network/types";
+import { isInsideCity } from "@/lib/network/validate";
 import { AREAS, type LoadedCase } from "@/lib/evals/types";
 
 /** Location of the cases, relative to the project root. */
@@ -70,6 +71,18 @@ function validateCase(raw: unknown, toolNames: Set<string>, entities: Set<string
   if (typeof raw.source !== "string" || raw.source.length === 0) problems.push("`source` must be a non-empty string");
   if (!isStringArray(raw.turns) || raw.turns.length === 0 || raw.turns.some((t) => t.trim() === "")) {
     problems.push("`turns` must be a non-empty array of non-empty strings");
+  }
+
+  if (raw.map_context !== undefined) {
+    const context = raw.map_context;
+    const point = isObject(context) ? context.selected_point : undefined;
+    if (!isObject(context) || !isObject(point)) {
+      problems.push("`map_context` must be { selected_point: { lat, lon } }");
+    } else if (typeof point.lat !== "number" || typeof point.lon !== "number" || !Number.isFinite(point.lat) || !Number.isFinite(point.lon)) {
+      problems.push("`map_context.selected_point` must have finite numeric `lat` and `lon`");
+    } else if (!isInsideCity({ lat: point.lat, lon: point.lon })) {
+      problems.push(`the selected point (${point.lat}, ${point.lon}) is outside the modelled city`);
+    }
   }
 
   const expect = raw.expect;

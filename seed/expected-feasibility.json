@@ -1,0 +1,4695 @@
+{
+  "_note": "Expected feasibility result per fixed point (A to F) and per seed subscriber position, derived by seed/derive-expected-feasibility.py, an independent Python implementation written from the spec and design.md (add-feasibility), never from the TypeScript engine. The engine must reproduce these numbers; if it disagrees, one of the two is wrong. Re-run the script to regenerate this file.",
+  "_constants_pending_validation": "The drop model (slack factor, connectors per drop) and the maximum drop route length are owner-chosen, industry-typical starting points and are NOT validated against a real source. The fiber and connector losses and the NAP totals are shared with expected-budgets.json. This copy records what produced these numbers.",
+  "loss_model": {
+    "drop_slack_factor": 1.3,
+    "drop_connectors": 2,
+    "fiber_db_per_km": 0.25,
+    "connector_db": 0.4,
+    "max_drop_route_m": 600,
+    "candidate_count": 3
+  },
+  "gpon_class": "B+",
+  "budget_db": 28,
+  "min_margin_db": 3,
+  "points": {
+    "A": {
+      "point": {
+        "lat": -27.4165,
+        "lon": -59.018
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-03",
+          "nap_name": "Villa Don Andrés",
+          "ratio": "1:2",
+          "straight_line_m": 167,
+          "route_m": 217,
+          "ports": {
+            "outputs": 2,
+            "subscribers": 1,
+            "child_naps": 1,
+            "free": 0
+          },
+          "drop": {
+            "straight_line_km": 0.167,
+            "straight_line_m": 167,
+            "slack_factor": 1.3,
+            "length_km": 0.217,
+            "length_m": 217,
+            "fiber_db": 0.05,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.85
+          },
+          "nap_total_loss_db": 7.98,
+          "nap_margin_db": 20.02,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.85,
+              "splitters_db": 3.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 8.83,
+            "margin_db": 19.17,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "no_free_ports"
+          ]
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 2502,
+          "route_m": 3252,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 2.502,
+            "straight_line_m": 2502,
+            "slack_factor": 1.3,
+            "length_km": 3.252,
+            "length_m": 3252,
+            "fiber_db": 0.81,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.61
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.76,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 18.66,
+            "margin_db": 9.34,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-12",
+          "nap_name": "Barrio Güiraldes",
+          "ratio": "1:16",
+          "straight_line_m": 2730,
+          "route_m": 3549,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 4,
+            "child_naps": 0,
+            "free": 12
+          },
+          "drop": {
+            "straight_line_km": 2.73,
+            "straight_line_m": 2730,
+            "slack_factor": 1.3,
+            "length_km": 3.549,
+            "length_m": 3549,
+            "fiber_db": 0.89,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.69
+          },
+          "nap_total_loss_db": 25.23,
+          "nap_margin_db": 2.77,
+          "nap_status": "marginal",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.84,
+              "splitters_db": 17,
+              "connectors_db": 3.2,
+              "splices_db": 0.88
+            },
+            "total_loss_db": 26.92,
+            "margin_db": 1.08,
+            "status": "marginal"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": null,
+      "feasible_count": 0
+    },
+    "B": {
+      "point": {
+        "lat": -27.4955,
+        "lon": -58.938
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-09",
+          "nap_name": "Barrio Los Silos",
+          "ratio": "1:8",
+          "straight_line_m": 167,
+          "route_m": 217,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 0.167,
+            "straight_line_m": 167,
+            "slack_factor": 1.3,
+            "length_km": 0.217,
+            "length_m": 217,
+            "fiber_db": 0.05,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.85
+          },
+          "nap_total_loss_db": 29.4,
+          "nap_margin_db": -1.4,
+          "nap_status": "fail",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.25,
+              "splitters_db": 21,
+              "connectors_db": 3.2,
+              "splices_db": 0.8
+            },
+            "total_loss_db": 30.25,
+            "margin_db": -2.25,
+            "status": "fail"
+          },
+          "feasible": false,
+          "reasons": [
+            "budget_fail"
+          ]
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-04",
+          "nap_name": "Barrio Provincias Unidas",
+          "ratio": "1:8",
+          "straight_line_m": 2842,
+          "route_m": 3694,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 1,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 2.842,
+            "straight_line_m": 2842,
+            "slack_factor": 1.3,
+            "length_km": 3.694,
+            "length_m": 3694,
+            "fiber_db": 0.92,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.72
+          },
+          "nap_total_loss_db": 15.18,
+          "nap_margin_db": 12.82,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.92,
+              "splitters_db": 10.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.9,
+            "margin_db": 11.1,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 4243,
+          "route_m": 5516,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 4.243,
+            "straight_line_m": 4243,
+            "slack_factor": 1.3,
+            "length_km": 5.516,
+            "length_m": 5516,
+            "fiber_db": 1.38,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.18
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.98,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 15.4,
+            "margin_db": 12.6,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": null,
+      "feasible_count": 0
+    },
+    "C": {
+      "point": {
+        "lat": -27.4432,
+        "lon": -58.977
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-01",
+          "nap_name": "Centro",
+          "ratio": "1:8",
+          "straight_line_m": 158,
+          "route_m": 205,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 0.158,
+            "straight_line_m": 158,
+            "slack_factor": 1.3,
+            "length_km": 0.205,
+            "length_m": 205,
+            "fiber_db": 0.05,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.85
+          },
+          "nap_total_loss_db": 12.34,
+          "nap_margin_db": 15.66,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 0.85,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 13.19,
+            "margin_db": 14.81,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 2202,
+          "route_m": 2862,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 2.202,
+            "straight_line_m": 2202,
+            "slack_factor": 1.3,
+            "length_km": 2.862,
+            "length_m": 2862,
+            "fiber_db": 0.72,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.52
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.85,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 17.19,
+            "margin_db": 10.81,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 3059,
+          "route_m": 3977,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 3.059,
+            "straight_line_m": 3059,
+            "slack_factor": 1.3,
+            "length_km": 3.977,
+            "length_m": 3977,
+            "fiber_db": 0.99,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.79
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.59,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 15.01,
+            "margin_db": 12.99,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-01",
+      "feasible_count": 1
+    },
+    "D": {
+      "point": {
+        "lat": -27.493,
+        "lon": -59.0338
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-06",
+          "nap_name": "Villa Prosperidad",
+          "ratio": "1:32",
+          "straight_line_m": 414,
+          "route_m": 539,
+          "ports": {
+            "outputs": 32,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 29
+          },
+          "drop": {
+            "straight_line_km": 0.414,
+            "straight_line_m": 414,
+            "slack_factor": 1.3,
+            "length_km": 0.539,
+            "length_m": 539,
+            "fiber_db": 0.13,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.93
+          },
+          "nap_total_loss_db": 24.56,
+          "nap_margin_db": 3.44,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.13,
+              "splitters_db": 17,
+              "connectors_db": 2.8,
+              "splices_db": 0.56
+            },
+            "total_loss_db": 25.49,
+            "margin_db": 2.51,
+            "status": "marginal"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-02",
+          "nap_name": "Barrio España",
+          "ratio": "1:16",
+          "straight_line_m": 4348,
+          "route_m": 5653,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 4.348,
+            "straight_line_m": 4348,
+            "slack_factor": 1.3,
+            "length_km": 5.653,
+            "length_m": 5653,
+            "fiber_db": 1.41,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.21
+          },
+          "nap_total_loss_db": 16.42,
+          "nap_margin_db": 11.58,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.81,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 18.63,
+            "margin_db": 9.37,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 6204,
+          "route_m": 8065,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 6.204,
+            "straight_line_m": 6204,
+            "slack_factor": 1.3,
+            "length_km": 8.065,
+            "length_m": 8065,
+            "fiber_db": 2.02,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.82
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.97,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 19.87,
+            "margin_db": 8.13,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-06",
+      "feasible_count": 1
+    },
+    "E": {
+      "point": {
+        "lat": -27.4659,
+        "lon": -58.97
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 434,
+          "route_m": 564,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 0.434,
+            "straight_line_m": 434,
+            "slack_factor": 1.3,
+            "length_km": 0.564,
+            "length_m": 564,
+            "fiber_db": 0.14,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.94
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.27,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 16.61,
+            "margin_db": 11.39,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 456,
+          "route_m": 593,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 0.456,
+            "straight_line_m": 456,
+            "slack_factor": 1.3,
+            "length_km": 0.593,
+            "length_m": 593,
+            "fiber_db": 0.15,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.95
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.75,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 14.17,
+            "margin_db": 13.83,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-04",
+          "nap_name": "Barrio Provincias Unidas",
+          "ratio": "1:8",
+          "straight_line_m": 1759,
+          "route_m": 2287,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 1,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 1.759,
+            "straight_line_m": 1759,
+            "slack_factor": 1.3,
+            "length_km": 2.287,
+            "length_m": 2287,
+            "fiber_db": 0.57,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.37
+          },
+          "nap_total_loss_db": 15.18,
+          "nap_margin_db": 12.82,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.57,
+              "splitters_db": 10.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.55,
+            "margin_db": 11.45,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-11",
+      "feasible_count": 2
+    },
+    "F": {
+      "point": {
+        "lat": -27.43,
+        "lon": -58.94
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-10",
+          "nap_name": "Villa Río Negro",
+          "ratio": "1:4",
+          "straight_line_m": 2447,
+          "route_m": 3181,
+          "ports": {
+            "outputs": 4,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 2
+          },
+          "drop": {
+            "straight_line_km": 2.447,
+            "straight_line_m": 2447,
+            "slack_factor": 1.3,
+            "length_km": 3.181,
+            "length_m": 3181,
+            "fiber_db": 0.8,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.6
+          },
+          "nap_total_loss_db": 11.08,
+          "nap_margin_db": 16.92,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.08,
+              "splitters_db": 7.2,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 12.68,
+            "margin_db": 15.32,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-07",
+          "nap_name": "Barrio Mujeres Argentinas",
+          "ratio": "1:8",
+          "straight_line_m": 2496,
+          "route_m": 3244,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 2.496,
+            "straight_line_m": 2496,
+            "slack_factor": 1.3,
+            "length_km": 3.244,
+            "length_m": 3244,
+            "fiber_db": 0.81,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.61
+          },
+          "nap_total_loss_db": 15.68,
+          "nap_margin_db": 12.32,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.91,
+              "splitters_db": 10.5,
+              "connectors_db": 2.4,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 17.29,
+            "margin_db": 10.71,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-01",
+          "nap_name": "Centro",
+          "ratio": "1:8",
+          "straight_line_m": 4082,
+          "route_m": 5307,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 4.082,
+            "straight_line_m": 4082,
+            "slack_factor": 1.3,
+            "length_km": 5.307,
+            "length_m": 5307,
+            "fiber_db": 1.33,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.13
+          },
+          "nap_total_loss_db": 12.34,
+          "nap_margin_db": 15.66,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.13,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 14.47,
+            "margin_db": 13.53,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": null,
+      "feasible_count": 0
+    }
+  },
+  "subscriber_positions": {
+    "SUB-001": {
+      "point": {
+        "lat": -27.439976,
+        "lon": -58.977237
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-01",
+          "nap_name": "Centro",
+          "ratio": "1:8",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 12.34,
+          "nap_margin_db": 15.66,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 0.92,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 13.26,
+            "margin_db": 14.74,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 2551,
+          "route_m": 3316,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 2.551,
+            "straight_line_m": 2551,
+            "slack_factor": 1.3,
+            "length_km": 3.316,
+            "length_m": 3316,
+            "fiber_db": 0.83,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.63
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.96,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 17.3,
+            "margin_db": 10.7,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-10",
+          "nap_name": "Villa Río Negro",
+          "ratio": "1:4",
+          "straight_line_m": 3069,
+          "route_m": 3990,
+          "ports": {
+            "outputs": 4,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 2
+          },
+          "drop": {
+            "straight_line_km": 3.069,
+            "straight_line_m": 3069,
+            "slack_factor": 1.3,
+            "length_km": 3.99,
+            "length_m": 3990,
+            "fiber_db": 1,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.8
+          },
+          "nap_total_loss_db": 11.08,
+          "nap_margin_db": 16.92,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.28,
+              "splitters_db": 7.2,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 12.88,
+            "margin_db": 15.12,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-01",
+      "feasible_count": 1
+    },
+    "SUB-002": {
+      "point": {
+        "lat": -27.445992,
+        "lon": -58.97649
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-01",
+          "nap_name": "Centro",
+          "ratio": "1:8",
+          "straight_line_m": 374,
+          "route_m": 486,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 0.374,
+            "straight_line_m": 374,
+            "slack_factor": 1.3,
+            "length_km": 0.486,
+            "length_m": 486,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 12.34,
+          "nap_margin_db": 15.66,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 0.92,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 13.26,
+            "margin_db": 14.74,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 1892,
+          "route_m": 2459,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 1.892,
+            "straight_line_m": 1892,
+            "slack_factor": 1.3,
+            "length_km": 2.459,
+            "length_m": 2459,
+            "fiber_db": 0.61,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.41
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.74,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 17.08,
+            "margin_db": 10.92,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 2745,
+          "route_m": 3569,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 2.745,
+            "straight_line_m": 2745,
+            "slack_factor": 1.3,
+            "length_km": 3.569,
+            "length_m": 3569,
+            "fiber_db": 0.89,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.69
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.49,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 14.91,
+            "margin_db": 13.09,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-01",
+      "feasible_count": 1
+    },
+    "SUB-003": {
+      "point": {
+        "lat": -27.443631,
+        "lon": -58.982073
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-01",
+          "nap_name": "Centro",
+          "ratio": "1:8",
+          "straight_line_m": 346,
+          "route_m": 450,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 0.346,
+            "straight_line_m": 346,
+            "slack_factor": 1.3,
+            "length_km": 0.45,
+            "length_m": 450,
+            "fiber_db": 0.11,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.91
+          },
+          "nap_total_loss_db": 12.34,
+          "nap_margin_db": 15.66,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 0.91,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 13.25,
+            "margin_db": 14.75,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 2365,
+          "route_m": 3074,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 2.365,
+            "straight_line_m": 2365,
+            "slack_factor": 1.3,
+            "length_km": 3.074,
+            "length_m": 3074,
+            "fiber_db": 0.77,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.57
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.9,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 17.24,
+            "margin_db": 10.76,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 3165,
+          "route_m": 4114,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 3.165,
+            "straight_line_m": 3165,
+            "slack_factor": 1.3,
+            "length_km": 4.114,
+            "length_m": 4114,
+            "fiber_db": 1.03,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.83
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.63,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 15.05,
+            "margin_db": 12.95,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-01",
+      "feasible_count": 1
+    },
+    "SUB-004": {
+      "point": {
+        "lat": -27.465776,
+        "lon": -58.997637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-02",
+          "nap_name": "Barrio España",
+          "ratio": "1:16",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 16.42,
+          "nap_margin_db": 11.58,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.52,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 17.34,
+            "margin_db": 10.66,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 2759,
+          "route_m": 3587,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 2.759,
+            "straight_line_m": 2759,
+            "slack_factor": 1.3,
+            "length_km": 3.587,
+            "length_m": 3587,
+            "fiber_db": 0.9,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.7
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.03,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 17.37,
+            "margin_db": 10.63,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 2767,
+          "route_m": 3597,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 2.767,
+            "straight_line_m": 2767,
+            "slack_factor": 1.3,
+            "length_km": 3.597,
+            "length_m": 3597,
+            "fiber_db": 0.9,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.7
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.5,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 14.92,
+            "margin_db": 13.08,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-02",
+      "feasible_count": 1
+    },
+    "SUB-005": {
+      "point": {
+        "lat": -27.472224,
+        "lon": -59.000363
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-02",
+          "nap_name": "Barrio España",
+          "ratio": "1:16",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 16.42,
+          "nap_margin_db": 11.58,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.52,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 17.34,
+            "margin_db": 10.66,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 3006,
+          "route_m": 3907,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 3.006,
+            "straight_line_m": 3006,
+            "slack_factor": 1.3,
+            "length_km": 3.907,
+            "length_m": 3907,
+            "fiber_db": 0.98,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.78
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.58,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 15,
+            "margin_db": 13,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 3204,
+          "route_m": 4165,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 3.204,
+            "straight_line_m": 3204,
+            "slack_factor": 1.3,
+            "length_km": 4.165,
+            "length_m": 4165,
+            "fiber_db": 1.04,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.84
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.17,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 17.51,
+            "margin_db": 10.49,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-02",
+      "feasible_count": 1
+    },
+    "SUB-006": {
+      "point": {
+        "lat": -27.414776,
+        "lon": -59.016637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-03",
+          "nap_name": "Villa Don Andrés",
+          "ratio": "1:2",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 2,
+            "subscribers": 1,
+            "child_naps": 1,
+            "free": 0
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 7.98,
+          "nap_margin_db": 20.02,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.92,
+              "splitters_db": 3.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 8.9,
+            "margin_db": 19.1,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "no_free_ports"
+          ]
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 2697,
+          "route_m": 3506,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 2.697,
+            "straight_line_m": 2697,
+            "slack_factor": 1.3,
+            "length_km": 3.506,
+            "length_m": 3506,
+            "fiber_db": 0.88,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.68
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.83,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 18.73,
+            "margin_db": 9.27,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-12",
+          "nap_name": "Barrio Güiraldes",
+          "ratio": "1:16",
+          "straight_line_m": 2779,
+          "route_m": 3613,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 4,
+            "child_naps": 0,
+            "free": 12
+          },
+          "drop": {
+            "straight_line_km": 2.779,
+            "straight_line_m": 2779,
+            "slack_factor": 1.3,
+            "length_km": 3.613,
+            "length_m": 3613,
+            "fiber_db": 0.9,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.7
+          },
+          "nap_total_loss_db": 25.23,
+          "nap_margin_db": 2.77,
+          "nap_status": "marginal",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.85,
+              "splitters_db": 17,
+              "connectors_db": 3.2,
+              "splices_db": 0.88
+            },
+            "total_loss_db": 26.93,
+            "margin_db": 1.07,
+            "status": "marginal"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": null,
+      "feasible_count": 0
+    },
+    "SUB-007": {
+      "point": {
+        "lat": -27.475776,
+        "lon": -58.958637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-04",
+          "nap_name": "Barrio Provincias Unidas",
+          "ratio": "1:8",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 1,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 15.18,
+          "nap_margin_db": 12.82,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.12,
+              "splitters_db": 10.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.1,
+            "margin_db": 11.9,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 1292,
+          "route_m": 1680,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 1.292,
+            "straight_line_m": 1292,
+            "slack_factor": 1.3,
+            "length_km": 1.68,
+            "length_m": 1680,
+            "fiber_db": 0.42,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.22
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.02,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 14.44,
+            "margin_db": 13.56,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 1898,
+          "route_m": 2468,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 1.898,
+            "straight_line_m": 1898,
+            "slack_factor": 1.3,
+            "length_km": 2.468,
+            "length_m": 2468,
+            "fiber_db": 0.62,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.42
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.75,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 17.09,
+            "margin_db": 10.91,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-04",
+      "feasible_count": 1
+    },
+    "SUB-008": {
+      "point": {
+        "lat": -27.482224,
+        "lon": -58.961363
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-04",
+          "nap_name": "Barrio Provincias Unidas",
+          "ratio": "1:8",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 1,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 15.18,
+          "nap_margin_db": 12.82,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.12,
+              "splitters_db": 10.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.1,
+            "margin_db": 11.9,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 1604,
+          "route_m": 2086,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 1.604,
+            "straight_line_m": 1604,
+            "slack_factor": 1.3,
+            "length_km": 2.086,
+            "length_m": 2086,
+            "fiber_db": 0.52,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.32
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.12,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 14.54,
+            "margin_db": 13.46,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 2405,
+          "route_m": 3126,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 2.405,
+            "straight_line_m": 2405,
+            "slack_factor": 1.3,
+            "length_km": 3.126,
+            "length_m": 3126,
+            "fiber_db": 0.78,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.58
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.91,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 17.25,
+            "margin_db": 10.75,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-04",
+      "feasible_count": 1
+    },
+    "SUB-009": {
+      "point": {
+        "lat": -27.466776,
+        "lon": -58.968637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.72,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 14.14,
+            "margin_db": 13.86,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 548,
+          "route_m": 712,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 0.548,
+            "straight_line_m": 548,
+            "slack_factor": 1.3,
+            "length_km": 0.712,
+            "length_m": 712,
+            "fiber_db": 0.18,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.98
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.31,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 16.65,
+            "margin_db": 11.35,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-04",
+          "nap_name": "Barrio Provincias Unidas",
+          "ratio": "1:8",
+          "straight_line_m": 1604,
+          "route_m": 2086,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 1,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 1.604,
+            "straight_line_m": 1604,
+            "slack_factor": 1.3,
+            "length_km": 2.086,
+            "length_m": 2086,
+            "fiber_db": 0.52,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.32
+          },
+          "nap_total_loss_db": 15.18,
+          "nap_margin_db": 12.82,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.52,
+              "splitters_db": 10.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.5,
+            "margin_db": 11.5,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-05",
+      "feasible_count": 1
+    },
+    "SUB-010": {
+      "point": {
+        "lat": -27.473224,
+        "lon": -58.971363
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.72,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 14.14,
+            "margin_db": 13.86,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 1255,
+          "route_m": 1632,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 1.255,
+            "straight_line_m": 1255,
+            "slack_factor": 1.3,
+            "length_km": 1.632,
+            "length_m": 1632,
+            "fiber_db": 0.41,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.21
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.54,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 16.88,
+            "margin_db": 11.12,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-04",
+          "nap_name": "Barrio Provincias Unidas",
+          "ratio": "1:8",
+          "straight_line_m": 1292,
+          "route_m": 1680,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 1,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 1.292,
+            "straight_line_m": 1292,
+            "slack_factor": 1.3,
+            "length_km": 1.68,
+            "length_m": 1680,
+            "fiber_db": 0.42,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.22
+          },
+          "nap_total_loss_db": 15.18,
+          "nap_margin_db": 12.82,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.42,
+              "splitters_db": 10.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.4,
+            "margin_db": 11.6,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-05",
+      "feasible_count": 1
+    },
+    "SUB-011": {
+      "point": {
+        "lat": -27.489776,
+        "lon": -59.036637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-06",
+          "nap_name": "Villa Prosperidad",
+          "ratio": "1:32",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 32,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 29
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 24.56,
+          "nap_margin_db": 3.44,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.12,
+              "splitters_db": 17,
+              "connectors_db": 2.8,
+              "splices_db": 0.56
+            },
+            "total_loss_db": 25.48,
+            "margin_db": 2.52,
+            "status": "marginal"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-02",
+          "nap_name": "Barrio España",
+          "ratio": "1:16",
+          "straight_line_m": 4373,
+          "route_m": 5685,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 4.373,
+            "straight_line_m": 4373,
+            "slack_factor": 1.3,
+            "length_km": 5.685,
+            "length_m": 5685,
+            "fiber_db": 1.42,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.22
+          },
+          "nap_total_loss_db": 16.42,
+          "nap_margin_db": 11.58,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.82,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 18.64,
+            "margin_db": 9.36,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 5938,
+          "route_m": 7719,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 5.938,
+            "straight_line_m": 5938,
+            "slack_factor": 1.3,
+            "length_km": 7.719,
+            "length_m": 7719,
+            "fiber_db": 1.93,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.73
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.88,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 19.78,
+            "margin_db": 8.22,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-06",
+      "feasible_count": 1
+    },
+    "SUB-012": {
+      "point": {
+        "lat": -27.495792,
+        "lon": -59.03589
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-06",
+          "nap_name": "Villa Prosperidad",
+          "ratio": "1:32",
+          "straight_line_m": 374,
+          "route_m": 486,
+          "ports": {
+            "outputs": 32,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 29
+          },
+          "drop": {
+            "straight_line_km": 0.374,
+            "straight_line_m": 374,
+            "slack_factor": 1.3,
+            "length_km": 0.486,
+            "length_m": 486,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 24.56,
+          "nap_margin_db": 3.44,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.12,
+              "splitters_db": 17,
+              "connectors_db": 2.8,
+              "splices_db": 0.56
+            },
+            "total_loss_db": 25.48,
+            "margin_db": 2.52,
+            "status": "marginal"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-02",
+          "nap_name": "Barrio España",
+          "ratio": "1:16",
+          "straight_line_m": 4703,
+          "route_m": 6114,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 4.703,
+            "straight_line_m": 4703,
+            "slack_factor": 1.3,
+            "length_km": 6.114,
+            "length_m": 6114,
+            "fiber_db": 1.53,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.33
+          },
+          "nap_total_loss_db": 16.42,
+          "nap_margin_db": 11.58,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.93,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 18.75,
+            "margin_db": 9.25,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 6557,
+          "route_m": 8524,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 6.557,
+            "straight_line_m": 6557,
+            "slack_factor": 1.3,
+            "length_km": 8.524,
+            "length_m": 8524,
+            "fiber_db": 2.13,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.93
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 4.08,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 19.98,
+            "margin_db": 8.02,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-06",
+      "feasible_count": 1
+    },
+    "SUB-013": {
+      "point": {
+        "lat": -27.493431,
+        "lon": -59.041473
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-06",
+          "nap_name": "Villa Prosperidad",
+          "ratio": "1:32",
+          "straight_line_m": 346,
+          "route_m": 450,
+          "ports": {
+            "outputs": 32,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 29
+          },
+          "drop": {
+            "straight_line_km": 0.346,
+            "straight_line_m": 346,
+            "slack_factor": 1.3,
+            "length_km": 0.45,
+            "length_m": 450,
+            "fiber_db": 0.11,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.91
+          },
+          "nap_total_loss_db": 24.56,
+          "nap_margin_db": 3.44,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.11,
+              "splitters_db": 17,
+              "connectors_db": 2.8,
+              "splices_db": 0.56
+            },
+            "total_loss_db": 25.47,
+            "margin_db": 2.53,
+            "status": "marginal"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-02",
+          "nap_name": "Barrio España",
+          "ratio": "1:16",
+          "straight_line_m": 4994,
+          "route_m": 6492,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 4.994,
+            "straight_line_m": 4994,
+            "slack_factor": 1.3,
+            "length_km": 6.492,
+            "length_m": 6492,
+            "fiber_db": 1.62,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.42
+          },
+          "nap_total_loss_db": 16.42,
+          "nap_margin_db": 11.58,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.02,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 18.84,
+            "margin_db": 9.16,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 6480,
+          "route_m": 8425,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 6.48,
+            "straight_line_m": 6480,
+            "slack_factor": 1.3,
+            "length_km": 8.425,
+            "length_m": 8425,
+            "fiber_db": 2.11,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.91
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 4.06,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 19.96,
+            "margin_db": 8.04,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-06",
+      "feasible_count": 1
+    },
+    "SUB-014": {
+      "point": {
+        "lat": -27.404776,
+        "lon": -58.943637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-07",
+          "nap_name": "Barrio Mujeres Argentinas",
+          "ratio": "1:8",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 15.68,
+          "nap_margin_db": 12.32,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.22,
+              "splitters_db": 10.5,
+              "connectors_db": 2.4,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.6,
+            "margin_db": 11.4,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-10",
+          "nap_name": "Villa Río Negro",
+          "ratio": "1:4",
+          "straight_line_m": 2111,
+          "route_m": 2744,
+          "ports": {
+            "outputs": 4,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 2
+          },
+          "drop": {
+            "straight_line_km": 2.111,
+            "straight_line_m": 2111,
+            "slack_factor": 1.3,
+            "length_km": 2.744,
+            "length_m": 2744,
+            "fiber_db": 0.69,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.49
+          },
+          "nap_total_loss_db": 11.08,
+          "nap_margin_db": 16.92,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.97,
+              "splitters_db": 7.2,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 12.57,
+            "margin_db": 15.43,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-01",
+          "nap_name": "Centro",
+          "ratio": "1:8",
+          "straight_line_m": 5492,
+          "route_m": 7140,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 5.492,
+            "straight_line_m": 5492,
+            "slack_factor": 1.3,
+            "length_km": 7.14,
+            "length_m": 7140,
+            "fiber_db": 1.78,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.58
+          },
+          "nap_total_loss_db": 12.34,
+          "nap_margin_db": 15.66,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.58,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 14.92,
+            "margin_db": 13.08,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-07",
+      "feasible_count": 1
+    },
+    "SUB-015": {
+      "point": {
+        "lat": -27.411224,
+        "lon": -58.946363
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-07",
+          "nap_name": "Barrio Mujeres Argentinas",
+          "ratio": "1:8",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 15.68,
+          "nap_margin_db": 12.32,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.22,
+              "splitters_db": 10.5,
+              "connectors_db": 2.4,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.6,
+            "margin_db": 11.4,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-10",
+          "nap_name": "Villa Río Negro",
+          "ratio": "1:4",
+          "straight_line_m": 1491,
+          "route_m": 1939,
+          "ports": {
+            "outputs": 4,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 2
+          },
+          "drop": {
+            "straight_line_km": 1.491,
+            "straight_line_m": 1491,
+            "slack_factor": 1.3,
+            "length_km": 1.939,
+            "length_m": 1939,
+            "fiber_db": 0.48,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.28
+          },
+          "nap_total_loss_db": 11.08,
+          "nap_margin_db": 16.92,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.76,
+              "splitters_db": 7.2,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 12.36,
+            "margin_db": 15.64,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-01",
+          "nap_name": "Centro",
+          "ratio": "1:8",
+          "straight_line_m": 4771,
+          "route_m": 6203,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 4.771,
+            "straight_line_m": 4771,
+            "slack_factor": 1.3,
+            "length_km": 6.203,
+            "length_m": 6203,
+            "fiber_db": 1.55,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.35
+          },
+          "nap_total_loss_db": 12.34,
+          "nap_margin_db": 15.66,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.35,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 14.69,
+            "margin_db": 13.31,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-07",
+      "feasible_count": 1
+    },
+    "SUB-016": {
+      "point": {
+        "lat": -27.435776,
+        "lon": -59.016637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.07,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 17.97,
+            "margin_db": 10.03,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-03",
+          "nap_name": "Villa Don Andrés",
+          "ratio": "1:2",
+          "straight_line_m": 1981,
+          "route_m": 2576,
+          "ports": {
+            "outputs": 2,
+            "subscribers": 1,
+            "child_naps": 1,
+            "free": 0
+          },
+          "drop": {
+            "straight_line_km": 1.981,
+            "straight_line_m": 1981,
+            "slack_factor": 1.3,
+            "length_km": 2.576,
+            "length_m": 2576,
+            "fiber_db": 0.64,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.44
+          },
+          "nap_total_loss_db": 7.98,
+          "nap_margin_db": 20.02,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.44,
+              "splitters_db": 3.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 9.42,
+            "margin_db": 18.58,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far",
+            "no_free_ports"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-01",
+          "nap_name": "Centro",
+          "ratio": "1:8",
+          "straight_line_m": 3843,
+          "route_m": 4996,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 3.843,
+            "straight_line_m": 3843,
+            "slack_factor": 1.3,
+            "length_km": 4.996,
+            "length_m": 4996,
+            "fiber_db": 1.25,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.05
+          },
+          "nap_total_loss_db": 12.34,
+          "nap_margin_db": 15.66,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.05,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 14.39,
+            "margin_db": 13.61,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-08",
+      "feasible_count": 1
+    },
+    "SUB-017": {
+      "point": {
+        "lat": -27.442224,
+        "lon": -59.019363
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.07,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 17.97,
+            "margin_db": 10.03,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-03",
+          "nap_name": "Villa Don Andrés",
+          "ratio": "1:2",
+          "straight_line_m": 2697,
+          "route_m": 3506,
+          "ports": {
+            "outputs": 2,
+            "subscribers": 1,
+            "child_naps": 1,
+            "free": 0
+          },
+          "drop": {
+            "straight_line_km": 2.697,
+            "straight_line_m": 2697,
+            "slack_factor": 1.3,
+            "length_km": 3.506,
+            "length_m": 3506,
+            "fiber_db": 0.88,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.68
+          },
+          "nap_total_loss_db": 7.98,
+          "nap_margin_db": 20.02,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.68,
+              "splitters_db": 3.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 9.66,
+            "margin_db": 18.34,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far",
+            "no_free_ports"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-02",
+          "nap_name": "Barrio España",
+          "ratio": "1:16",
+          "straight_line_m": 3592,
+          "route_m": 4669,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 3.592,
+            "straight_line_m": 3592,
+            "slack_factor": 1.3,
+            "length_km": 4.669,
+            "length_m": 4669,
+            "fiber_db": 1.17,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.97
+          },
+          "nap_total_loss_db": 16.42,
+          "nap_margin_db": 11.58,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.57,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 18.39,
+            "margin_db": 9.61,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-08",
+      "feasible_count": 1
+    },
+    "SUB-018": {
+      "point": {
+        "lat": -27.493776,
+        "lon": -58.936637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-09",
+          "nap_name": "Barrio Los Silos",
+          "ratio": "1:8",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 29.4,
+          "nap_margin_db": -1.4,
+          "nap_status": "fail",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.32,
+              "splitters_db": 21,
+              "connectors_db": 3.2,
+              "splices_db": 0.8
+            },
+            "total_loss_db": 30.32,
+            "margin_db": -2.32,
+            "status": "fail"
+          },
+          "feasible": false,
+          "reasons": [
+            "budget_fail"
+          ]
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-04",
+          "nap_name": "Barrio Provincias Unidas",
+          "ratio": "1:8",
+          "straight_line_m": 2830,
+          "route_m": 3679,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 1,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 2.83,
+            "straight_line_m": 2830,
+            "slack_factor": 1.3,
+            "length_km": 3.679,
+            "length_m": 3679,
+            "fiber_db": 0.92,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.72
+          },
+          "nap_total_loss_db": 15.18,
+          "nap_margin_db": 12.82,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.92,
+              "splitters_db": 10.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.9,
+            "margin_db": 11.1,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 4222,
+          "route_m": 5488,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 4.222,
+            "straight_line_m": 4222,
+            "slack_factor": 1.3,
+            "length_km": 5.488,
+            "length_m": 5488,
+            "fiber_db": 1.37,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.17
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.97,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 15.39,
+            "margin_db": 12.61,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": null,
+      "feasible_count": 0
+    },
+    "SUB-019": {
+      "point": {
+        "lat": -27.499792,
+        "lon": -58.93589
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-09",
+          "nap_name": "Barrio Los Silos",
+          "ratio": "1:8",
+          "straight_line_m": 374,
+          "route_m": 486,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 0.374,
+            "straight_line_m": 374,
+            "slack_factor": 1.3,
+            "length_km": 0.486,
+            "length_m": 486,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 29.4,
+          "nap_margin_db": -1.4,
+          "nap_status": "fail",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.32,
+              "splitters_db": 21,
+              "connectors_db": 3.2,
+              "splices_db": 0.8
+            },
+            "total_loss_db": 30.32,
+            "margin_db": -2.32,
+            "status": "fail"
+          },
+          "feasible": false,
+          "reasons": [
+            "budget_fail"
+          ]
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-04",
+          "nap_name": "Barrio Provincias Unidas",
+          "ratio": "1:8",
+          "straight_line_m": 3317,
+          "route_m": 4312,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 1,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 3.317,
+            "straight_line_m": 3317,
+            "slack_factor": 1.3,
+            "length_km": 4.312,
+            "length_m": 4312,
+            "fiber_db": 1.08,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.88
+          },
+          "nap_total_loss_db": 15.18,
+          "nap_margin_db": 12.82,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 4.08,
+              "splitters_db": 10.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 17.06,
+            "margin_db": 10.94,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 4722,
+          "route_m": 6138,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 4.722,
+            "straight_line_m": 4722,
+            "slack_factor": 1.3,
+            "length_km": 6.138,
+            "length_m": 6138,
+            "fiber_db": 1.53,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.33
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.13,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 15.55,
+            "margin_db": 12.45,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": null,
+      "feasible_count": 0
+    },
+    "SUB-020": {
+      "point": {
+        "lat": -27.497431,
+        "lon": -58.941473
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-09",
+          "nap_name": "Barrio Los Silos",
+          "ratio": "1:8",
+          "straight_line_m": 346,
+          "route_m": 450,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 0.346,
+            "straight_line_m": 346,
+            "slack_factor": 1.3,
+            "length_km": 0.45,
+            "length_m": 450,
+            "fiber_db": 0.11,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.91
+          },
+          "nap_total_loss_db": 29.4,
+          "nap_margin_db": -1.4,
+          "nap_status": "fail",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.31,
+              "splitters_db": 21,
+              "connectors_db": 3.2,
+              "splices_db": 0.8
+            },
+            "total_loss_db": 30.31,
+            "margin_db": -2.31,
+            "status": "fail"
+          },
+          "feasible": false,
+          "reasons": [
+            "budget_fail"
+          ]
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-04",
+          "nap_name": "Barrio Provincias Unidas",
+          "ratio": "1:8",
+          "straight_line_m": 2746,
+          "route_m": 3570,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 1,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 2.746,
+            "straight_line_m": 2746,
+            "slack_factor": 1.3,
+            "length_km": 3.57,
+            "length_m": 3570,
+            "fiber_db": 0.89,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.69
+          },
+          "nap_total_loss_db": 15.18,
+          "nap_margin_db": 12.82,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.89,
+              "splitters_db": 10.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.87,
+            "margin_db": 11.13,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 4150,
+          "route_m": 5395,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 4.15,
+            "straight_line_m": 4150,
+            "slack_factor": 1.3,
+            "length_km": 5.395,
+            "length_m": 5395,
+            "fiber_db": 1.35,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.15
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.95,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 15.37,
+            "margin_db": 12.63,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": null,
+      "feasible_count": 0
+    },
+    "SUB-021": {
+      "point": {
+        "lat": -27.413776,
+        "lon": -58.958637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-10",
+          "nap_name": "Villa Río Negro",
+          "ratio": "1:4",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 4,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 2
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 11.08,
+          "nap_margin_db": 16.92,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.4,
+              "splitters_db": 7.2,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 12,
+            "margin_db": 16,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-07",
+          "nap_name": "Barrio Mujeres Argentinas",
+          "ratio": "1:8",
+          "straight_line_m": 1491,
+          "route_m": 1939,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 1.491,
+            "straight_line_m": 1491,
+            "slack_factor": 1.3,
+            "length_km": 1.939,
+            "length_m": 1939,
+            "fiber_db": 0.48,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.28
+          },
+          "nap_total_loss_db": 15.68,
+          "nap_margin_db": 12.32,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.58,
+              "splitters_db": 10.5,
+              "connectors_db": 2.4,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.96,
+            "margin_db": 11.04,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-01",
+          "nap_name": "Centro",
+          "ratio": "1:8",
+          "straight_line_m": 3819,
+          "route_m": 4965,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 3.819,
+            "straight_line_m": 3819,
+            "slack_factor": 1.3,
+            "length_km": 4.965,
+            "length_m": 4965,
+            "fiber_db": 1.24,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.04
+          },
+          "nap_total_loss_db": 12.34,
+          "nap_margin_db": 15.66,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.04,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 14.38,
+            "margin_db": 13.62,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-10",
+      "feasible_count": 1
+    },
+    "SUB-022": {
+      "point": {
+        "lat": -27.420224,
+        "lon": -58.961363
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-10",
+          "nap_name": "Villa Río Negro",
+          "ratio": "1:4",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 4,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 2
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 11.08,
+          "nap_margin_db": 16.92,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.4,
+              "splitters_db": 7.2,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 12,
+            "margin_db": 16,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-07",
+          "nap_name": "Barrio Mujeres Argentinas",
+          "ratio": "1:8",
+          "straight_line_m": 2111,
+          "route_m": 2744,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 2.111,
+            "straight_line_m": 2111,
+            "slack_factor": 1.3,
+            "length_km": 2.744,
+            "length_m": 2744,
+            "fiber_db": 0.69,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.49
+          },
+          "nap_total_loss_db": 15.68,
+          "nap_margin_db": 12.32,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.79,
+              "splitters_db": 10.5,
+              "connectors_db": 2.4,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 17.17,
+            "margin_db": 10.83,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-01",
+          "nap_name": "Centro",
+          "ratio": "1:8",
+          "straight_line_m": 3069,
+          "route_m": 3990,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 3.069,
+            "straight_line_m": 3069,
+            "slack_factor": 1.3,
+            "length_km": 3.99,
+            "length_m": 3990,
+            "fiber_db": 1,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.8
+          },
+          "nap_total_loss_db": 12.34,
+          "nap_margin_db": 15.66,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.8,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 14.14,
+            "margin_db": 13.86,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-10",
+      "feasible_count": 1
+    },
+    "SUB-023": {
+      "point": {
+        "lat": -27.458776,
+        "lon": -58.968637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.25,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 16.59,
+            "margin_db": 11.41,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 1255,
+          "route_m": 1632,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 1.255,
+            "straight_line_m": 1255,
+            "slack_factor": 1.3,
+            "length_km": 1.632,
+            "length_m": 1632,
+            "fiber_db": 0.41,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.21
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 2.01,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 14.43,
+            "margin_db": 13.57,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-01",
+          "nap_name": "Centro",
+          "ratio": "1:8",
+          "straight_line_m": 1992,
+          "route_m": 2589,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 3,
+            "child_naps": 0,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 1.992,
+            "straight_line_m": 1992,
+            "slack_factor": 1.3,
+            "length_km": 2.589,
+            "length_m": 2589,
+            "fiber_db": 0.65,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.45
+          },
+          "nap_total_loss_db": 12.34,
+          "nap_margin_db": 15.66,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.45,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 13.79,
+            "margin_db": 14.21,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-11",
+      "feasible_count": 1
+    },
+    "SUB-024": {
+      "point": {
+        "lat": -27.465224,
+        "lon": -58.971363
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-11",
+          "nap_name": "Barrio San Cayetano",
+          "ratio": "1:16",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 15.67,
+          "nap_margin_db": 12.33,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.25,
+              "splitters_db": 13.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.24
+            },
+            "total_loss_db": 16.59,
+            "margin_db": 11.41,
+            "status": "pass"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-05",
+          "nap_name": "Barrio Sarmiento",
+          "ratio": "1:8",
+          "straight_line_m": 548,
+          "route_m": 712,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 6
+          },
+          "drop": {
+            "straight_line_km": 0.548,
+            "straight_line_m": 548,
+            "slack_factor": 1.3,
+            "length_km": 0.712,
+            "length_m": 712,
+            "fiber_db": 0.18,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.98
+          },
+          "nap_total_loss_db": 13.22,
+          "nap_margin_db": 14.78,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 1.78,
+              "splitters_db": 10.5,
+              "connectors_db": 1.6,
+              "splices_db": 0.32
+            },
+            "total_loss_db": 14.2,
+            "margin_db": 13.8,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-04",
+          "nap_name": "Barrio Provincias Unidas",
+          "ratio": "1:8",
+          "straight_line_m": 1898,
+          "route_m": 2468,
+          "ports": {
+            "outputs": 8,
+            "subscribers": 2,
+            "child_naps": 1,
+            "free": 5
+          },
+          "drop": {
+            "straight_line_km": 1.898,
+            "straight_line_m": 1898,
+            "slack_factor": 1.3,
+            "length_km": 2.468,
+            "length_m": 2468,
+            "fiber_db": 0.62,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.42
+          },
+          "nap_total_loss_db": 15.18,
+          "nap_margin_db": 12.82,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.62,
+              "splitters_db": 10.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 16.6,
+            "margin_db": 11.4,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-11",
+      "feasible_count": 1
+    },
+    "SUB-025": {
+      "point": {
+        "lat": -27.402776,
+        "lon": -59.041637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-12",
+          "nap_name": "Barrio Güiraldes",
+          "ratio": "1:16",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 4,
+            "child_naps": 0,
+            "free": 12
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 25.23,
+          "nap_margin_db": 2.77,
+          "nap_status": "marginal",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.07,
+              "splitters_db": 17,
+              "connectors_db": 3.2,
+              "splices_db": 0.88
+            },
+            "total_loss_db": 26.15,
+            "margin_db": 1.85,
+            "status": "marginal"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-03",
+          "nap_name": "Villa Don Andrés",
+          "ratio": "1:2",
+          "straight_line_m": 2883,
+          "route_m": 3747,
+          "ports": {
+            "outputs": 2,
+            "subscribers": 1,
+            "child_naps": 1,
+            "free": 0
+          },
+          "drop": {
+            "straight_line_km": 2.883,
+            "straight_line_m": 2883,
+            "slack_factor": 1.3,
+            "length_km": 3.747,
+            "length_m": 3747,
+            "fiber_db": 0.94,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.74
+          },
+          "nap_total_loss_db": 7.98,
+          "nap_margin_db": 20.02,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.74,
+              "splitters_db": 3.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 9.72,
+            "margin_db": 18.28,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far",
+            "no_free_ports"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 4655,
+          "route_m": 6051,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 4.655,
+            "straight_line_m": 4655,
+            "slack_factor": 1.3,
+            "length_km": 6.051,
+            "length_m": 6051,
+            "fiber_db": 1.51,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.31
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.46,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 19.36,
+            "margin_db": 8.64,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-12",
+      "feasible_count": 1
+    },
+    "SUB-026": {
+      "point": {
+        "lat": -27.407363,
+        "lon": -59.039776
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-12",
+          "nap_name": "Barrio Güiraldes",
+          "ratio": "1:16",
+          "straight_line_m": 353,
+          "route_m": 458,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 4,
+            "child_naps": 0,
+            "free": 12
+          },
+          "drop": {
+            "straight_line_km": 0.353,
+            "straight_line_m": 353,
+            "slack_factor": 1.3,
+            "length_km": 0.458,
+            "length_m": 458,
+            "fiber_db": 0.11,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.91
+          },
+          "nap_total_loss_db": 25.23,
+          "nap_margin_db": 2.77,
+          "nap_status": "marginal",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.06,
+              "splitters_db": 17,
+              "connectors_db": 3.2,
+              "splices_db": 0.88
+            },
+            "total_loss_db": 26.14,
+            "margin_db": 1.86,
+            "status": "marginal"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-03",
+          "nap_name": "Villa Don Andrés",
+          "ratio": "1:2",
+          "straight_line_m": 2453,
+          "route_m": 3189,
+          "ports": {
+            "outputs": 2,
+            "subscribers": 1,
+            "child_naps": 1,
+            "free": 0
+          },
+          "drop": {
+            "straight_line_km": 2.453,
+            "straight_line_m": 2453,
+            "slack_factor": 1.3,
+            "length_km": 3.189,
+            "length_m": 3189,
+            "fiber_db": 0.8,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.6
+          },
+          "nap_total_loss_db": 7.98,
+          "nap_margin_db": 20.02,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.6,
+              "splitters_db": 3.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 9.58,
+            "margin_db": 18.42,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far",
+            "no_free_ports"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 4122,
+          "route_m": 5359,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 4.122,
+            "straight_line_m": 4122,
+            "slack_factor": 1.3,
+            "length_km": 5.359,
+            "length_m": 5359,
+            "fiber_db": 1.34,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.14
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.29,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 19.19,
+            "margin_db": 8.81,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-12",
+      "feasible_count": 1
+    },
+    "SUB-027": {
+      "point": {
+        "lat": -27.409224,
+        "lon": -59.044363
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-12",
+          "nap_name": "Barrio Güiraldes",
+          "ratio": "1:16",
+          "straight_line_m": 383,
+          "route_m": 498,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 4,
+            "child_naps": 0,
+            "free": 12
+          },
+          "drop": {
+            "straight_line_km": 0.383,
+            "straight_line_m": 383,
+            "slack_factor": 1.3,
+            "length_km": 0.498,
+            "length_m": 498,
+            "fiber_db": 0.12,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.92
+          },
+          "nap_total_loss_db": 25.23,
+          "nap_margin_db": 2.77,
+          "nap_status": "marginal",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.07,
+              "splitters_db": 17,
+              "connectors_db": 3.2,
+              "splices_db": 0.88
+            },
+            "total_loss_db": 26.15,
+            "margin_db": 1.85,
+            "status": "marginal"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-03",
+          "nap_name": "Villa Don Andrés",
+          "ratio": "1:2",
+          "straight_line_m": 2779,
+          "route_m": 3613,
+          "ports": {
+            "outputs": 2,
+            "subscribers": 1,
+            "child_naps": 1,
+            "free": 0
+          },
+          "drop": {
+            "straight_line_km": 2.779,
+            "straight_line_m": 2779,
+            "slack_factor": 1.3,
+            "length_km": 3.613,
+            "length_m": 3613,
+            "fiber_db": 0.9,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.7
+          },
+          "nap_total_loss_db": 7.98,
+          "nap_margin_db": 20.02,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.7,
+              "splitters_db": 3.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 9.68,
+            "margin_db": 18.32,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far",
+            "no_free_ports"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 4211,
+          "route_m": 5474,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 4.211,
+            "straight_line_m": 4211,
+            "slack_factor": 1.3,
+            "length_km": 5.474,
+            "length_m": 5474,
+            "fiber_db": 1.37,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.17
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.32,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 19.22,
+            "margin_db": 8.78,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-12",
+      "feasible_count": 1
+    },
+    "SUB-028": {
+      "point": {
+        "lat": -27.404637,
+        "lon": -59.046224
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "nap_id": "NAP-12",
+          "nap_name": "Barrio Güiraldes",
+          "ratio": "1:16",
+          "straight_line_m": 353,
+          "route_m": 458,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 4,
+            "child_naps": 0,
+            "free": 12
+          },
+          "drop": {
+            "straight_line_km": 0.353,
+            "straight_line_m": 353,
+            "slack_factor": 1.3,
+            "length_km": 0.458,
+            "length_m": 458,
+            "fiber_db": 0.11,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 0.91
+          },
+          "nap_total_loss_db": 25.23,
+          "nap_margin_db": 2.77,
+          "nap_status": "marginal",
+          "projected": {
+            "by_source": {
+              "fiber_db": 5.06,
+              "splitters_db": 17,
+              "connectors_db": 3.2,
+              "splices_db": 0.88
+            },
+            "total_loss_db": 26.14,
+            "margin_db": 1.86,
+            "status": "marginal"
+          },
+          "feasible": true,
+          "reasons": []
+        },
+        {
+          "rank": 2,
+          "nap_id": "NAP-03",
+          "nap_name": "Villa Don Andrés",
+          "ratio": "1:2",
+          "straight_line_m": 3157,
+          "route_m": 4105,
+          "ports": {
+            "outputs": 2,
+            "subscribers": 1,
+            "child_naps": 1,
+            "free": 0
+          },
+          "drop": {
+            "straight_line_km": 3.157,
+            "straight_line_m": 3157,
+            "slack_factor": 1.3,
+            "length_km": 4.105,
+            "length_m": 4105,
+            "fiber_db": 1.03,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 1.83
+          },
+          "nap_total_loss_db": 7.98,
+          "nap_margin_db": 20.02,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.83,
+              "splitters_db": 3.5,
+              "connectors_db": 2,
+              "splices_db": 0.48
+            },
+            "total_loss_db": 9.81,
+            "margin_db": 18.19,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far",
+            "no_free_ports"
+          ]
+        },
+        {
+          "rank": 3,
+          "nap_id": "NAP-08",
+          "nap_name": "Barrio Italia",
+          "ratio": "1:16",
+          "straight_line_m": 4729,
+          "route_m": 6147,
+          "ports": {
+            "outputs": 16,
+            "subscribers": 2,
+            "child_naps": 0,
+            "free": 14
+          },
+          "drop": {
+            "straight_line_km": 4.729,
+            "straight_line_m": 4729,
+            "slack_factor": 1.3,
+            "length_km": 6.147,
+            "length_m": 6147,
+            "fiber_db": 1.54,
+            "connectors": 2,
+            "connectors_db": 0.8,
+            "loss_db": 2.34
+          },
+          "nap_total_loss_db": 17.05,
+          "nap_margin_db": 10.95,
+          "nap_status": "pass",
+          "projected": {
+            "by_source": {
+              "fiber_db": 3.49,
+              "splitters_db": 13.5,
+              "connectors_db": 2,
+              "splices_db": 0.4
+            },
+            "total_loss_db": 19.39,
+            "margin_db": 8.61,
+            "status": "pass"
+          },
+          "feasible": false,
+          "reasons": [
+            "too_far"
+          ]
+        }
+      ],
+      "best_nap_id": "NAP-12",
+      "feasible_count": 1
+    }
+  }
+}

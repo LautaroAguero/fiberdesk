@@ -38,13 +38,34 @@ export type { HighlightStatus, ImpactStatus } from "@/lib/optical/status";
  * add-cut-impact, decision 5): `cut` for the cut element, `out_of_service` for
  * what is downstream of it. They carry no margin, because an outage has none.
  * The earlier variants are unchanged, so recorded runs re-project as before.
+ *
+ * The last two kinds belong to connection feasibility (design.md,
+ * add-feasibility, decision 7). `point` is the evaluated point, with the best
+ * candidate's NAP id or null; `candidate` is one of the three nearest NAPs with
+ * its rank and feasibility. Neither carries a `status` or a margin: a candidate's
+ * projection is about a hypothetical subscriber, not the NAP's own link, so
+ * painting it with a budget status would claim the NAP's link fails when it is
+ * merely full. They declare `status?: undefined` so that `entry.status` still
+ * reads on the union, as `undefined`.
  */
 export type HighlightEntry =
   | { kind: "nap"; id: string; status: BudgetStatus; margin_db: number }
   | { kind: "subscriber"; id: string; nap_id: string; status: BudgetStatus; margin_db: number }
   | { kind: "run"; id: string; status: BudgetStatus }
   | { kind: "nap" | "run"; id: string; status: ImpactStatus }
-  | { kind: "subscriber"; id: string; nap_id: string; status: ImpactStatus };
+  | { kind: "subscriber"; id: string; nap_id: string; status: ImpactStatus }
+  | {
+      kind: "point";
+      id: "selected-point";
+      lat: number;
+      lon: number;
+      best_nap_id: string | null;
+      status?: undefined;
+    }
+  | { kind: "candidate"; id: string; rank: number; feasibility: CandidateFeasibility; status?: undefined };
+
+/** How a connection candidate reads on the map. `marginal` is feasible with a marginal projection. */
+export type CandidateFeasibility = "feasible" | "marginal" | "not_feasible";
 
 /** The terminal payload of a turn — see design.md, decision 5: projected, never emitted. */
 export interface HighlightPayload {

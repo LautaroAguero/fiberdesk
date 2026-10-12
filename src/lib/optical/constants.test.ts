@@ -17,6 +17,7 @@ import {
   DROP_SLACK_FACTOR,
   FIBER_DB_PER_KM,
   GPON_CLASS,
+  MAX_DROP_ROUTE_M,
   MIN_MARGIN_DB,
   SPLICE_DB,
   SPLITTER_DB,
@@ -100,5 +101,21 @@ describe("1.4 the constants module matches the frozen copy in expected-traces.js
 
   test("connector loss", () => {
     expect(CONNECTOR_DB).toBe(tracesFixture.loss_model.connector_db);
+  });
+});
+
+describe("1.2 the maximum drop route length", () => {
+  test("is 600 m", () => {
+    expect(MAX_DROP_ROUTE_M).toBe(600);
+  });
+
+  test("the longest seed drop in expected-traces.json is within it", () => {
+    const longestM = Math.max(
+      ...Object.values(
+        (tracesFixture as unknown as { subscribers: Record<string, { length_km: number }> }).subscribers,
+      ).map((s) => Math.round(s.length_km * 1000)),
+    );
+    expect(longestM).toBe(498);
+    expect(longestM).toBeLessThanOrEqual(MAX_DROP_ROUTE_M);
   });
 });

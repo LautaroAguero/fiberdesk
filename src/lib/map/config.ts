@@ -94,6 +94,39 @@ export const CUT_RUN_WIDTH = 6;
  */
 export const DARK_RUN_OPACITY = 0.85;
 
+/**
+ * The colours of connection feasibility (design.md, add-feasibility, decision 8).
+ * They sit apart from both palettes above on purpose. Green, amber and red say
+ * "how good is this NAP's own link"; magenta and slate say "this is down". A
+ * candidate answers a third question, "could a new customer connect here", and
+ * painting a full NAP red would claim its link fails when it is merely full. So a
+ * candidate is a RING around the NAP, leaving the fill to the NAP's own entry,
+ * and the rings use teal, yellow and grey, none of which is a budget or cut
+ * colour. The point and its drop line are blue, the one hue nothing else but the
+ * OLT's indigo uses, and the OLT is a larger solid disc. A not-feasible ring is
+ * a dark grey, slightly thinner, rather than dashed, because MapLibre cannot
+ * drive a dash from feature-state.
+ *
+ * Changed during task 4.3: the first version drew the not-feasible ring in
+ * gray-500 at 2 px and 0.6 opacity. In the browser it vanished against the
+ * neutral NAP fill, so a not-feasible candidate looked like a NAP that was not
+ * a candidate at all. It is now zinc-700, 3 px, nearly opaque.
+ */
+export const CANDIDATE_COLOR = {
+  feasible: "#0d9488", // teal-600
+  marginal: "#ca8a04", // yellow-600: feasible, with a marginal projection
+  not_feasible: "#3f3f46", // zinc-700
+} as const;
+
+/** Ring width, in pixels, of each candidate style: not feasible is the thinnest. */
+export const CANDIDATE_RING_WIDTH = { feasible: 4, marginal: 4, not_feasible: 3 } as const;
+
+/** Opacity of a candidate ring. */
+export const CANDIDATE_RING_OPACITY = { feasible: 1, marginal: 1, not_feasible: 0.9 } as const;
+
+/** Colour of the selected point's marker, the evaluated point and the drop line. Tailwind blue-600. */
+export const POINT_COLOR = "#2563eb";
+
 /** Colour for a NAP not named in the current highlight. Tailwind slate-400. */
 export const NEUTRAL_NAP_COLOR = "#94a3b8";
 

@@ -12,6 +12,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 
 import { EFFORT, MAX_TOKENS, MODEL, PROMPT_CACHING } from "@/lib/assistant/config";
 import { runAssistantLoop } from "@/lib/assistant/loop";
+import { parseMapContext } from "@/lib/assistant/map-context";
 import { createAnthropicClient, createModelClient } from "@/lib/assistant/model-client";
 import { projectHighlight } from "@/lib/assistant/highlight";
 import { createSseStream } from "@/lib/assistant/stream";
@@ -24,6 +25,8 @@ import { loadNetwork } from "@/lib/network/load";
 
 interface ChatRequestBody {
   messages: Anthropic.MessageParam[];
+  /** Optional, so an older client keeps working. Validated by `parseMapContext`. */
+  map_context?: unknown;
 }
 
 function isChatRequestBody(value: unknown): value is ChatRequestBody {
@@ -49,6 +52,15 @@ export async function POST(request: Request): Promise<Response> {
       { status: 400 },
     );
   }
+
+  // The selected point is checked before any model call: a point outside the
+  // modelled city is the client's mistake, not something to stream an answer
+  // about. See design.md (add-feasibility), decision 5.
+  const parsedMapContext = parseMapContext(body);
+  if (!parsedMapContext.ok) {
+    return Response.json({ error: parsedMapContext.error }, { status: 400 });
+  }
+  const mapContext = parsedMapContext.mapContext;
 
   // A failure here happens before any bytes are sent, so it is a normal HTTP
   // error rather than an SSE event. Only a failure DURING streaming becomes
@@ -92,6 +104,7 @@ export async function POST(request: Request): Promise<Response> {
         messages,
         effort: EFFORT,
         promptCaching: PROMPT_CACHING,
+        mapContext,
         onEvent: emit,
       });
       toolCalls = result.toolCalls;

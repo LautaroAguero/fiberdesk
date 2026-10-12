@@ -40,10 +40,14 @@ as a side panel. Every NAP the assistant highlights is coloured and reframed on 
 NAP can be clicked for its optical budget breakdown — see *The map*, below.
 
 **Phase 4 — production — in progress.** A live eval suite measures the assistant (see *Evals*),
-prompt caching cuts what repeated calls cost, and the assistant can now trace one subscriber's
-link end to end and say what a fiber cut takes down — see *Tracing one subscriber* and *What a cut
-takes down*, below. One more map capability (whether a point on the map can be connected) comes
-next. There is no deploy yet.
+and prompt caching cuts what repeated calls cost. The assistant has the three map capabilities its
+users asked for:
+- it traces one subscriber's link end to end;
+- it says what a fiber cut takes down;
+- it says whether a new customer can be connected at a point clicked on the map.
+
+See *Tracing one subscriber*, *What a cut takes down* and *Can a customer connect here?*, below.
+There is no deploy yet.
 
 ## Getting started
 
@@ -153,13 +157,15 @@ second time, and adds the **drop**: the last stretch of fiber from the NAP to th
 ```ts
 const trace = traceSubscriber(network, "SUB-025");
 // NAP-12's own budget: 25.23 dB, margin 2.77 dB, marginal
-// drop: 0.383 km in straight line × 1.3 slack = 0.498 km → 0.12 dB of fiber + 2 × 0.40 dB connectors = 0.92 dB
+// drop: 0.383 km (383 m) in straight line × 1.3 slack = 0.498 km (498 m)
+//       → 0.12 dB of fiber + 2 × 0.40 dB connectors = 0.92 dB
 // { total_loss_db: 26.15, margin_db: 1.85, status: "marginal", rx_power_dbm: -23.15 }
 ```
 
 **The drop is a model, not a measurement.** The seed has no drop cables, only the straight line
 from each NAP to its subscribers. The drop's length is that distance, by haversine, times a slack
-factor of **1.3**, and it adds **2 connectors** (the NAP port and the ONT). Both values sit in
+factor of **1.3**, and it adds **2 connectors** (the NAP port and the ONT). Each length is stated
+in km and in metres, so an answer never has to convert one into the other. Both values sit in
 `constants.ts` beside the others, as assumptions **pending validation**. They were chosen in the
 handoff as industry-typical starting points, and no published source backs them yet. The received
 power at the ONT is an estimate too, and no receiver sensitivity is modelled, so the system never
@@ -201,12 +207,58 @@ does not have. A cut here is total and hypothetical: no partial damage, no rerou
 is a tree) and no repair times. The 24 possible cuts are checked against a hand-derived oracle,
 `seed/expected-cut-impacts.json`.
 
+### Can a customer connect here?
+
+`evaluateConnection(network, point)` in `src/lib/feasibility/` answers the question sales and field
+planning ask most: can a new customer be connected at this point on the map? It always evaluates
+**the three NAPs nearest to the point**, and runs three checks on each:
+
+- **Drop distance.** The drop route, modelled exactly as in a subscriber's trace, must be at most
+  **600 m**.
+- **Free ports.** Free ports are the splitter's outputs, less the subscribers it serves, less the
+  child NAPs it feeds. Feeding a cascade uses up a port, which is why NAP-03 (a 1:2 serving one
+  subscriber and feeding NAP-12) is full.
+- **Projected budget.** The NAP's own budget plus the new drop must not fail.
+
+A NAP that fails a check is still returned, with every reason that applies (`too_far`,
+`no_free_ports`, `budget_fail`). Feasible candidates come first, and the result names the best one
+and how many are feasible.
+
+```ts
+const result = evaluateConnection(network, { lat: -27.4659, lon: -58.97 });
+// #1 NAP-11 (1:16): 434 m straight, 564 m of route, 14 free ports, drop 0.94 dB
+//    → projected 16.61 dB, margin 11.39 dB, pass — feasible
+// #2 NAP-05 (1:8):  456 m straight, 593 m of route, 6 free ports, drop 0.95 dB
+//    → projected 14.17 dB, margin 13.83 dB, pass — feasible
+// #3 NAP-04 (1:8):  1759 m straight, 2287 m of route — not feasible: too_far
+// best_nap_id: "NAP-11", feasible_count: 2
+```
+
+The seed already holds the cases worth showing:
+- next to NAP-03, the nearest box is full;
+- next to NAP-09, the box has five free ports, but no new link there closes its budget (margin
+  −2.25 dB);
+- 414 m from NAP-06, the connection is feasible but marginal (2.51 dB), although NAP-06 itself
+  passes.
+
+**The 600 m maximum is an assumption, pending validation.** The handoff suggested about 300 m. But
+every seed subscriber sits 346–383 m in straight line from its NAP, so 450–498 m of modelled drop,
+and under 300 m no existing customer could have been connected to its own box. The owner chose to
+move the maximum, measured on the route rather than the straight line, and to leave the seed and
+the slack factor alone. It lives in `constants.ts` as an operational limit, beside the minimum
+margin.
+
+The engine is bound to `seed/expected-feasibility.json`: six points and all 28 subscriber
+positions, derived by `seed/derive-expected-feasibility.py`, an independent implementation in
+Python. Planting a new customer exactly where an existing one is projects the same figures as that
+subscriber's trace.
+
 ## The assistant
 
 `src/lib/assistant/` and `src/app/api/chat/route.ts` are the copilot: a route handler that streams
 an answer while orchestrating the optical budget engine and the documentation corpus through tool
 calls. **The model never computes a number and never states a documented figure it did not just
-retrieve.** Every figure it states comes from one of six tools, named for the shape of their
+retrieve.** Every figure it states comes from one of seven tools, named for the shape of their
 answer rather than the operation:
 
 - **`summarize_optical_budgets`** — one thin row per NAP (id, name, total loss, margin, status).
@@ -220,6 +272,8 @@ answer rather than the operation:
   one of the 28 subscriber ids, so an id the network lacks cannot be traced.
 - **`list_cut_impact`** — what a cut of one fiber run or NAP takes out of service downstream, with
   the counts. Its argument is one of the 12 runs or 12 NAPs; the OLT is not on the list.
+- **`list_connection_candidates`** — the three NAPs nearest to the point selected on the map, each
+  with its verdict and reasons. It takes **no arguments**: see *The map context*, below.
 - **`search_documentation`** — the passages in the technical corpus that match a query, returned
   as citable `search_result` blocks. See *The documentation corpus*, below.
 - **`get_optical_constants`** — what the system itself computes with, so a documented figure can
@@ -229,9 +283,11 @@ Survey first, detail second: twelve full breakdowns cost roughly 1,650 tokens ag
 for a survey plus detail on the two links that actually fail — and firing all twelve at once would
 require the model to already know every identifier, which the survey exists to avoid.
 
-**The map highlight is projected in code, never emitted by the model.** Each entry names its kind
-— a NAP, a subscriber or a fiber run — with its status: a budget classification, or `cut` /
-`out_of_service` for an outage, which outranks it. Every field in it — identifier, status, margin —
+**The map highlight is projected in code, never emitted by the model.** Each entry names its kind:
+- a NAP, a subscriber or a fiber run, with its status: a budget classification, or `cut` /
+  `out_of_service` for an outage, which outranks it;
+- or, for a feasibility answer, the evaluated `point` and one `candidate` per NAP, with its rank
+  and its feasibility. Every field in it — identifier, status, margin —
 already exists in a tool result. Asking the model to repeat it back
 would be asking it to copy numbers, and copying is exactly where a model writes 2.7 for 2.77.
 
@@ -239,6 +295,22 @@ There is no server-side conversation store. Each streamed turn ends with the exa
 array the server sent to the model — tool calls and results intact — and the browser tab holds
 that array and resends it verbatim on the next question. Close the tab and the conversation is
 gone; that is by design for now.
+
+### The map context
+
+The chat request carries the map's state beside the conversation: `map_context.selected_point`,
+the point the user clicked. The route rejects a point outside the modelled city before any model
+call. The point then goes only to the tool that reads it, never into the system prompt or the
+messages. Two things follow:
+
+- **The model never copies a coordinate.** It would be the same mistake the projected highlight
+  avoids. The tool echoes the point it evaluated, so any coordinate in an answer is grounded.
+- **The cached prompt prefix is the same for every click,** and the history the browser resends
+  carries no stale "a point is selected" marker.
+
+With no point selected, the tool returns an error that tells the model to ask for a click.
+Coordinates typed into the chat get the same answer: the assistant asks the user to select the
+point on the map instead of evaluating a location it cannot pass to the tool.
 
 ### Failing loudly
 
@@ -258,38 +330,55 @@ between a document and the constants. Those are measured by the live eval suite 
 
 ### Evals
 
-`npm run eval` asks the real model 34 cases (38 questions, counting follow-ups) and checks every
+`npm run eval` asks the real model 42 cases (47 questions, counting follow-ups) and checks every
 answer with deterministic graders — which tools it called and in what order, which NAPs,
-subscribers and cut runs the map highlighted, whether every figure in the prose came from a tool, whether it
+subscribers, cut runs and candidate NAPs the map highlighted, whether every figure in the prose came from a tool, whether it
 declined what the system does not model. It calls the API under a mandatory spend cap and is never
 part of `npm test`. How it works, and what each grader does *not* check:
 [`evals/README.md`](evals/README.md).
 
 **Latest run** — `claude-opus-5`, effort `low`, prompt caching on, from
-[`evals/runs/2026-10-12T17-12-15Z.regraded.json`](evals/runs/2026-10-12T17-12-15Z.regraded.json):
+[`evals/runs/2026-10-12T19-04-33Z.regraded.json`](evals/runs/2026-10-12T19-04-33Z.regraded.json):
 
 | Area | Passed | Rate | 95% Wilson interval |
 |---|---|---|---|
+| Can a customer connect here | 8/8 | 100.0% | 67.6%–100.0% |
 | What a cut takes down | 6/6 | 100.0% | 61.0%–100.0% |
 | Tracing one subscriber | 7/7 | 100.0% | 64.6%–100.0% |
 | Declining what the system cannot answer | 5/5 | 100.0% | 56.6%–100.0% |
 | Documentation | 5/5 | 100.0% | 56.6%–100.0% |
-| Optical budget questions | 5/8 | 62.5% | 30.6%–86.3% |
+| Optical budget questions | 4/8 | 50.0% | 21.5%–78.5% |
 | Multi-turn follow-ups | 2/3 | 66.7% | 20.8%–93.9% |
-| **Overall** | **30/34** | **88.2%** | **73.4%–95.3%** |
+| **Overall** | **37/42** | **88.1%** | **75.0%–94.8%** |
 
-Per question, the median cost is **$0.0157** as measured (**$0.0410** cold, with nothing in the
-prompt cache), and p95 latency is **10.7 s**. The run cost $0.63.
+Per question, the median cost is **$0.0176** as measured (**$0.0482** cold, with nothing in the
+prompt cache), and p95 latency is **10.7 s**. The run cost $0.92.
+
+The feasibility cases include:
+- the full nearest NAP (NAP-03) and the failing one (NAP-09);
+- a comfortable connection, and a feasible but marginal one (NAP-06);
+- two feasible NAPs, and the follow-up "¿y si lo conecto a la segunda opción?";
+- a point out of coverage, and no point selected.
 
 The cut cases include a feeder cut through a cascade, a NAP down, a cut at the OLT, an element the
 network lacks, and the follow-up "¿cuántos clientes son?". The trace cases include a subscriber
 whose NAP passes while it does not, a lookup by name, an id the network lacks, and a question on
-whether an ONT will work. Every failure in this run is on the older cases: twice the model answers
-from the survey without fetching the breakdown, and twice it does arithmetic in prose ("19.8 km",
-"20 km"). Between two runs of nearly the same configuration, those 21 older cases have moved by
-three, so a single run is a rough measure. The readings are in
-[`openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md`](openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md)
-and `openspec/changes/archive/2026-10-12-add-cut-impact/verification.md`.
+whether an ONT will work.
+
+Every failure in this run is on the older cases. Twice the model answers from the survey without
+fetching the breakdown. Four times it writes a figure no tool returned:
+- "casi 20 km", twice (11.2 + 8.6 km);
+- "las 12 NAPs", a count of the survey's rows;
+- "superan los 10 dB", a threshold of its own.
+Between two runs of nearly the same configuration, those older cases move by about three, so a
+single run is a rough measure.
+
+The first full run with feasibility caught one regression worth fixing. A trace answer converted
+0.383 km into "383 m", a figure no tool returned. The drop now states both units. The readings
+are in the `verification.md` of each change:
+[`add-subscriber-trace`](openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md),
+[`add-cut-impact`](openspec/changes/archive/2026-10-12-add-cut-impact/verification.md) and
+`add-feasibility`.
 
 **Can a cheaper model do this?** Not yet. The change `reduce-cost-per-question` tried to halve the
 cost per question. Every configuration was judged by a rule fixed before any of them ran
@@ -384,6 +473,15 @@ no path or downstream set of its own: the payload lists the runs. A cut is drawn
 budget colours: the cut element in magenta, everything out of service in a dark slate. The map
 component only calls MapLibre's `setFeatureState` with that result; it never recolours,
 reclassifies or recomputes anything itself.
+
+**A feasibility answer** rings each candidate NAP by its verdict: teal if feasible, yellow if
+feasible but marginal, dark grey if not. Each ring carries its rank, and a dashed blue drop line
+runs from the evaluated point to the best candidate. The ring leaves the NAP's fill to its own
+classification: a full NAP is not a failing one.
+
+**Clicking empty map space** selects a point: a blue marker appears, and every chat request carries
+it until it is cleared or moved. Selecting a new point clears a feasibility highlight that belonged
+to the old one, and leaves any other highlight alone.
 
 **Clicking any NAP** — highlighted or not, before or after asking a question — opens its full
 optical budget breakdown: `src/lib/map/breakdown.ts` (`formatBreakdown`) formats a `BudgetResult`

@@ -127,7 +127,13 @@ async function runCase(
   const turns: TurnRecord[] = [];
   let lastGraded: GradedTurn | null = null;
 
-  const base = { id: evalCase.id, area: evalCase.area, graders: {}, sign_only: [] as number[] };
+  const base = {
+    id: evalCase.id,
+    area: evalCase.area,
+    ...(evalCase.map_context !== undefined && { map_context: evalCase.map_context }),
+    graders: {},
+    sign_only: [] as number[],
+  };
 
   try {
     for (const userText of evalCase.turns) {
@@ -143,6 +149,9 @@ async function runCase(
         network,
         searchIndex,
         messages: [...messages, { role: "user", content: userText }],
+        // The point rides on every turn, as it does on every chat request; it never
+        // enters the messages (design.md, add-feasibility, decisions 5 and 9).
+        mapContext: evalCase.map_context ?? {},
         effort: config.effort,
         promptCaching: config.promptCaching,
         onEvent: () => {},

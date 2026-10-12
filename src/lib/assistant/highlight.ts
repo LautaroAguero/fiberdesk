@@ -4,8 +4,8 @@
  * (add-subscriber-trace), decision 7, and specs/network-assistant/spec.md,
  * "The map payload is produced by the server".
  *
- * Only `detail_optical_budget`, `trace_subscriber_link` and `list_cut_impact`
- * calls become entries. `summarize_optical_budgets` returns all twelve
+ * Only `detail_optical_budget`, `trace_subscriber_link`, `list_cut_impact` and
+ * `list_connection_candidates` calls become entries. `summarize_optical_budgets` returns all twelve
  * NAPs for the model's own reasoning; highlighting all twelve — ten of them
  * passing — would defeat the point of pointing at a problem. The NAPs the
  * model chose to zoom into are the ones worth drawing attention to, which is
@@ -17,21 +17,26 @@
  * itself is not added, because its classification may differ from the
  * subscriber's (add-subscriber-trace, decision 7). A cut-impact call contributes
  * the cut element as `cut` and every NAP, subscriber and run it takes out of
- * service as `out_of_service`, with no margin (add-cut-impact, decision 5).
+ * service as `out_of_service`, with no margin (add-cut-impact, decision 5). A
+ * connection-candidates call contributes one `point` entry and one `candidate`
+ * entry per candidate, and no NAP entry: a candidate's projection is about a
+ * hypothetical subscriber, not the NAP's own link (add-feasibility, decision 7).
  *
  * Entries merge by `(kind, id)` and the more severe status wins (`cut`,
  * `out_of_service`, `fail`, `marginal`, `pass`). A more severe entry replaces
  * the other whole, so no margin survives an outage. `fit_bounds` is true when
- * any NAP, subscriber or cut-run entry exists.
+ * any NAP, subscriber, point or cut-run entry exists.
  */
 
 import type { ToolCallRecord } from "@/lib/assistant/loop";
 import {
+  CONNECTION_CANDIDATES_TOOL_NAME,
   CUT_IMPACT_TOOL_NAME,
   DETAIL_TOOL_NAME,
   TRACE_TOOL_NAME,
 } from "@/lib/assistant/tool-definitions";
-import type { HighlightEntry, HighlightPayload } from "@/lib/assistant/events";
+import type { CandidateFeasibility, HighlightEntry, HighlightPayload } from "@/lib/assistant/events";
+import type { ConnectionCandidate, ConnectionFeasibility } from "@/lib/feasibility/feasibility";
 import type { BudgetResult, BudgetStatus } from "@/lib/optical/budget";
 import { worseStatus } from "@/lib/optical/status";
 import type { SubscriberTrace } from "@/lib/optical/trace";
@@ -45,14 +50,22 @@ import type { CutImpact } from "@/lib/topology/cut";
 function put(entries: Map<string, HighlightEntry>, entry: HighlightEntry): void {
   const key = `${entry.kind}:${entry.id}`;
   const existing = entries.get(key);
+  // Point and candidate entries carry no status: only compare when both have one.
   if (
-    existing !== undefined &&
+    existing?.status !== undefined &&
+    entry.status !== undefined &&
     existing.status !== entry.status &&
     worseStatus(existing.status, entry.status) === existing.status
   ) {
     return;
   }
   entries.set(key, entry);
+}
+
+/** How a candidate reads on the map: `marginal` is feasible with a marginal projection. */
+function candidateFeasibility(candidate: ConnectionCandidate): CandidateFeasibility {
+  if (!candidate.feasible) return "not_feasible";
+  return candidate.projected.status === "marginal" ? "marginal" : "feasible";
 }
 
 /** Adds the runs of `hops` to `entries`, each with `status`, merging a repeated run to the worse one. */
@@ -108,6 +121,23 @@ export function projectHighlight(toolCalls: ToolCallRecord[]): HighlightPayload 
       for (const runId of result.runs_out_of_service) {
         put(entries, { kind: "run", id: runId, status: "out_of_service" });
       }
+    } else if (call.name === CONNECTION_CANDIDATES_TOOL_NAME) {
+      const result = call.result as ConnectionFeasibility;
+      put(entries, {
+        kind: "point",
+        id: "selected-point",
+        lat: result.point.lat,
+        lon: result.point.lon,
+        best_nap_id: result.best_nap_id,
+      });
+      for (const candidate of result.candidates) {
+        put(entries, {
+          kind: "candidate",
+          id: candidate.nap_id,
+          rank: candidate.rank,
+          feasibility: candidateFeasibility(candidate),
+        });
+      }
     }
   }
 
@@ -118,6 +148,7 @@ export function projectHighlight(toolCalls: ToolCallRecord[]): HighlightPayload 
       (entry) =>
         entry.kind === "nap" ||
         entry.kind === "subscriber" ||
+        entry.kind === "point" ||
         (entry.kind === "run" && entry.status === "cut"),
     ),
   };

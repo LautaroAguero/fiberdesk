@@ -5,6 +5,7 @@
  */
 
 import { dispatchTool } from "@/lib/assistant/dispatcher";
+import type { MapContext } from "@/lib/assistant/map-context";
 import { projectHighlight } from "@/lib/assistant/highlight";
 import type { ToolCallRecord } from "@/lib/assistant/loop";
 import { loadCorpus } from "@/lib/corpus/load";
@@ -16,8 +17,8 @@ export const network = loadNetwork();
 export const searchIndex = buildSearchIndex(loadCorpus());
 
 /** A ToolCallRecord the way loop.ts builds one, from a real dispatch. */
-export function call(name: string, input: unknown, iteration = 1): ToolCallRecord {
-  const { content, isError } = dispatchTool(name, input, network, searchIndex);
+export function call(name: string, input: unknown, iteration = 1, mapContext: MapContext = {}): ToolCallRecord {
+  const { content, isError } = dispatchTool(name, input, network, searchIndex, mapContext);
   return {
     name,
     input,

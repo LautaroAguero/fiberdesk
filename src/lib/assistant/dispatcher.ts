@@ -18,8 +18,10 @@ import type Anthropic from "@anthropic-ai/sdk";
 
 import { detailOpticalBudget, summarizeOpticalBudgets } from "@/lib/assistant/budgets";
 import { searchDocumentation } from "@/lib/assistant/documentation-search";
+import type { MapContext } from "@/lib/assistant/map-context";
 import { getOpticalConstantsSnapshot } from "@/lib/assistant/optical-constants";
 import {
+  CONNECTION_CANDIDATES_TOOL_NAME,
   CUT_IMPACT_TOOL_NAME,
   DETAIL_TOOL_NAME,
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
@@ -28,6 +30,7 @@ import {
   TRACE_TOOL_NAME,
 } from "@/lib/assistant/tool-definitions";
 import type { SearchIndex } from "@/lib/corpus/search";
+import { evaluateConnection } from "@/lib/feasibility/feasibility";
 import type { Network } from "@/lib/network/types";
 import { traceSubscriber } from "@/lib/optical/trace";
 import { cutImpact } from "@/lib/topology/cut";
@@ -79,6 +82,11 @@ export interface DispatchResult {
   isError: boolean;
 }
 
+/** What the model reads when it asks about a location and the user has not clicked one. */
+export const NO_POINT_MESSAGE =
+  "No point is selected on the map. Ask the user to click the map where the new customer " +
+  "would connect. Do not guess a location.";
+
 const errorResult = (message: string): DispatchResult => ({
   content: JSON.stringify({ error: message }),
   isError: true,
@@ -88,12 +96,18 @@ const errorResult = (message: string): DispatchResult => ({
  * Runs the tool named `name` against `network` and `searchIndex`. Never
  * throws: a failure is reported as `{ content, isError: true }` for the
  * caller to wrap into a tool_result.
+ *
+ * `mapContext` is the request's map state, for a tool that evaluates what the
+ * user selected rather than an argument the model wrote. It defaults to no
+ * point, so every caller that predates it is unchanged. See design.md
+ * (add-feasibility), decision 5.
  */
 export function dispatchTool(
   name: string,
   input: unknown,
   network: Network,
   searchIndex: SearchIndex,
+  mapContext: MapContext = {},
 ): DispatchResult {
   try {
     switch (name) {
@@ -132,6 +146,15 @@ export function dispatchTool(
         // or guessed impact.
         return { content: JSON.stringify(cutImpact(network, input.element_id)), isError: false };
       }
+      case CONNECTION_CANDIDATES_TOOL_NAME: {
+        // No arguments: the point is the one the user selected, read from the request
+        // (design.md, add-feasibility, decision 5). The model never supplies a coordinate.
+        const point = mapContext.selected_point;
+        if (point === undefined) {
+          return errorResult(NO_POINT_MESSAGE);
+        }
+        return { content: JSON.stringify(evaluateConnection(network, point)), isError: false };
+      }
       case SEARCH_DOCUMENTATION_TOOL_NAME: {
         if (!isSearchInput(input)) {
           return errorResult("search_documentation requires a query");
@@ -160,8 +183,9 @@ export function runToolUse(
   toolUse: Anthropic.ToolUseBlock,
   network: Network,
   searchIndex: SearchIndex,
+  mapContext: MapContext = {},
 ): Anthropic.ToolResultBlockParam {
-  const { content, isError } = dispatchTool(toolUse.name, toolUse.input, network, searchIndex);
+  const { content, isError } = dispatchTool(toolUse.name, toolUse.input, network, searchIndex, mapContext);
   return {
     type: "tool_result",
     tool_use_id: toolUse.id,

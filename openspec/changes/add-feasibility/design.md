@@ -34,7 +34,7 @@ Results for the eval points:
 
 | Point | Candidates (route, verdict) | Best |
 |---|---|---|
-| A (-27.4165, -59.0180) | NAP-03 217 m, `no_free_ports` · NAP-08 3253 m, `too_far` · NAP-12 3549 m, `too_far` | none |
+| A (-27.4165, -59.0180) | NAP-03 217 m, `no_free_ports` · NAP-08 3252 m, `too_far` · NAP-12 3549 m, `too_far` | none |
 | B (-27.4955, -58.9380) | NAP-09 217 m, `budget_fail` (−2.25 dB) · NAP-04 `too_far` · NAP-05 `too_far` | none |
 | C (-27.4432, -58.9770) | NAP-01 205 m, feasible (14.81 dB) · NAP-11 `too_far` · NAP-05 `too_far` | NAP-01 |
 | D (-27.4930, -59.0338) | NAP-06 539 m, feasible, marginal (2.51 dB) · NAP-02 `too_far` · NAP-08 `too_far` | NAP-06 |
@@ -74,7 +74,15 @@ The function holds the exact code now inside `traceSubscriber`:
   CONNECTOR_DB)`, `loss_db = round2(fiber + connectors)`;
 - km rounded to three decimals.
 
-`traceSubscriber` calls it and changes nothing else. `SubscriberDrop` moves with it and is
+`traceSubscriber` calls it and changes nothing else.
+
+*Changed during task 6.2:* the drop also states `straight_line_m` and `length_m`, the reported km
+restated in whole metres. In the first full live run, `trace-by-name-es` had passed in the three
+runs before it. This time it wrote "383 m en línea recta", converting the trace's 0.383 km into
+metres, a figure no tool returned. The likely trigger is the new tool's metres. This applies decision
+3's rule, "both units, so the model never converts", to the trace as well. The trace's figures are
+unchanged, but its result gains two fields. Recorded trace results therefore no longer hash the
+same, and older runs re-grade those cases as recorded. `SubscriberDrop` moves with it and is
 re-exported from `trace.ts`, so no import breaks. A new subscriber at a point gets a link computed
 the way a subscriber's link is. That shared step goes in one helper too:
 
@@ -263,9 +271,16 @@ different question, so it gets a different kind.
     a position and never chooses a NAP.
 - **Candidate styles:** they use a NAP ring (`circle-stroke-*` via feature-state) rather than the
   fill, so a NAP keeps its fill and a nap-entry style can win the fill without conflict. Feasible
-  is a teal ring, marginal an amber ring, not feasible a dashed-looking grey ring at reduced
-  opacity. Rings are not data-driven dashes; the "dashed" look is a thinner, lighter stroke. The
-  rank appears in a `naps-label` variant, `"NAP-11 · #1"`, also by feature-state.
+  is a teal ring and marginal a yellow ring. Not feasible is a dark grey ring, slightly thinner.
+  Rings cannot be data-driven dashes.
+  *Changed during task 4.3:* the first not-feasible ring was gray-500 at 2 px and 0.6 opacity,
+  and in the browser it vanished against the neutral NAP fill. It is now zinc-700, 3 px, at 0.9
+  opacity.
+- **Rank labels.** The rank is drawn as its own label, `#1`, above the NAP.
+  *Changed during task 4.3:* the plan was a `naps-label` variant driven by feature-state, but
+  MapLibre cannot drive a layout property such as `text-field` from feature-state. The labels
+  are features of the `feasibility` GeoJSON source, built from the resolved payload by
+  `src/lib/map/feasibility-geojson.ts`.
 - **Resolver:** `resolveHighlight` returns `candidateFeasibility`, `candidateRank`, `point` and
   `dropLine`, and drops entries for unknown NAPs. Bounds include the point and the candidates.
 

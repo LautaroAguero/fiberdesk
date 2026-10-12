@@ -24,6 +24,24 @@ export const CITY_BOUNDS = {
   lon_max: -58.93,
 } as const;
 
+const latInsideCity = (lat: number): boolean => lat >= CITY_BOUNDS.lat_min && lat <= CITY_BOUNDS.lat_max;
+const lonInsideCity = (lon: number): boolean => lon >= CITY_BOUNDS.lon_min && lon <= CITY_BOUNDS.lon_max;
+
+/**
+ * True when `position` has finite coordinates inside `CITY_BOUNDS`. The one
+ * definition of "inside the modelled city" shared by the loader, the chat
+ * route's map context, the eval cases and the feasibility engine — see
+ * design.md (add-feasibility), decision 3.
+ */
+export function isInsideCity(position: { lat: number; lon: number }): boolean {
+  return (
+    Number.isFinite(position.lat) &&
+    Number.isFinite(position.lon) &&
+    latInsideCity(position.lat) &&
+    lonInsideCity(position.lon)
+  );
+}
+
 /** A single rule violation, naming what broke and where. */
 export interface ValidationIssue {
   /** Id of the offending entity, or a path when the failure is structural. */
@@ -63,14 +81,14 @@ function checkPosition(entity: string, value: Record<string, unknown>, issues: V
   }
 
   const { lat, lon } = value;
-  if (isFiniteNumber(lat) && (lat < CITY_BOUNDS.lat_min || lat > CITY_BOUNDS.lat_max)) {
+  if (isFiniteNumber(lat) && !latInsideCity(lat)) {
     issues.push({
       entity,
       field: "lat",
       message: `${lat} is outside the modelled city (${CITY_BOUNDS.lat_min}..${CITY_BOUNDS.lat_max})`,
     });
   }
-  if (isFiniteNumber(lon) && (lon < CITY_BOUNDS.lon_min || lon > CITY_BOUNDS.lon_max)) {
+  if (isFiniteNumber(lon) && !lonInsideCity(lon)) {
     issues.push({
       entity,
       field: "lon",

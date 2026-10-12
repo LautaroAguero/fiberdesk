@@ -18,8 +18,10 @@ import BudgetBreakdown from "@/components/BudgetBreakdown";
 import ChatPanel from "@/components/ChatPanel";
 import NetworkMap from "@/components/NetworkMap";
 import type { HighlightPayload } from "@/lib/assistant/events";
+import type { SelectedPoint } from "@/lib/assistant/map-context";
 import { formatBreakdown } from "@/lib/map/breakdown";
 import { resolveHighlight } from "@/lib/map/highlight";
+import { clearsOnNewPoint } from "@/lib/map/point";
 import type { BudgetResult } from "@/lib/optical/budget";
 import type { Network } from "@/lib/network/types";
 
@@ -36,6 +38,9 @@ export default function Copilot({ network, budgets }: CopilotProps) {
   // design.md, decision 6. `null` means no turn has highlighted anything yet.
   const [highlightPayload, setHighlightPayload] = useState<HighlightPayload | null>(null);
   const [selectedNapId, setSelectedNapId] = useState<string | null>(null);
+  // The point the user clicked on empty map space; every chat request carries it
+  // (design.md (add-feasibility), decision 5), or none once cleared.
+  const [selectedPoint, setSelectedPoint] = useState<SelectedPoint | null>(null);
 
   const highlight = useMemo(
     () => resolveHighlight(highlightPayload ?? EMPTY_PAYLOAD, network),
@@ -60,23 +65,50 @@ export default function Copilot({ network, budgets }: CopilotProps) {
     setHighlightPayload(null);
   }
 
+  // A new point retires a feasibility highlight (its candidates belong to the old
+  // point) and leaves any other highlight alone.
+  function handleSelectPoint(point: SelectedPoint) {
+    if (clearsOnNewPoint(highlightPayload)) setHighlightPayload(null);
+    setSelectedPoint(point);
+  }
+
   const hasHighlight =
-    Object.keys(highlight.napStatus).length > 0 || Object.keys(highlight.subscriberStatus).length > 0;
+    Object.keys(highlight.napStatus).length > 0 ||
+    Object.keys(highlight.subscriberStatus).length > 0 ||
+    Object.keys(highlight.candidateFeasibility).length > 0 ||
+    highlight.point !== null;
 
   return (
     <div className="flex h-screen w-screen flex-col md:flex-row">
       <div className="relative h-[55vh] w-full md:h-full md:flex-1" data-selected-nap-id={selectedNapId ?? undefined}>
-        <NetworkMap network={network} highlight={highlight} onSelectNap={setSelectedNapId} />
+        <NetworkMap
+          network={network}
+          highlight={highlight}
+          onSelectNap={setSelectedNapId}
+          onSelectPoint={handleSelectPoint}
+          selectedPoint={selectedPoint}
+        />
 
-        {hasHighlight && (
-          <button
-            type="button"
-            onClick={handleClearHighlight}
-            className="absolute top-3 left-3 rounded bg-white px-3 py-1.5 text-sm font-medium text-black shadow dark:bg-zinc-900 dark:text-zinc-50"
-          >
-            Clear highlight
-          </button>
-        )}
+        <div className="absolute top-3 left-3 flex gap-2">
+          {hasHighlight && (
+            <button
+              type="button"
+              onClick={handleClearHighlight}
+              className="rounded bg-white px-3 py-1.5 text-sm font-medium text-black shadow dark:bg-zinc-900 dark:text-zinc-50"
+            >
+              Clear highlight
+            </button>
+          )}
+          {selectedPoint !== null && (
+            <button
+              type="button"
+              onClick={() => setSelectedPoint(null)}
+              className="rounded bg-white px-3 py-1.5 text-sm font-medium text-black shadow dark:bg-zinc-900 dark:text-zinc-50"
+            >
+              Clear point
+            </button>
+          )}
+        </div>
 
         {selectedBreakdown !== null && (
           <BudgetBreakdown breakdown={selectedBreakdown} onClose={() => setSelectedNapId(null)} />
@@ -84,7 +116,7 @@ export default function Copilot({ network, budgets }: CopilotProps) {
       </div>
 
       <div className="h-[45vh] w-full border-t border-zinc-200 md:h-full md:w-[400px] md:shrink-0 md:border-t-0 md:border-l dark:border-zinc-800">
-        <ChatPanel onTurnDone={handleTurnDone} />
+        <ChatPanel onTurnDone={handleTurnDone} selectedPoint={selectedPoint} />
       </div>
     </div>
   );

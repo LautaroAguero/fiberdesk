@@ -12,10 +12,16 @@
  * colour of an element that two entries mark differently: the more severe
  * status wins, an outage over any classification (add-cut-impact, decision 5).
  * A cut run is bounded like any other run, so a reframe on a cut contains it.
+ *
+ * A connection-feasibility answer adds a point and candidates (add-feasibility,
+ * decision 8). The candidates are told apart from the NAP statuses: they have a
+ * feasibility and a rank, never a budget status, so a NAP's own entry keeps its
+ * fill. The drop line runs from the payload's point to the NAP the payload names
+ * as best: this module looks up a position and never picks a NAP.
  */
 
 import { toLngLat } from "@/lib/map/geojson";
-import type { HighlightPayload } from "@/lib/assistant/events";
+import type { CandidateFeasibility, HighlightPayload } from "@/lib/assistant/events";
 import { worseStatus, type HighlightStatus } from "@/lib/optical/status";
 import type { Network } from "@/lib/network/types";
 
@@ -36,7 +42,21 @@ export interface ResolvedHighlight {
   runIds: string[];
   /** Payload ids that name no NAP, subscriber or run in `network`: ignored, never drawn at an invented position. */
   unknownIds: string[];
-  /** Bounds to fit the view to, or `null` when `fit_bounds` is false or no NAP or subscriber entry is known. */
+  /** Feasibility of each known candidate NAP, keyed by its id. */
+  candidateFeasibility: Record<string, CandidateFeasibility>;
+  /** Rank (from 1) of each known candidate NAP, keyed by its id. */
+  candidateRank: Record<string, number>;
+  /** The evaluated point as the payload gave it, or `null` when the payload has none. */
+  point: { lat: number; lon: number } | null;
+  /**
+   * `[from, to]` as `[lon, lat]` pairs: the point to the best candidate's NAP.
+   * `null` when there is no point, no best candidate, or the NAP is unknown.
+   */
+  dropLine: [[number, number], [number, number]] | null;
+  /**
+   * Bounds to fit the view to, or `null` when `fit_bounds` is false or no NAP,
+   * subscriber, point or candidate entry is known.
+   */
   bounds: LngLatBoundsTuple | null;
 }
 
@@ -49,6 +69,10 @@ export function resolveHighlight(payload: HighlightPayload, network: Network): R
   const napStatus: Record<string, HighlightStatus> = {};
   const subscriberStatus: Record<string, HighlightStatus> = {};
   const runStatus: Record<string, HighlightStatus> = {};
+  const candidateFeasibility: Record<string, CandidateFeasibility> = {};
+  const candidateRank: Record<string, number> = {};
+  let point: ResolvedHighlight["point"] = null;
+  let bestNapId: string | null = null;
   const unknownIds: string[] = [];
 
   // Two entries naming one element keep the more severe status, in the shared
@@ -72,12 +96,24 @@ export function resolveHighlight(payload: HighlightPayload, network: Network): R
         if (runById.has(entry.id)) merge(runStatus, entry.id, entry.status);
         else unknownIds.push(entry.id);
         break;
+      case "candidate":
+        if (napById.has(entry.id)) {
+          candidateFeasibility[entry.id] = entry.feasibility;
+          candidateRank[entry.id] = entry.rank;
+        } else unknownIds.push(entry.id);
+        break;
+      case "point":
+        point = { lat: entry.lat, lon: entry.lon };
+        bestNapId = entry.best_nap_id;
+        break;
     }
   }
 
   const points: Array<[number, number]> = [];
   for (const id of Object.keys(napStatus)) points.push(toLngLat(napById.get(id)!));
   for (const id of Object.keys(subscriberStatus)) points.push(toLngLat(subscriberById.get(id)!));
+  for (const id of Object.keys(candidateFeasibility)) points.push(toLngLat(napById.get(id)!));
+  if (point !== null) points.push(toLngLat(point));
   const hasSubject = points.length > 0;
   for (const id of Object.keys(runStatus)) points.push(...runById.get(id)!.geometry);
 
@@ -87,8 +123,23 @@ export function resolveHighlight(payload: HighlightPayload, network: Network): R
     runStatus,
     runIds: Object.keys(runStatus),
     unknownIds,
+    candidateFeasibility,
+    candidateRank,
+    point,
+    dropLine: dropLineOf(point, bestNapId, napById),
     bounds: payload.fit_bounds && hasSubject ? computeBounds([toLngLat(network.olt), ...points]) : null,
   };
+}
+
+/** The drop line from the point to the best candidate's NAP, or `null` when any part is missing. */
+function dropLineOf(
+  point: ResolvedHighlight["point"],
+  bestNapId: string | null,
+  napById: Map<string, Network["splitters"][number]>,
+): ResolvedHighlight["dropLine"] {
+  const nap = bestNapId === null ? undefined : napById.get(bestNapId);
+  if (point === null || nap === undefined) return null;
+  return [toLngLat(point), toLngLat(nap)];
 }
 
 /** The bounding box of `points`, given at least one. */

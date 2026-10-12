@@ -11,7 +11,9 @@ The slack factor and the number of connectors per drop SHALL live in the optical
 their unit, their source and a pending-validation mark, like every other constant. The drop SHALL
 reuse the existing fiber attenuation and connector loss, and SHALL NOT contain literal loss
 figures. The result SHALL state the straight-line distance, the slack factor and the modelled
-length, so that a reader can see the drop is an estimate.
+length, so that a reader can see the drop is an estimate. Each length SHALL be stated both in
+kilometres and in whole metres, the metres being the reported kilometres restated, so that no
+answer has to convert one unit into the other.
 
 There SHALL be one drop model. A subscriber's trace and a connection-feasibility projection SHALL
 compute the drop the same way, so the same distance always gives the same drop.
@@ -24,7 +26,8 @@ straight line.
 #### Scenario: The drop of a cascaded subscriber
 
 - **WHEN** the drop of SUB-025 is computed, with a slack factor of 1.3 and 2 connectors per drop
-- **THEN** the straight-line distance is 0.383 km and the modelled length is 0.498 km
+- **THEN** the straight-line distance is 0.383 km (383 m) and the modelled length is 0.498 km
+  (498 m)
 - **AND** the drop's fiber loss is 0.12 dB (at 0.25 dB/km) and its connector loss is 0.80 dB
   (2 × 0.40 dB)
 - **AND** the drop loss is 0.92 dB

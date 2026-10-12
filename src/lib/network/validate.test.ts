@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { collectIssues, assertValidNetwork, NetworkValidationError } from "@/lib/network/validate";
+import { collectIssues, assertValidNetwork, isInsideCity, NetworkValidationError } from "@/lib/network/validate";
 
 /**
  * A minimal network that satisfies every rule. Each test mutates one thing and
@@ -216,5 +216,20 @@ describe("assertValidNetwork", () => {
   test("rejects a non-object outright", () => {
     expect(() => assertValidNetwork(null)).toThrow(NetworkValidationError);
     expect(() => assertValidNetwork([])).toThrow(NetworkValidationError);
+  });
+});
+
+describe("isInsideCity (add-feasibility 1.4)", () => {
+  test("a point in Resistencia is inside", () => {
+    expect(isInsideCity({ lat: -27.4659, lon: -58.97 })).toBe(true);
+  });
+
+  test("a point in Buenos Aires is outside", () => {
+    expect(isInsideCity({ lat: -34.6037, lon: -58.3816 })).toBe(false);
+  });
+
+  test("a non-finite coordinate is outside", () => {
+    expect(isInsideCity({ lat: Number.NaN, lon: -58.97 })).toBe(false);
+    expect(isInsideCity({ lat: -27.4659, lon: Number.POSITIVE_INFINITY })).toBe(false);
   });
 });

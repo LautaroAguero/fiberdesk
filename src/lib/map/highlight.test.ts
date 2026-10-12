@@ -273,3 +273,112 @@ describe("2.3 resolveHighlight on a cut", () => {
     expectContained(result.bounds!, [...points, ...runVertices("FR-03", "FR-12")]);
   });
 });
+
+describe("4.1 resolveHighlight on connection candidates", () => {
+  const E_PAYLOAD: HighlightPayload = {
+    highlight: [
+      { kind: "point", id: "selected-point", lat: -27.4659, lon: -58.97, best_nap_id: "NAP-11" },
+      { kind: "candidate", id: "NAP-11", rank: 1, feasibility: "feasible" },
+      { kind: "candidate", id: "NAP-05", rank: 2, feasibility: "feasible" },
+      { kind: "candidate", id: "NAP-04", rank: 3, feasibility: "not_feasible" },
+    ],
+    fit_bounds: true,
+  };
+  const A_PAYLOAD: HighlightPayload = {
+    highlight: [
+      { kind: "point", id: "selected-point", lat: -27.4165, lon: -59.018, best_nap_id: null },
+      { kind: "candidate", id: "NAP-03", rank: 1, feasibility: "not_feasible" },
+      { kind: "candidate", id: "NAP-08", rank: 2, feasibility: "not_feasible" },
+      { kind: "candidate", id: "NAP-12", rank: 3, feasibility: "not_feasible" },
+    ],
+    fit_bounds: true,
+  };
+
+  test("two feasible candidates and one not, with ranks, a point and a drop line to the best", () => {
+    const result = resolveHighlight(E_PAYLOAD, network);
+    const nap11 = network.splitters.find((n) => n.id === "NAP-11")!;
+
+    expect(result.candidateFeasibility).toEqual({
+      "NAP-11": "feasible",
+      "NAP-05": "feasible",
+      "NAP-04": "not_feasible",
+    });
+    expect(result.candidateRank).toEqual({ "NAP-11": 1, "NAP-05": 2, "NAP-04": 3 });
+    expect(result.point).toEqual({ lat: -27.4659, lon: -58.97 });
+    expect(result.dropLine).toEqual([
+      [-58.97, -27.4659],
+      [nap11.lon, nap11.lat],
+    ]);
+    expect(result.napStatus).toEqual({});
+    expect(result.subscriberStatus).toEqual({});
+    expect(result.runIds).toEqual([]);
+    expect(result.unknownIds).toEqual([]);
+  });
+
+  test("no feasible candidate: the point and candidates are resolved, with no drop line", () => {
+    const result = resolveHighlight(A_PAYLOAD, network);
+
+    expect(result.point).toEqual({ lat: -27.4165, lon: -59.018 });
+    expect(Object.keys(result.candidateFeasibility)).toHaveLength(3);
+    expect(result.dropLine).toBeNull();
+  });
+
+  test("a payload that names a candidate the map does not know drops it, and its drop line", () => {
+    const result = resolveHighlight(
+      {
+        highlight: [
+          { kind: "point", id: "selected-point", lat: -27.4659, lon: -58.97, best_nap_id: "NAP-99" },
+          { kind: "candidate", id: "NAP-99", rank: 1, feasibility: "feasible" },
+          { kind: "candidate", id: "NAP-05", rank: 2, feasibility: "feasible" },
+        ],
+        fit_bounds: true,
+      },
+      network,
+    );
+
+    expect(result.unknownIds).toEqual(["NAP-99"]);
+    expect(result.candidateFeasibility).toEqual({ "NAP-05": "feasible" });
+    expect(result.candidateRank).toEqual({ "NAP-05": 2 });
+    expect(result.dropLine).toBeNull();
+  });
+
+  test("reframing on A: the bounds contain the point, NAP-03, NAP-08 and NAP-12", () => {
+    const result = resolveHighlight(A_PAYLOAD, network);
+    const napPoints = network.splitters
+      .filter((n) => ["NAP-03", "NAP-08", "NAP-12"].includes(n.id))
+      .map((n): [number, number] => [n.lon, n.lat]);
+
+    expect(result.bounds).not.toBeNull();
+    expectContained(result.bounds!, [[-59.018, -27.4165], ...napPoints]);
+  });
+
+  test("no reframe when fit_bounds is false", () => {
+    expect(resolveHighlight({ ...E_PAYLOAD, fit_bounds: false }, network).bounds).toBeNull();
+  });
+
+  test("a NAP with both a nap entry and a candidate entry keeps the nap entry's style", () => {
+    const result = resolveHighlight(
+      {
+        highlight: [
+          { kind: "nap", id: "NAP-11", status: "marginal", margin_db: 2.5 },
+          ...E_PAYLOAD.highlight,
+        ],
+        fit_bounds: true,
+      },
+      network,
+    );
+
+    expect(result.napStatus).toEqual({ "NAP-11": "marginal" });
+    expect(result.candidateFeasibility["NAP-11"]).toBe("feasible");
+    expect(result.candidateRank["NAP-11"]).toBe(1);
+  });
+
+  test("a payload without a point or candidates resolves them empty", () => {
+    const result = resolveHighlight(REFERENCE_PAYLOAD, network);
+
+    expect(result.point).toBeNull();
+    expect(result.dropLine).toBeNull();
+    expect(result.candidateFeasibility).toEqual({});
+    expect(result.candidateRank).toEqual({});
+  });
+});
