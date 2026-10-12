@@ -57,7 +57,7 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
       (a) a run with caching records `true`;
       (b) the baseline record file, loaded as-is, reads as `false`;
       (c) the prompt hash is the same with and without caching.
-- [ ] 3.2 Add `coldCost(turn, prices)` to `src/lib/evals/stats.ts` (design.md, decision 3). It
+- [x] 3.2 Add `coldCost(turn, prices)` to `src/lib/evals/stats.ts` (design.md, decision 3). It
       returns the turn's measured cost plus the first call's cache-read tokens × (write rate − read
       rate) of the model that served that call, or `null` when any call is unpriced. Add
       `cold_cost_per_question { n, median, p95 }` to `RunSummary` via `summarizeRun`, and print it

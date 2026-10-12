@@ -33,8 +33,10 @@ export function formatSummary(record: RunRecord): string {
     ...Object.entries(summary.by_area).map(([area, rate]) => rateRow(area, rate)),
     rateRow("**overall**", summary.overall),
     "",
-    `Cost per question (n=${summary.cost_per_question.n}): median ${usd(summary.cost_per_question.median)}, ` +
-      `p95 ${usd(summary.cost_per_question.p95)}`,
+    `Cost per question, measured (n=${summary.cost_per_question.n}): median ` +
+      `${usd(summary.cost_per_question.median)}, p95 ${usd(summary.cost_per_question.p95)}`,
+    `Cost per question, cold (n=${summary.cold_cost_per_question.n}): median ` +
+      `${usd(summary.cold_cost_per_question.median)}, p95 ${usd(summary.cold_cost_per_question.p95)}`,
     `Latency per question (n=${summary.latency_ms_per_question.n}): median ` +
       `${seconds(summary.latency_ms_per_question.median)}, p95 ${seconds(summary.latency_ms_per_question.p95)}`,
   ];

@@ -136,6 +136,12 @@ export interface RunSummary {
   by_area: Record<string, RateSummary>;
   /** Per question = per user turn. US dollars. */
   cost_per_question: { n: number; median: number | null; p95: number | null };
+  /**
+   * The same, with each question's first-call cache reads re-priced as writes: the cost had no
+   * earlier question warmed the cache. Computed by `summarizeRun`; absent from older stored
+   * summaries, which is why `decide` recomputes summaries instead of reading them.
+   */
+  cold_cost_per_question: { n: number; median: number | null; p95: number | null };
   latency_ms_per_question: { n: number; median: number | null; p95: number | null };
 }
 

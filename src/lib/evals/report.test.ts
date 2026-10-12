@@ -53,7 +53,8 @@ describe("formatSummary", () => {
       record([caseRecord("a", "pass", 0.02), caseRecord("b", "pass", 0.02), caseRecord("c", "fail", 0.01)]),
     );
     expect(text).toContain("| budget | 2/3 | 66.7% |");
-    expect(text).toContain("Cost per question (n=3): median $0.0200, p95 $0.0200");
+    expect(text).toContain("Cost per question, measured (n=3): median $0.0200, p95 $0.0200");
+    expect(text).toContain("Cost per question, cold (n=3): median $0.0200, p95 $0.0200");
     expect(text).toContain("Latency per question (n=3): median 4.0 s, p95 4.0 s");
     expect(text).toContain("- c — grounding: ungrounded figure 2.7");
   });

@@ -2,10 +2,12 @@
  * The statistics a run reports: pass rates with a 95% Wilson interval, and
  * the median and 95th percentile of cost and latency per question. All of it
  * computed here, deterministically — no figure in a summary comes from a
- * model. See design.md (add-eval-harness), decision 12.
+ * model. See design.md (add-eval-harness), decision 12; the cold cost is
+ * design.md (reduce-cost-per-question), decision 3.
  */
 
-import type { CaseRecord, RateSummary, RunSummary } from "@/lib/evals/types";
+import { MODEL_PRICES, type ModelPrice } from "@/lib/assistant/pricing";
+import type { CaseRecord, RateSummary, RunSummary, TurnRecord } from "@/lib/evals/types";
 
 /** The z-score for a two-sided 95% interval. */
 const Z_95 = 1.96;
@@ -63,6 +65,28 @@ function rate(cases: CaseRecord[]): RateSummary {
   };
 }
 
+/**
+ * The cost of a question had no earlier question warmed the prompt cache:
+ * its measured cost, with the cache-read tokens of its FIRST model call
+ * re-priced as cache writes at the serving model's rates. Reads on later
+ * calls of the same question stay at the read rate — the first call would
+ * have written what they read. Without caching, cold equals measured.
+ *
+ * `null` when the cost cannot be priced (any call unpriced), never estimated.
+ * See design.md (reduce-cost-per-question), decision 3.
+ */
+export function coldCost(
+  turn: Pick<TurnRecord, "cost_usd" | "calls">,
+  prices: Readonly<Record<string, ModelPrice>> = MODEL_PRICES,
+): number | null {
+  if (turn.cost_usd === null) return null;
+  if (turn.calls.some((call) => call.cost_usd === null || !prices[call.model])) return null;
+  const first = turn.calls[0];
+  if (!first) return turn.cost_usd;
+  const price = prices[first.model];
+  return turn.cost_usd + (first.cache_read_input_tokens * (price.cache_write_5m - price.cache_read)) / 1_000_000;
+}
+
 function distribution(values: number[]) {
   return values.length === 0
     ? { n: 0, median: null, p95: null }
@@ -89,6 +113,9 @@ export function summarizeRun(cases: CaseRecord[]): RunSummary {
     by_area: byArea,
     cost_per_question: distribution(
       turns.map((t) => t.cost_usd).filter((cost): cost is number => cost !== null),
+    ),
+    cold_cost_per_question: distribution(
+      turns.map((t) => coldCost(t)).filter((cost): cost is number => cost !== null),
     ),
     latency_ms_per_question: distribution(turns.map((t) => t.latency_ms)),
   };
