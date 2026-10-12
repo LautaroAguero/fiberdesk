@@ -1,0 +1,658 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-12T18:55:40.246Z",
+  "finished_at": "2026-10-12T18:56:47.802Z",
+  "git_commit": "192839c6164d4c44b0740040d42c690b6a2c14be",
+  "model": "claude-opus-5",
+  "effort": "low",
+  "overridden": {
+    "model": false,
+    "effort": false
+  },
+  "prompt_caching": true,
+  "prompt_hash": "5bb26aa373616ee186195717edec4f7197db52d1ceb6cb2d8a947320ed0e45fa",
+  "max_usd": 0.5,
+  "spent_usd": 0.2248675,
+  "status": "complete",
+  "stopped_reason": null,
+  "unpriced_models": [],
+  "summary": {
+    "overall": {
+      "passes": 8,
+      "completed": 8,
+      "errors": 0,
+      "skipped": 0,
+      "rate": 1,
+      "low": 0.6755843804891231,
+      "high": 1
+    },
+    "by_area": {
+      "feasibility": {
+        "passes": 8,
+        "completed": 8,
+        "errors": 0,
+        "skipped": 0,
+        "rate": 1,
+        "low": 0.6755843804891231,
+        "high": 1
+      }
+    },
+    "cost_per_question": {
+      "n": 9,
+      "median": 0.02328875,
+      "p95": 0.055988750000000004
+    },
+    "cold_cost_per_question": {
+      "n": 9,
+      "median": 0.053443500000000005,
+      "p95": 0.055988750000000004
+    },
+    "latency_ms_per_question": {
+      "n": 9,
+      "median": 7188.379500000003,
+      "p95": 12455.986499999999
+    }
+  },
+  "cases": [
+    {
+      "id": "feas-full-es",
+      "area": "feasibility",
+      "map_context": {
+        "selected_point": {
+          "lat": -27.4165,
+          "lon": -59.018
+        }
+      },
+      "graders": {
+        "trajectory": {
+          "pass": true,
+          "reasons": []
+        },
+        "highlight": {
+          "pass": true,
+          "reasons": []
+        },
+        "grounding": {
+          "pass": true,
+          "reasons": []
+        }
+      },
+      "sign_only": [],
+      "outcome": "pass",
+      "turns": [
+        {
+          "user": "¿puedo conectar un cliente acá?",
+          "answer": "I need the map point — por favor hacé clic en el mapa donde se conectaría el cliente.\n\nDéjame verificar si ya hay un punto seleccionado:\nSí había un punto seleccionado. El resultado: **ningún candidato es factible** (0 de 3).\n\nLos tres NAP más cercanos:\n\n1. **NAP-03 \"Villa Don Andrés\"** (1:2) — 167 m en línea recta, 217 m de ruta. No factible: **sin puertos libres** (0 libres de 2 salidas). El enlace proyectado daría 8.83 dB de pérdida y 19.17 dB de margen (pass), pero no hay puerto.\n2. **NAP-08 \"Barrio Italia\"** (1:16) — 2502 m en línea recta, 3252 m de ruta. No factible: **demasiado lejos** (máximo de drop 600 m). Tiene 14 puertos libres; proyectado 18.66 dB, margen 9.34 dB.\n3. **NAP-12 \"Barrio Güiraldes\"** (1:16) — 2730 m en línea recta, 3549 m de ruta. No factible: **demasiado lejos**. 12 puertos libres; proyectado 26.92 dB, margen 1.08 dB — además sería **marginal**, igual que el propio NAP (margen 2.77 dB).\n\nEl drop es una estimación modelada (distancia en línea recta por un factor de holgura). El sistema no puede decir si el ONT de ese cliente funcionaría.",
+          "cited_sources": [],
+          "stop_reason": "end_turn",
+          "trajectory": [
+            {
+              "name": "list_connection_candidates",
+              "input": {},
+              "iteration": 1,
+              "is_error": false,
+              "result_sha256": "c32b439fce3549e94f08673a227241750cfa9f2d37f966a0def6c0b8d77a248a"
+            }
+          ],
+          "highlight_ids": [
+            "NAP-03",
+            "NAP-08",
+            "NAP-12"
+          ],
+          "calls": [
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 85,
+              "cache_creation_input_tokens": 5225,
+              "cache_read_input_tokens": 0,
+              "latency_ms": 6244.1493,
+              "cost_usd": 0.03479125,
+              "stop_reason": "tool_use"
+            },
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 465,
+              "cache_creation_input_tokens": 1112,
+              "cache_read_input_tokens": 5225,
+              "latency_ms": 6211.8372,
+              "cost_usd": 0.0211975,
+              "stop_reason": "end_turn"
+            }
+          ],
+          "cost_usd": 0.055988750000000004,
+          "latency_ms": 12455.986499999999
+        }
+      ],
+      "cost_usd": 0.055988750000000004
+    },
+    {
+      "id": "feas-budget-fail-es",
+      "area": "feasibility",
+      "map_context": {
+        "selected_point": {
+          "lat": -27.4955,
+          "lon": -58.938
+        }
+      },
+      "graders": {
+        "trajectory": {
+          "pass": true,
+          "reasons": []
+        },
+        "highlight": {
+          "pass": true,
+          "reasons": []
+        },
+        "grounding": {
+          "pass": true,
+          "reasons": []
+        },
+        "figures": {
+          "pass": true,
+          "reasons": []
+        }
+      },
+      "sign_only": [],
+      "outcome": "pass",
+      "turns": [
+        {
+          "user": "¿se puede conectar un cliente en este punto?",
+          "answer": "No, en ese punto no se puede conectar: de las 3 NAPs más cercanas, ninguna es viable (0 candidatas factibles).\n\n1. **NAP-09 \"Barrio Los Silos\"** (1:8) — 167 m en línea recta, 217 m de ruta, 5 puertos libres. No viable por **presupuesto óptico**: la NAP ya está en fallo (pérdida 29.4 dB, margen −1.4 dB) y el enlace proyectado daría 30.25 dB con margen −2.25 dB (fail).\n2. **NAP-04 \"Barrio Provincias Unidas\"** (1:8) — 2842 m recta / 3694 m de ruta, 5 puertos libres. No viable: **demasiado lejos** (límite de drop 600 m), aunque el enlace proyectado pasaría (16.9 dB, margen 11.1 dB).\n3. **NAP-05 \"Barrio Sarmiento\"** (1:8) — 4243 m recta / 5516 m de ruta, 6 puertos libres. No viable: **demasiado lejos**; proyectado 15.4 dB, margen 12.6 dB.\n\nEl drop es una estimación modelada (distancia recta × factor de holgura 1.3). El sistema tampoco puede decir si la ONT del cliente funcionaría; solo clasifica contra el presupuesto de clase GPON B+ (28 dB).",
+          "cited_sources": [],
+          "stop_reason": "end_turn",
+          "trajectory": [
+            {
+              "name": "list_connection_candidates",
+              "input": {},
+              "iteration": 1,
+              "is_error": false,
+              "result_sha256": "62199d39d8fe6bfc0dbcc0d9bbbd765b7458922c00b1a54d45f9284b077e32b2"
+            }
+          ],
+          "highlight_ids": [
+            "NAP-09",
+            "NAP-04",
+            "NAP-05"
+          ],
+          "calls": [
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 31,
+              "cache_creation_input_tokens": 89,
+              "cache_read_input_tokens": 5138,
+              "latency_ms": 2291.1892000000007,
+              "cost_usd": 0.00391025,
+              "stop_reason": "tool_use"
+            },
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 480,
+              "cache_creation_input_tokens": 1064,
+              "cache_read_input_tokens": 5227,
+              "latency_ms": 6601.815199999999,
+              "cost_usd": 0.0212735,
+              "stop_reason": "end_turn"
+            }
+          ],
+          "cost_usd": 0.02518375,
+          "latency_ms": 8893.0044
+        }
+      ],
+      "cost_usd": 0.02518375
+    },
+    {
+      "id": "feas-ok-en",
+      "area": "feasibility",
+      "map_context": {
+        "selected_point": {
+          "lat": -27.4432,
+          "lon": -58.977
+        }
+      },
+      "graders": {
+        "trajectory": {
+          "pass": true,
+          "reasons": []
+        },
+        "highlight": {
+          "pass": true,
+          "reasons": []
+        },
+        "grounding": {
+          "pass": true,
+          "reasons": []
+        },
+        "figures": {
+          "pass": true,
+          "reasons": []
+        }
+      },
+      "sign_only": [],
+      "outcome": "pass",
+      "turns": [
+        {
+          "user": "can I connect a new customer here?",
+          "answer": "I'll check the point you've selected on the map.\nYes — 1 of the 3 nearest NAPs is feasible.\n\n**Best candidate: NAP-01 \"Centro\" (feasible)**\n- Straight-line 158 m, route 205 m (max drop route 600 m)\n- Free ports: 5 of 8 (1:8 splitter)\n- Drop (modelled estimate): 0.205 km, 0.85 dB loss\n- Projected link: 13.19 dB total loss, margin 14.81 dB — status **pass** (against the B+ 28 dB class budget, min margin 3 dB)\n\nNot feasible:\n- **NAP-11 \"Barrio San Cayetano\"** — too far (route 2862 m); 14 free ports; projected 17.19 dB, margin 10.81 dB\n- **NAP-05 \"Barrio Sarmiento\"** — too far (route 3977 m); 6 free ports; projected 15.01 dB, margin 12.99 dB\n\nNote: the drop is a modelled estimate (straight-line × 1.3 slack), and the system can't say whether the customer's ONT will actually work — it only classifies against the GPON class budget.",
+          "cited_sources": [],
+          "stop_reason": "end_turn",
+          "trajectory": [
+            {
+              "name": "list_connection_candidates",
+              "input": {},
+              "iteration": 1,
+              "is_error": false,
+              "result_sha256": "6bfc2d8c6d6ef44ed5f2a641eab48ce7be6a820a64d381598a2dcf5adc4d6f99"
+            }
+          ],
+          "highlight_ids": [
+            "NAP-01",
+            "NAP-11",
+            "NAP-05"
+          ],
+          "calls": [
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 46,
+              "cache_creation_input_tokens": 82,
+              "cache_read_input_tokens": 5138,
+              "latency_ms": 2141.3371000000006,
+              "cost_usd": 0.0042415,
+              "stop_reason": "tool_use"
+            },
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 375,
+              "cache_creation_input_tokens": 1071,
+              "cache_read_input_tokens": 5220,
+              "latency_ms": 4777.5603999999985,
+              "cost_usd": 0.01868875,
+              "stop_reason": "end_turn"
+            }
+          ],
+          "cost_usd": 0.02293025,
+          "latency_ms": 6918.897499999999
+        }
+      ],
+      "cost_usd": 0.02293025
+    },
+    {
+      "id": "feas-marginal-es",
+      "area": "feasibility",
+      "map_context": {
+        "selected_point": {
+          "lat": -27.493,
+          "lon": -59.0338
+        }
+      },
+      "graders": {
+        "trajectory": {
+          "pass": true,
+          "reasons": []
+        },
+        "highlight": {
+          "pass": true,
+          "reasons": []
+        },
+        "grounding": {
+          "pass": true,
+          "reasons": []
+        },
+        "figures": {
+          "pass": true,
+          "reasons": []
+        }
+      },
+      "sign_only": [],
+      "outcome": "pass",
+      "turns": [
+        {
+          "user": "¿puedo dar de alta un cliente acá?",
+          "answer": "Sí, hay 1 candidato factible de los 3 más cercanos:\n\n**Mejor opción: NAP-06 \"Villa Prosperidad\"** (1:32)\n- Distancia: 414 m en línea recta, 539 m de ruta (drop estimado por modelo, factor 1.3)\n- Puertos libres: 29 de 32\n- Enlace proyectado del nuevo abonado: pérdida total 25.49 dB, margen 2.51 dB → **marginal** (por debajo del mínimo recomendado de 3.00 dB), aunque la NAP en sí pasa con margen 3.44 dB.\n\nLas otras dos no son factibles por distancia (`too_far`): NAP-02 \"Barrio España\" (4348 m / 5653 m) y NAP-08 \"Barrio Italia\" (6204 m / 8065 m).\n\nNota: el sistema no puede decir si la ONT del cliente funcionará; la clasificación es contra el presupuesto de clase GPON B+ (28 dB).",
+          "cited_sources": [],
+          "stop_reason": "end_turn",
+          "trajectory": [
+            {
+              "name": "list_connection_candidates",
+              "input": {},
+              "iteration": 1,
+              "is_error": false,
+              "result_sha256": "be6897f219d85978110b048c59c1e872d2ef3f129720fc56afda7728019b0d3d"
+            }
+          ],
+          "highlight_ids": [
+            "NAP-06",
+            "NAP-02",
+            "NAP-08"
+          ],
+          "calls": [
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 31,
+              "cache_creation_input_tokens": 89,
+              "cache_read_input_tokens": 5138,
+              "latency_ms": 2343.7875999999997,
+              "cost_usd": 0.00391025,
+              "stop_reason": "tool_use"
+            },
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 344,
+              "cache_creation_input_tokens": 1049,
+              "cache_read_input_tokens": 5227,
+              "latency_ms": 4851.007899999997,
+              "cost_usd": 0.01777975,
+              "stop_reason": "end_turn"
+            }
+          ],
+          "cost_usd": 0.02169,
+          "latency_ms": 7194.7954999999965
+        }
+      ],
+      "cost_usd": 0.02169
+    },
+    {
+      "id": "feas-two-options-es",
+      "area": "feasibility",
+      "map_context": {
+        "selected_point": {
+          "lat": -27.4659,
+          "lon": -58.97
+        }
+      },
+      "graders": {
+        "trajectory": {
+          "pass": true,
+          "reasons": []
+        },
+        "highlight": {
+          "pass": true,
+          "reasons": []
+        },
+        "grounding": {
+          "pass": true,
+          "reasons": []
+        }
+      },
+      "sign_only": [],
+      "outcome": "pass",
+      "turns": [
+        {
+          "user": "¿puedo conectar un cliente acá?",
+          "answer": "I'll check the point you selected on the map.\nSí, 2 de las 3 opciones son factibles.\n\n**Mejor candidato: NAP-11 \"Barrio San Cayetano\"** (1:16)\n- Distancia: 434 m en línea recta, 564 m de ruta estimada\n- Puertos libres: 14 de 16\n- Drop estimado: 0,564 km, 0,94 dB\n- Enlace proyectado: 16,61 dB de pérdida, margen 11,39 dB → **pass**\n\n**Opción 2: NAP-05 \"Barrio Sarmiento\"** (1:8) — factible\n- 456 m recta / 593 m ruta, 6 puertos libres\n- Proyectado: 14,17 dB, margen 13,83 dB → pass\n\n**Opción 3: NAP-04 \"Barrio Provincias Unidas\"** — **no factible**: demasiado lejos (1.759 m recta / 2.287 m ruta, máximo 600 m de ruta).\n\nNota: el drop es una estimación modelada (distancia en línea recta por un factor de holgura). El sistema no puede determinar si la ONT del cliente funcionará; solo clasifica contra el presupuesto de clase GPON B+ (28 dB).",
+          "cited_sources": [],
+          "stop_reason": "end_turn",
+          "trajectory": [
+            {
+              "name": "list_connection_candidates",
+              "input": {},
+              "iteration": 1,
+              "is_error": false,
+              "result_sha256": "01d53b6f59fffd0b7c707101b60d3febd557264293d6a0886c7c84480f695651"
+            }
+          ],
+          "highlight_ids": [
+            "NAP-11",
+            "NAP-05",
+            "NAP-04"
+          ],
+          "calls": [
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 45,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 5225,
+              "latency_ms": 1577.8073000000004,
+              "cost_usd": 0.0037475,
+              "stop_reason": "tool_use"
+            },
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 409,
+              "cache_creation_input_tokens": 1071,
+              "cache_read_input_tokens": 5225,
+              "latency_ms": 4985.856700000004,
+              "cost_usd": 0.01954125,
+              "stop_reason": "end_turn"
+            }
+          ],
+          "cost_usd": 0.02328875,
+          "latency_ms": 6563.664000000004
+        }
+      ],
+      "cost_usd": 0.02328875
+    },
+    {
+      "id": "feas-second-option-es",
+      "area": "feasibility",
+      "map_context": {
+        "selected_point": {
+          "lat": -27.4659,
+          "lon": -58.97
+        }
+      },
+      "graders": {
+        "grounding": {
+          "pass": true,
+          "reasons": []
+        },
+        "figures": {
+          "pass": true,
+          "reasons": []
+        }
+      },
+      "sign_only": [],
+      "outcome": "pass",
+      "turns": [
+        {
+          "user": "¿puedo conectar un cliente acá?",
+          "answer": "I'll check the point you've selected on the map.\nSí: de las 3 NAPs más cercanas al punto, **2 son factibles**.\n\n**Mejor opción — NAP-11 \"Barrio San Cayetano\" (1:16)**\n- Distancia: 434 m en línea recta, 564 m de ruta\n- Puertos libres: 14 de 16\n- Drop estimado (modelado): 0,564 km, 0,94 dB\n- Enlace proyectado: 16,61 dB de pérdida total, margen 11,39 dB → pass\n\n**Opción 2 — NAP-05 \"Barrio Sarmiento\" (1:8)**\n- 456 m línea recta, 593 m de ruta; 6 puertos libres de 8\n- Drop 0,95 dB; proyectado 14,17 dB, margen 13,83 dB → pass\n\n**Opción 3 — NAP-04 \"Barrio Provincias Unidas\"**: no factible, motivo: demasiado lejos (1759 m / 2287 m de ruta).\n\nEl drop es una estimación modelada (distancia en línea recta × factor de holgura). El sistema no puede decir si la ONT del cliente funcionará; solo clasifica contra el presupuesto de clase GPON (B+, 28 dB).",
+          "cited_sources": [],
+          "stop_reason": "end_turn",
+          "trajectory": [
+            {
+              "name": "list_connection_candidates",
+              "input": {},
+              "iteration": 1,
+              "is_error": false,
+              "result_sha256": "01d53b6f59fffd0b7c707101b60d3febd557264293d6a0886c7c84480f695651"
+            }
+          ],
+          "highlight_ids": [
+            "NAP-11",
+            "NAP-05",
+            "NAP-04"
+          ],
+          "calls": [
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 46,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 5225,
+              "latency_ms": 1751.6103000000003,
+              "cost_usd": 0.0037725,
+              "stop_reason": "tool_use"
+            },
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 415,
+              "cache_creation_input_tokens": 1072,
+              "cache_read_input_tokens": 5225,
+              "latency_ms": 5436.7692000000025,
+              "cost_usd": 0.0196975,
+              "stop_reason": "end_turn"
+            }
+          ],
+          "cost_usd": 0.023469999999999998,
+          "latency_ms": 7188.379500000003
+        },
+        {
+          "user": "¿y si lo conecto a la segunda opción?",
+          "answer": "Conectándolo a la **opción 2, NAP-05 \"Barrio Sarmiento\" (1:8)**, el resultado es factible:\n\n- **Distancia:** 456 m en línea recta, 593 m de ruta (dentro del máximo de 600 m)\n- **Puertos:** 8 salidas, 2 abonados, 0 NAPs hijas → **6 libres**\n- **Drop estimado (modelado):** 0,593 km con factor de holgura 1,3 → fibra 0,15 dB + 2 conectores 0,8 dB = **0,95 dB**\n- **Enlace proyectado del nuevo abonado:** fibra 1,75 dB, splitters 10,50 dB, conectores 1,60 dB, empalmes 0,32 dB → **14,17 dB** de pérdida total, **margen 13,83 dB**, estado **pass** (sin advertencia de marginalidad)\n- La NAP en sí: 13,22 dB de pérdida, margen 14,78 dB, estado pass\n\nEs una opción válida, con más margen que NAP-11 (13,83 dB frente a 11,39 dB), aunque su ruta de 593 m queda muy cerca del límite de 600 m. El drop sigue siendo una estimación modelada, y el sistema no puede determinar si la ONT del cliente funcionará.",
+          "cited_sources": [],
+          "stop_reason": "end_turn",
+          "trajectory": [],
+          "highlight_ids": [],
+          "calls": [
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 465,
+              "cache_creation_input_tokens": 434,
+              "cache_read_input_tokens": 6297,
+              "latency_ms": 5861.8225999999995,
+              "cost_usd": 0.017496,
+              "stop_reason": "end_turn"
+            }
+          ],
+          "cost_usd": 0.017496,
+          "latency_ms": 5861.8225999999995
+        }
+      ],
+      "cost_usd": 0.040966
+    },
+    {
+      "id": "feas-out-of-coverage-es",
+      "area": "feasibility",
+      "map_context": {
+        "selected_point": {
+          "lat": -27.43,
+          "lon": -58.94
+        }
+      },
+      "graders": {
+        "trajectory": {
+          "pass": true,
+          "reasons": []
+        },
+        "highlight": {
+          "pass": true,
+          "reasons": []
+        },
+        "grounding": {
+          "pass": true,
+          "reasons": []
+        }
+      },
+      "sign_only": [],
+      "outcome": "pass",
+      "turns": [
+        {
+          "user": "¿llega la red hasta acá?",
+          "answer": "En ese punto la red **no llega**: ninguno de los 3 NAP más cercanos es viable (0 candidatos factibles), todos por \"demasiado lejos\" (máximo de drop: 600 m).\n\n- **NAP-10 \"Villa Río Negro\"** (1:4): 2447 m en línea recta, 3181 m de ruta; 2 puertos libres. Proyectado: 12.68 dB de pérdida, margen 15.32 dB.\n- **NAP-07 \"Barrio Mujeres Argentinas\"** (1:8): 2496 m recta, 3244 m ruta; 6 puertos libres. Proyectado: 17.29 dB, margen 10.71 dB.\n- **NAP-01 \"Centro\"** (1:8): 4082 m recta, 5307 m ruta; 5 puertos libres. Proyectado: 14.47 dB, margen 13.53 dB.\n\nEl presupuesto óptico daría bien en los tres casos, pero la distancia del drop (estimación modelada) excede el límite. El sistema tampoco puede decir si la ONT funcionaría en ese punto.",
+          "cited_sources": [],
+          "stop_reason": "end_turn",
+          "trajectory": [
+            {
+              "name": "list_connection_candidates",
+              "input": {},
+              "iteration": 1,
+              "is_error": false,
+              "result_sha256": "f4325d02b33e7e7462d854f8ed4d106f73c31a6876ce459f6c1a488e8b922b31"
+            }
+          ],
+          "highlight_ids": [
+            "NAP-10",
+            "NAP-07",
+            "NAP-01"
+          ],
+          "calls": [
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 74,
+              "cache_creation_input_tokens": 84,
+              "cache_read_input_tokens": 5138,
+              "latency_ms": 2674.904800000004,
+              "cost_usd": 0.004954,
+              "stop_reason": "tool_use"
+            },
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 378,
+              "cache_creation_input_tokens": 1100,
+              "cache_read_input_tokens": 5222,
+              "latency_ms": 4947.2477,
+              "cost_usd": 0.018946,
+              "stop_reason": "end_turn"
+            }
+          ],
+          "cost_usd": 0.0239,
+          "latency_ms": 7622.152500000004
+        }
+      ],
+      "cost_usd": 0.0239
+    },
+    {
+      "id": "feas-no-point-es",
+      "area": "feasibility",
+      "graders": {
+        "trajectory": {
+          "pass": true,
+          "reasons": []
+        },
+        "abstention": {
+          "pass": true,
+          "reasons": []
+        }
+      },
+      "sign_only": [],
+      "outcome": "pass",
+      "turns": [
+        {
+          "user": "¿puedo conectar un cliente acá?",
+          "answer": "I need the point on the map — ¿podrías hacer clic en el mapa donde se conectaría el cliente? Déjame verificar si ya hay uno seleccionado.\nNo hay ningún punto seleccionado en el mapa todavía. Por favor, hacé clic en el mapa en el lugar exacto donde se conectaría el cliente y vuelvo a evaluarlo (te diré los tres NAP más cercanos, sus distancias, puertos libres y si es viable).",
+          "cited_sources": [],
+          "stop_reason": "end_turn",
+          "trajectory": [
+            {
+              "name": "list_connection_candidates",
+              "input": {},
+              "iteration": 1,
+              "is_error": true,
+              "result_sha256": null
+            }
+          ],
+          "highlight_ids": [],
+          "calls": [
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 88,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 5225,
+              "latency_ms": 2486.7379999999903,
+              "cost_usd": 0.0048225,
+              "stop_reason": "tool_use"
+            },
+            {
+              "model": "claude-opus-5",
+              "input_tokens": 2,
+              "output_tokens": 104,
+              "cache_creation_input_tokens": 140,
+              "cache_read_input_tokens": 5225,
+              "latency_ms": 2357.73520000001,
+              "cost_usd": 0.0060975,
+              "stop_reason": "end_turn"
+            }
+          ],
+          "cost_usd": 0.01092,
+          "latency_ms": 4844.4732
+        }
+      ],
+      "cost_usd": 0.01092
+    }
+  ]
+}
