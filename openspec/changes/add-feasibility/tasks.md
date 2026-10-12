@@ -7,7 +7,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 
 ## 1. Shared drop, ports and the maximum (`optical-budget`)
 
-- [ ] 1.1 Move the drop computation out of `traceSubscriber` into `src/lib/optical/drop.ts`, as
+- [x] 1.1 Move the drop computation out of `traceSubscriber` into `src/lib/optical/drop.ts`, as
       `modelDrop(from, to)` and `projectLink(napBudget, drop)` (design.md, decision 1).
       `SubscriberDrop` moves with them and is re-exported from `trace.ts`, and `trace.ts` calls
       the two functions.

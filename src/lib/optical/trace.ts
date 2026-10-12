@@ -4,8 +4,10 @@
  * A trace is two parts. The serving NAP's budget comes from `calculateBudget`,
  * unchanged, so a subscriber's path is by construction the path the NAP detail
  * and the map already show: this module never walks the tree itself. The drop,
- * the last stretch from the NAP to the subscriber, is modelled here from the
- * straight-line distance, a slack factor and the connectors a drop adds.
+ * the last stretch from the NAP to the subscriber, is modelled by
+ * `@/lib/optical/drop` (shared with the feasibility engine, see design.md
+ * (add-feasibility), decision 1) from the straight-line distance, a slack
+ * factor and the connectors a drop adds.
  *
  * Every figure is derived from `@/lib/optical/constants`; no literal loss value
  * lives in this file. Link figures are computed from the already-reported
@@ -16,7 +18,6 @@
  * is modelled, so the result carries no field that says whether the ONT works.
  */
 
-import { haversineKm } from "@/lib/geo/distance";
 import {
   calculateBudget,
   round2,
@@ -25,36 +26,10 @@ import {
   type BudgetStatus,
   type CalculateBudgetOptions,
 } from "@/lib/optical/budget";
-import {
-  CONNECTOR_DB,
-  DROP_CONNECTORS,
-  DROP_SLACK_FACTOR,
-  FIBER_DB_PER_KM,
-} from "@/lib/optical/constants";
+import { modelDrop, projectLink, type SubscriberDrop } from "@/lib/optical/drop";
 import type { GponClass, Network } from "@/lib/network/types";
 
-/** Rounds to three decimal places, for lengths in km. */
-function round3(value: number): number {
-  return Math.round(value * 1000) / 1000;
-}
-
-/** The drop from the serving NAP to the subscriber. A modelled estimate. */
-export interface SubscriberDrop {
-  /** Great-circle distance from the NAP to the subscriber, in km. */
-  straight_line_km: number;
-  /** The slack factor applied (route length over straight-line distance). */
-  slack_factor: number;
-  /** Modelled route length of the drop, in km. */
-  length_km: number;
-  /** Fiber loss over `length_km`, in dB. */
-  fiber_db: number;
-  /** Connectors the drop adds. */
-  connectors: number;
-  /** Connector loss of the drop, in dB. */
-  connectors_db: number;
-  /** `fiber_db + connectors_db`, in dB. */
-  loss_db: number;
-}
+export type { SubscriberDrop };
 
 export interface SubscriberTrace {
   subscriber_id: string;
@@ -107,17 +82,8 @@ export function traceSubscriber(
 
   const napBudget = calculateBudget(network, nap.id, options);
 
-  const straightKm = haversineKm(nap, subscriber);
-  const routeKm = straightKm * DROP_SLACK_FACTOR;
-
-  const dropFiberDb = round2(routeKm * FIBER_DB_PER_KM);
-  const dropConnectorsDb = round2(DROP_CONNECTORS * CONNECTOR_DB);
-  const dropLossDb = round2(dropFiberDb + dropConnectorsDb);
-
-  const totalLossDb = round2(napBudget.total_loss_db + dropLossDb);
-  const marginDb = round2(napBudget.budget_db - totalLossDb);
-  const status: BudgetStatus =
-    marginDb < 0 ? "fail" : marginDb < napBudget.min_margin_db ? "marginal" : "pass";
+  const drop = modelDrop(nap, subscriber);
+  const link = projectLink(napBudget, drop);
 
   return {
     subscriber_id: subscriber.id,
@@ -128,24 +94,11 @@ export function traceSubscriber(
     budget_db: napBudget.budget_db,
     min_margin_db: napBudget.min_margin_db,
     nap: napBudget,
-    drop: {
-      straight_line_km: round3(straightKm),
-      slack_factor: DROP_SLACK_FACTOR,
-      length_km: round3(routeKm),
-      fiber_db: dropFiberDb,
-      connectors: DROP_CONNECTORS,
-      connectors_db: dropConnectorsDb,
-      loss_db: dropLossDb,
-    },
-    by_source: {
-      fiber_db: round2(napBudget.by_source.fiber_db + dropFiberDb),
-      splitters_db: napBudget.by_source.splitters_db,
-      connectors_db: round2(napBudget.by_source.connectors_db + dropConnectorsDb),
-      splices_db: napBudget.by_source.splices_db,
-    },
-    total_loss_db: totalLossDb,
-    margin_db: marginDb,
-    status,
-    rx_power_dbm: round2(network.olt.tx_power_dbm - totalLossDb),
+    drop,
+    by_source: link.by_source,
+    total_loss_db: link.total_loss_db,
+    margin_db: link.margin_db,
+    status: link.status,
+    rx_power_dbm: round2(network.olt.tx_power_dbm - link.total_loss_db),
   };
 }
