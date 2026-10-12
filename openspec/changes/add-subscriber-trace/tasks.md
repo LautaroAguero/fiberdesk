@@ -14,7 +14,7 @@ pass before it is ticked.
       (b) the distance is symmetric;
       (c) a point to itself is 0;
       (d) NAP-12 to SUB-025 is 0.38291 km, to five decimals.
-- [ ] 1.2 Add `DROP_SLACK_FACTOR = 1.3` and `DROP_CONNECTORS = 2` to
+- [x] 1.2 Add `DROP_SLACK_FACTOR = 1.3` and `DROP_CONNECTORS = 2` to
       `src/lib/optical/constants.ts`, each with unit, source (owner decision 2 of the 2026-10-07
       handoff, no published source) and the pending-validation mark (design.md, decision 4). Verify
       with a test that both are exported with those values.

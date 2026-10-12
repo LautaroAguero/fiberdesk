@@ -13,6 +13,8 @@ import { describe, expect, test } from "vitest";
 
 import {
   CONNECTOR_DB,
+  DROP_CONNECTORS,
+  DROP_SLACK_FACTOR,
   FIBER_DB_PER_KM,
   GPON_CLASS,
   MIN_MARGIN_DB,
@@ -60,5 +62,12 @@ describe("1.3 the constants module matches the frozen fixture", () => {
 
   test("the recommended minimum margin", () => {
     expect(MIN_MARGIN_DB).toBe(fixture.min_margin_db);
+  });
+});
+
+describe("1.2 the drop constants", () => {
+  test("slack factor and connectors per drop are exported with the owner's values", () => {
+    expect(DROP_SLACK_FACTOR).toBe(1.3);
+    expect(DROP_CONNECTORS).toBe(2);
   });
 });
