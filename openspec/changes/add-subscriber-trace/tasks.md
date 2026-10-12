@@ -85,7 +85,7 @@ pass before it is ticked.
       - reframing on the reference question, and on SUB-025 (the bounds contain SUB-025, the OLT,
         and every vertex of FR-03 and FR-12);
       - `fit_bounds` false gives `bounds` null.
-- [ ] 2.3 Update `Copilot.tsx` and `NetworkMap.tsx`:
+- [x] 2.3 Update `Copilot.tsx` and `NetworkMap.tsx`:
       - set feature-state `status` on the `subscribers` source;
       - colour the subscriber circle by status, with a larger radius when highlighted;
       - clear the previous subscribers and runs on replacement and on clear;
