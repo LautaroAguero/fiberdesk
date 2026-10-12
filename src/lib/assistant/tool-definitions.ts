@@ -158,7 +158,10 @@ export function buildToolDefinitions(network: Network): Anthropic.Tool[] {
       "subscriber's own status and totals from this tool, never the NAP's. The drop is a " +
       "modelled estimate (straight-line distance times a slack factor), and the received " +
       "power is an estimate with no receiver sensitivity behind it, so this tool cannot " +
-      "say whether an ONT will work.",
+      "say whether an ONT will work. The identifier list below is every subscriber the " +
+      "network has: if the subscriber the user names is not in it, do NOT call this tool " +
+      "at all — not with another identifier, not to check the range — and say that " +
+      "subscriber does not exist.",
     strict: true,
     input_schema: {
       type: "object",

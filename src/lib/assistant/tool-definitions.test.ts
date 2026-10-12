@@ -122,6 +122,13 @@ describe("3.1 the subscriber trace tool", () => {
     expect(trace.description).toContain("Subscriber 014");
   });
 
+  test("the description forbids calling it for a subscriber the network lacks", () => {
+    // A live run traced SUB-001 for a question about SUB-099 (add-subscriber-trace,
+    // verification.md); the rule sits where the model reads it when choosing the tool.
+    expect(trace.description).toContain("do NOT call this tool");
+    expect(trace.description).toContain("not with another identifier");
+  });
+
   test("the description says a passing NAP does not vouch for its subscribers, and the drop is modelled", () => {
     expect(trace.description!.toLowerCase()).toContain("passing nap does not mean");
     expect(trace.description!.toLowerCase()).toContain("modelled estimate");
