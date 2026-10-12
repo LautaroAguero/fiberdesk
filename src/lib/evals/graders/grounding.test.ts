@@ -77,6 +77,8 @@ describe("the tool definitions are a source (hand validation of the first baseli
   });
 
   test("the definitions ground only the 3.00 dB default — a new figure there should be a deliberate choice", () => {
+    // trace_subscriber_link's description names "SUB-014" and "Subscriber 014". Both are
+    // identifiers and masked as non-figures, so neither grounds a bare 14.
     expect([...new Set(numbersInValue(buildToolDefinitions(network)))]).toEqual([3]);
   });
 });

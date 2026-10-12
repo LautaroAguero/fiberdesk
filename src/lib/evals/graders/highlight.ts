@@ -1,6 +1,8 @@
 /**
- * The highlight grader: the entities in the payload the server projected,
- * against a hand-written oracle set. Applied only where the reference
+ * The highlight grader: the NAPs and subscribers in the payload the server
+ * projected, against a hand-written oracle set. Run entries only describe the
+ * paths of those subjects and are not compared (design.md, add-subscriber-trace,
+ * decision 9). Applied only where the reference
  * behaviour requires a detail call — a survey-only answer projects nothing,
  * by design. See design.md (add-eval-harness), decision 7.
  */
@@ -9,9 +11,9 @@ import type { HighlightPayload } from "@/lib/assistant/events";
 import type { GradedTurn } from "@/lib/evals/graders/input";
 import type { GraderResult, HighlightExpectation } from "@/lib/evals/types";
 
-/** The entity ids a payload highlights. */
+/** The entity ids a payload highlights: NAPs and subscribers, not the runs that describe their paths. */
 export function highlightIds(payload: HighlightPayload): string[] {
-  return payload.highlight.map((entry) => entry.nap_id);
+  return payload.highlight.filter((entry) => entry.kind !== "run").map((entry) => entry.id);
 }
 
 export function gradeHighlight(turn: GradedTurn, expected: HighlightExpectation): GraderResult {

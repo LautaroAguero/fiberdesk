@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 
+import type { HighlightPayload } from "@/lib/assistant/events";
 import {
   DETAIL_TOOL_NAME,
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
@@ -8,7 +9,7 @@ import {
 import { gradeAbstention } from "@/lib/evals/graders/abstention";
 import { gradeCitation } from "@/lib/evals/graders/citation";
 import { gradeFigures } from "@/lib/evals/graders/figures";
-import { gradeHighlight } from "@/lib/evals/graders/highlight";
+import { gradeHighlight, highlightIds } from "@/lib/evals/graders/highlight";
 import { call, turn } from "@/lib/evals/graders/test-helpers";
 
 const detail = (napId: string) => call(DETAIL_TOOL_NAME, { nap_id: napId });
@@ -29,6 +30,31 @@ describe("gradeHighlight", () => {
       oracle,
     );
     expect(result.reasons).toEqual(["unexpected in highlight: NAP-06"]);
+  });
+
+  test("run entries in the payload are not compared: the reference oracle still passes", () => {
+    const t = turn({ answer: "", toolCalls: [detail("NAP-09"), detail("NAP-12")] });
+    expect(t.payload.highlight.some((entry) => entry.kind === "run")).toBe(true);
+    expect(highlightIds(t.payload)).toEqual(["NAP-09", "NAP-12"]);
+    expect(gradeHighlight(t, oracle).pass).toBe(true);
+  });
+
+  test("a traced subscriber is compared by its identifier", () => {
+    const payload: HighlightPayload = {
+      highlight: [
+        { kind: "subscriber", id: "SUB-025", nap_id: "NAP-12", status: "marginal", margin_db: 1.85 },
+        { kind: "run", id: "FR-03", status: "marginal" },
+        { kind: "run", id: "FR-12", status: "marginal" },
+      ],
+      fit_bounds: true,
+    };
+    const t = turn({ answer: "", payload });
+    expect(highlightIds(payload)).toEqual(["SUB-025"]);
+    expect(gradeHighlight(t, { mode: "equals", ids: ["SUB-025"] })).toEqual({ pass: true, reasons: [] });
+    expect(gradeHighlight(t, { mode: "equals", ids: ["NAP-12"] }).reasons).toEqual([
+      "missing from highlight: NAP-12",
+      "unexpected in highlight: SUB-025",
+    ]);
   });
 
   test("contains tolerates extras but not omissions", () => {

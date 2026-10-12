@@ -18,6 +18,20 @@ describe("5.2 the optical constants snapshot", () => {
     expect(snapshot.splice_loss).toMatchObject({ value: 0.08, unit: "dB" });
   });
 
+  test("the drop constants read 1.3 and 2, each with its unit and the pending-validation marker", () => {
+    const snapshot = getOpticalConstantsSnapshot();
+    expect(snapshot.drop_slack_factor).toEqual({
+      value: 1.3,
+      unit: "ratio (dimensionless)",
+      status: "industry_typical_pending_validation",
+    });
+    expect(snapshot.drop_connectors).toEqual({
+      value: 2,
+      unit: "connectors per drop",
+      status: "industry_typical_pending_validation",
+    });
+  });
+
   test("every physical constant carries the pending-validation marker", () => {
     const snapshot = getOpticalConstantsSnapshot();
     expect(snapshot.fiber_attenuation.status).toBe("industry_typical_pending_validation");

@@ -1,5 +1,5 @@
 /**
- * The four tools exposed to the model.
+ * The five tools exposed to the model.
  *
  * The first two are named for the shape of their answer, not the operation
  * — see design.md (add-optical-budget-engine), decision 2. Their
@@ -7,7 +7,7 @@
  * 1): nothing in code sequences the two calls, so the wording below has to
  * carry that strategy on its own.
  *
- * All four schemas are `strict: true`: the model's arguments are valid by
+ * All five schemas are `strict: true`: the model's arguments are valid by
  * construction, not by validation after the fact. The detail tool's
  * identifier is an enum built from the loaded network, so an identifier the
  * dataset does not contain cannot be produced — see the cost of that
@@ -18,6 +18,12 @@
  * the corpus is in English (design.md, decision 3), and the constants tool
  * states it returns configuration, not a specific NAP's measurements, so it
  * is not reached for on an ordinary budget question (design.md, Risks).
+ *
+ * The fifth, `trace_subscriber_link`, is added by add-subscriber-trace. It is
+ * named for the shape of its answer like the first two: one subscriber's link,
+ * traced end to end. Its identifier is an enum of the network's subscribers
+ * (design.md, decisions 6 and 11: the enum is fine for 28 subscribers and
+ * would not scale to thousands).
  */
 
 import type Anthropic from "@anthropic-ai/sdk";
@@ -28,6 +34,7 @@ export const SUMMARIZE_TOOL_NAME = "summarize_optical_budgets";
 export const DETAIL_TOOL_NAME = "detail_optical_budget";
 export const SEARCH_DOCUMENTATION_TOOL_NAME = "search_documentation";
 export const GET_OPTICAL_CONSTANTS_TOOL_NAME = "get_optical_constants";
+export const TRACE_TOOL_NAME = "trace_subscriber_link";
 
 /**
  * Builds both tool definitions against `network`. Rebuilt whenever the
@@ -35,6 +42,7 @@ export const GET_OPTICAL_CONSTANTS_TOOL_NAME = "get_optical_constants";
  */
 export function buildToolDefinitions(network: Network): Anthropic.Tool[] {
   const napIds = network.splitters.map((nap) => nap.id);
+  const subscriberIds = network.subscribers.map((subscriber) => subscriber.id);
 
   const summarize: Anthropic.Tool = {
     name: SUMMARIZE_TOOL_NAME,
@@ -121,7 +129,8 @@ export function buildToolDefinitions(network: Network): Anthropic.Tool[] {
     name: GET_OPTICAL_CONSTANTS_TOOL_NAME,
     description:
       "Returns the project's own optical constants — fiber attenuation, connector loss, " +
-      "splice loss, splitter insertion loss per ratio, GPON class budgets, and the " +
+      "splice loss, the subscriber drop model (slack factor and connectors per drop), " +
+      "splitter insertion loss per ratio, GPON class budgets, and the " +
       "recommended minimum margin — each with its unit and its standing as industry-typical " +
       "and pending validation. Call this to state what the system computes with, especially " +
       "when a documented figure needs to be compared against it. This returns configuration, " +
@@ -136,5 +145,37 @@ export function buildToolDefinitions(network: Network): Anthropic.Tool[] {
     },
   };
 
-  return [summarize, detail, searchDocumentation, getOpticalConstants];
+  const traceSubscriberLink: Anthropic.Tool = {
+    name: TRACE_TOOL_NAME,
+    description:
+      "Returns ONE subscriber's link budget traced end to end from the OLT to the " +
+      "subscriber's ONT: the serving NAP's hop-by-hop path, the drop from the NAP to the " +
+      "subscriber, the end-to-end totals per loss source, the margin, the subscriber's own " +
+      "pass/marginal/fail status next to its NAP's status, and the estimated received " +
+      "power. Use it for any question about a specific subscriber or customer. " +
+      "Identifiers look like \"SUB-014\" and match the subscriber named \"Subscriber 014\". " +
+      "A passing NAP does not mean its subscribers pass: the drop adds loss, so report the " +
+      "subscriber's own status and totals from this tool, never the NAP's. The drop is a " +
+      "modelled estimate (straight-line distance times a slack factor), and the received " +
+      "power is an estimate with no receiver sensitivity behind it, so this tool cannot " +
+      "say whether an ONT will work. The identifier list below is every subscriber the " +
+      "network has: if the subscriber the user names is not in it, do NOT call this tool " +
+      "at all — not with another identifier, not to check the range — and say that " +
+      "subscriber does not exist.",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: {
+        subscriber_id: {
+          type: "string",
+          enum: subscriberIds,
+          description: "Identifier of the subscriber to trace, e.g. \"SUB-025\".",
+        },
+      },
+      required: ["subscriber_id"],
+      additionalProperties: false,
+    },
+  };
+
+  return [summarize, detail, searchDocumentation, getOpticalConstants, traceSubscriberLink];
 }

@@ -43,14 +43,13 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === "string");
 
-/** Every id a highlight may name: the OLT, NAPs, fiber runs and subscribers. */
-function entityIds(network: Network): Set<string> {
-  return new Set([
-    network.olt.id,
-    ...network.splitters.map((nap) => nap.id),
-    ...network.fiber_runs.map((run) => run.id),
-    ...network.subscribers.map((sub) => sub.id),
-  ]);
+/**
+ * Every id a highlight oracle may name: NAPs and subscribers. Run entries only
+ * describe the path of the entity they belong to and are never compared (see
+ * `highlightIds`), so an oracle naming one could never be met.
+ */
+function oracleIds(network: Network): Set<string> {
+  return new Set([...network.splitters.map((nap) => nap.id), ...network.subscribers.map((sub) => sub.id)]);
 }
 
 /** Validates one case's fields. Returns its problems; empty when valid. */
@@ -120,7 +119,7 @@ function validateCase(raw: unknown, toolNames: Set<string>, entities: Set<string
       problems.push("`highlight` must be { mode: \"equals\" | \"contains\", ids: string[] }");
     } else {
       for (const id of h.ids) {
-        if (!entities.has(id)) problems.push(`highlight oracle names ${id}, which the network does not contain`);
+        if (!entities.has(id)) problems.push(`highlight oracle names ${id}, which is not a NAP or subscriber the network contains`);
       }
       if (h.oracle !== undefined && h.oracle !== "non_passing") {
         problems.push(`unknown highlight oracle tag ${JSON.stringify(h.oracle)}`);
@@ -148,7 +147,7 @@ function validateCase(raw: unknown, toolNames: Set<string>, entities: Set<string
  */
 export function loadCases(network: Network, dir: string = CASES_DIR): LoadedCase[] {
   const toolNames = new Set(buildToolDefinitions(network).map((tool) => tool.name));
-  const entities = entityIds(network);
+  const entities = oracleIds(network);
 
   const fileNames = readdirSync(dir)
     .filter((name) => name.endsWith(".json"))

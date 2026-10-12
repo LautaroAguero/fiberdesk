@@ -47,9 +47,9 @@ export interface NetworkMapProps {
 /**
  * A paint expression that reads `featureStateKey` (a `BudgetStatus` string,
  * or unset) off feature state and resolves it to that status's colour,
- * falling back to `fallback` when unset. Shared between the NAP layer
- * (`status`) and the run layer (`onPath`) — see design.md, decision 2: "the
- * highlighted path takes its NAP's status colour".
+ * falling back to `fallback` when unset. Shared between the NAP and subscriber
+ * layers (`status`) and the run layer (`onPath`): the colour of each is the
+ * classification its payload entry carries.
  */
 function statusColorExpression(featureStateKey: "status" | "onPath", fallback: string): ExpressionSpecification {
   return [
@@ -91,7 +91,11 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
     id: "subscribers-circle",
     type: "circle",
     source: "subscribers",
-    paint: { "circle-radius": 2.5, "circle-color": SUBSCRIBER_COLOR },
+    paint: {
+      // A traced subscriber takes its status colour and grows, like a NAP does.
+      "circle-radius": ["case", ["!=", ["feature-state", "status"], null], 6, 2.5],
+      "circle-color": statusColorExpression("status", SUBSCRIBER_COLOR),
+    },
   });
 
   map.addLayer({
@@ -243,7 +247,11 @@ export default function NetworkMap({ network, highlight, onSelectNap }: NetworkM
 
   // Applies the resolved highlight through setFeatureState — see design.md,
   // decision 5: no layer is ever re-added for a turn, only paint state.
-  const previousHighlightRef = useRef<{ napIds: string[]; runIds: string[] }>({ napIds: [], runIds: [] });
+  const previousHighlightRef = useRef<{ napIds: string[]; subscriberIds: string[]; runIds: string[] }>({
+    napIds: [],
+    subscriberIds: [],
+    runIds: [],
+  });
   useEffect(() => {
     const map = mapRef.current;
     if (!isReady || map === null) return;
@@ -252,6 +260,9 @@ export default function NetworkMap({ network, highlight, onSelectNap }: NetworkM
     for (const napId of previous.napIds) {
       map.removeFeatureState({ source: "naps", id: napId });
     }
+    for (const subscriberId of previous.subscriberIds) {
+      map.removeFeatureState({ source: "subscribers", id: subscriberId });
+    }
     for (const runId of previous.runIds) {
       map.removeFeatureState({ source: "runs", id: runId });
     }
@@ -259,11 +270,18 @@ export default function NetworkMap({ network, highlight, onSelectNap }: NetworkM
     for (const [napId, status] of Object.entries(highlight.napStatus)) {
       map.setFeatureState({ source: "naps", id: napId }, { status });
     }
+    for (const [subscriberId, status] of Object.entries(highlight.subscriberStatus)) {
+      map.setFeatureState({ source: "subscribers", id: subscriberId }, { status });
+    }
     for (const runId of highlight.runIds) {
       map.setFeatureState({ source: "runs", id: runId }, { onPath: highlight.runStatus[runId] });
     }
 
-    previousHighlightRef.current = { napIds: Object.keys(highlight.napStatus), runIds: highlight.runIds };
+    previousHighlightRef.current = {
+      napIds: Object.keys(highlight.napStatus),
+      subscriberIds: Object.keys(highlight.subscriberStatus),
+      runIds: highlight.runIds,
+    };
 
     if (highlight.bounds !== null) {
       keepInitialViewRef.current = false;

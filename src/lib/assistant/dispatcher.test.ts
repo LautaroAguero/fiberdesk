@@ -8,6 +8,7 @@ import {
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
   SEARCH_DOCUMENTATION_TOOL_NAME,
   SUMMARIZE_TOOL_NAME,
+  TRACE_TOOL_NAME,
 } from "@/lib/assistant/tool-definitions";
 import { buildSearchIndex } from "@/lib/corpus/search";
 import { loadCorpus } from "@/lib/corpus/load";
@@ -36,6 +37,35 @@ describe("3.1 dispatch covers the optical budget tools", () => {
       nap_id: "NAP-12",
       total_loss_db: 25.23,
     });
+  });
+});
+
+describe("3.2 dispatch covers the subscriber trace tool", () => {
+  test("trace_subscriber_link returns the figures of SUB-025 as JSON", () => {
+    const result = dispatchTool(TRACE_TOOL_NAME, { subscriber_id: "SUB-025" }, network, searchIndex);
+    expect(result.isError).toBe(false);
+    const trace = JSON.parse(result.content as string);
+    expect(trace).toMatchObject({
+      subscriber_id: "SUB-025",
+      nap_id: "NAP-12",
+      total_loss_db: 26.15,
+      margin_db: 1.85,
+      status: "marginal",
+      rx_power_dbm: -23.15,
+    });
+    expect(trace.drop).toMatchObject({ length_km: 0.498, loss_db: 0.92 });
+  });
+
+  test("an unknown subscriber is an error result naming the id, with no figures", () => {
+    const result = dispatchTool(TRACE_TOOL_NAME, { subscriber_id: "SUB-099" }, network, searchIndex);
+    expect(result.isError).toBe(true);
+    expect(result.content as string).toContain("SUB-099");
+    expect(result.content as string).not.toContain("total_loss_db");
+  });
+
+  test("a call without a subscriber_id is an error result", () => {
+    const result = dispatchTool(TRACE_TOOL_NAME, {}, network, searchIndex);
+    expect(result.isError).toBe(true);
   });
 });
 

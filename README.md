@@ -39,6 +39,11 @@ below, for why.
 as a side panel. Every NAP the assistant highlights is coloured and reframed on the map, and any
 NAP can be clicked for its optical budget breakdown — see *The map*, below.
 
+**Phase 4 — production — in progress.** A live eval suite measures the assistant (see *Evals*),
+prompt caching cuts what repeated calls cost, and the assistant can now trace one subscriber's
+link end to end — see *Tracing one subscriber*, below. Two more map capabilities (what a fiber cut
+takes down, and whether a point on the map can be connected) come next. There is no deploy yet.
+
 ## Getting started
 
 ```bash
@@ -138,12 +143,44 @@ before this engine existed; `src/lib/optical/fixture.test.ts` asserts the engine
 exactly, for all 12 NAPs. Editing a constant now fails the suite — on purpose, so that change has
 to go through a spec rather than land as a quiet data edit.
 
+### Tracing one subscriber
+
+`traceSubscriber(network, subscriberId)` extends a NAP's budget to one customer's ONT. It takes
+the serving NAP's budget exactly as `calculateBudget` reports it, so it never walks the tree a
+second time, and adds the **drop**: the last stretch of fiber from the NAP to the customer.
+
+```ts
+const trace = traceSubscriber(network, "SUB-025");
+// NAP-12's own budget: 25.23 dB, margin 2.77 dB, marginal
+// drop: 0.383 km in straight line × 1.3 slack = 0.498 km → 0.12 dB of fiber + 2 × 0.40 dB connectors = 0.92 dB
+// { total_loss_db: 26.15, margin_db: 1.85, status: "marginal", rx_power_dbm: -23.15 }
+```
+
+**The drop is a model, not a measurement.** The seed has no drop cables, only the straight line
+from each NAP to its subscribers. The drop's length is that distance, by haversine, times a slack
+factor of **1.3**, and it adds **2 connectors** (the NAP port and the ONT). Both values sit in
+`constants.ts` beside the others, as assumptions **pending validation**. They were chosen in the
+handoff as industry-typical starting points, and no published source backs them yet. The received
+power at the ONT is an estimate too, and no receiver sensitivity is modelled, so the system never
+says whether an ONT "will work".
+
+**A box that passes does not vouch for its customers.** NAP-06 passes with 3.44 dB of margin, but
+the 0.92 dB drop leaves each of its three subscribers **marginal** at 2.52 dB. A subscriber is
+classified on its own link, never on its NAP's.
+
+Like the NAP engine, the trace is bound to an oracle: `seed/expected-traces.json`, all 28
+subscribers, derived by `seed/derive-expected-traces.py` — a second implementation in another
+language, written from the spec rather than from this code.
+
+**Scale limit.** The trace tool lists all 28 subscriber ids in its schema. That works for a seed
+this size; with thousands of subscribers it would need a search tool in front of it instead.
+
 ## The assistant
 
 `src/lib/assistant/` and `src/app/api/chat/route.ts` are the copilot: a route handler that streams
 an answer while orchestrating the optical budget engine and the documentation corpus through tool
 calls. **The model never computes a number and never states a documented figure it did not just
-retrieve.** Every figure it states comes from one of four tools, named for the shape of their
+retrieve.** Every figure it states comes from one of five tools, named for the shape of their
 answer rather than the operation:
 
 - **`summarize_optical_budgets`** — one thin row per NAP (id, name, total loss, margin, status).
@@ -152,6 +189,9 @@ answer rather than the operation:
 - **`detail_optical_budget`** — the full per-hop breakdown for one NAP, the only source that can
   attribute a loss to a specific fiber run or splitter. Call this after, only for the NAPs worth
   explaining.
+- **`trace_subscriber_link`** — one subscriber's link traced end to end, from the OLT through its
+  NAP and the drop to its ONT, with the subscriber's own status beside its NAP's. Its argument is
+  one of the 28 subscriber ids, so an id the network lacks cannot be traced.
 - **`search_documentation`** — the passages in the technical corpus that match a query, returned
   as citable `search_result` blocks. See *The documentation corpus*, below.
 - **`get_optical_constants`** — what the system itself computes with, so a documented figure can
@@ -161,8 +201,9 @@ Survey first, detail second: twelve full breakdowns cost roughly 1,650 tokens ag
 for a survey plus detail on the two links that actually fail — and firing all twelve at once would
 require the model to already know every identifier, which the survey exists to avoid.
 
-**The map highlight is projected in code, never emitted by the model.** Every field in it —
-identifier, status, margin — already exists in a tool result. Asking the model to repeat it back
+**The map highlight is projected in code, never emitted by the model.** Each entry names its kind
+— a NAP, a subscriber or a fiber run on a highlighted path — with its status, and every field in
+it — identifier, status, margin — already exists in a tool result. Asking the model to repeat it back
 would be asking it to copy numbers, and copying is exactly where a model writes 2.7 for 2.77.
 
 There is no server-side conversation store. Each streamed turn ends with the exact updated message
@@ -188,11 +229,34 @@ between a document and the constants. Those are measured by the live eval suite 
 
 ### Evals
 
-`npm run eval` asks the real model 21 cases (24 questions, counting follow-ups) and checks every
-answer with deterministic graders — which tools it called and in what order, which NAPs the map
-highlighted, whether every figure in the prose came from a tool, whether it declined what the
-system does not model. It calls the API under a mandatory spend cap and is never part of
-`npm test`. How it works, and what each grader does *not* check: [`evals/README.md`](evals/README.md).
+`npm run eval` asks the real model 28 cases (31 questions, counting follow-ups) and checks every
+answer with deterministic graders — which tools it called and in what order, which NAPs and
+subscribers the map highlighted, whether every figure in the prose came from a tool, whether it
+declined what the system does not model. It calls the API under a mandatory spend cap and is never
+part of `npm test`. How it works, and what each grader does *not* check:
+[`evals/README.md`](evals/README.md).
+
+**Latest run** — `claude-opus-5`, effort `low`, prompt caching on, from
+[`evals/runs/2026-10-12T14-05-31Z.regraded.json`](evals/runs/2026-10-12T14-05-31Z.regraded.json):
+
+| Area | Passed | Rate | 95% Wilson interval |
+|---|---|---|---|
+| Tracing one subscriber | 7/7 | 100.0% | 64.6%–100.0% |
+| Declining what the system cannot answer | 5/5 | 100.0% | 56.6%–100.0% |
+| Documentation | 5/5 | 100.0% | 56.6%–100.0% |
+| Optical budget questions | 5/8 | 62.5% | 30.6%–86.3% |
+| Multi-turn follow-ups | 1/3 | 33.3% | 6.1%–79.2% |
+| **Overall** | **23/28** | **82.1%** | **64.4%–92.1%** |
+
+Per question, the median cost is **$0.0190** as measured (**$0.0385** cold, with nothing in the
+prompt cache), and p95 latency is **12.1 s**. The run cost $0.63.
+
+The trace cases include a subscriber whose NAP passes while it does not, a lookup by name, an id
+the network lacks, and a question on whether an ONT will work. Every failure in this run is on the
+older cases, and each one is the model doing arithmetic in prose: "20.8 km" for 12 + 8.8, for
+instance. Between two runs of nearly the same configuration, those 21 older cases moved by three
+(19/21, then 16/21), so a single run is a rough measure. Every reading is in
+[`openspec/changes/add-subscriber-trace/verification.md`](openspec/changes/add-subscriber-trace/verification.md).
 
 **Can a cheaper model do this?** Not yet. The change `reduce-cost-per-question` tried to halve the
 cost per question. Every configuration was judged by a rule fixed before any of them ran
@@ -279,10 +343,11 @@ map points MapLibre at it with `setWorkerUrl`.
 **Every figure the map shows still comes from the server, unchanged.** `src/app/page.tsx` is a
 server component: it loads the network and computes every NAP's budget once, with the same
 `calculateBudget` engine described above, and hands both down as props. When a turn ends, the
-assistant's `HighlightPayload` — the same one the route handler has always emitted — is resolved
-against that data by `src/lib/map/highlight.ts` (`resolveHighlight`), a pure, unit-tested function
-that decides which NAPs to colour, which fiber runs lie on their path back to the OLT, and where
-to fit the view. The map component only calls MapLibre's `setFeatureState` with that result; it
+assistant's `HighlightPayload` names every NAP, subscriber and fiber run to paint, each with its
+status. `src/lib/map/highlight.ts` (`resolveHighlight`) resolves it against the loaded network. It
+is a pure, unit-tested function that decides which NAPs and subscribers to colour, which runs to
+mark (a run shared by two highlighted paths takes the worse status), and where to fit the view. It
+derives no path of its own: the payload lists the runs. The map component only calls MapLibre's `setFeatureState` with that result; it
 never recolours, reclassifies or recomputes anything itself.
 
 **Clicking any NAP** — highlighted or not, before or after asking a question — opens its full

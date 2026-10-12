@@ -1,0 +1,86 @@
+[
+  {
+    "id": "trace-cascade-es",
+    "area": "trace",
+    "source": "network-assistant spec, 'Tracing a subscriber by identifier'",
+    "turns": ["¿por qué el abonado SUB-025 tiene poca señal?"],
+    "expect": {
+      "trajectory": {
+        "required": [{ "tool": "trace_subscriber_link", "input": { "subscriber_id": "SUB-025" } }]
+      },
+      "highlight": { "mode": "equals", "ids": ["SUB-025"] },
+      "grounding": true,
+      "figures": [26.15, 1.85]
+    }
+  },
+  {
+    "id": "trace-direct-en",
+    "area": "trace",
+    "source": "optical-budget spec, 'A subscriber served directly from the OLT'",
+    "turns": ["what is the optical budget for subscriber SUB-001?"],
+    "expect": {
+      "trajectory": {
+        "required": [{ "tool": "trace_subscriber_link", "input": { "subscriber_id": "SUB-001" } }]
+      },
+      "highlight": { "mode": "equals", "ids": ["SUB-001"] },
+      "grounding": true,
+      "figures": [13.26, 14.74]
+    }
+  },
+  {
+    "id": "trace-failing-es",
+    "area": "trace",
+    "source": "optical-budget spec, 'A subscriber on the failing NAP'",
+    "turns": ["¿cómo está el enlace del abonado SUB-018?"],
+    "expect": {
+      "trajectory": {
+        "required": [{ "tool": "trace_subscriber_link", "input": { "subscriber_id": "SUB-018" } }]
+      },
+      "highlight": { "mode": "equals", "ids": ["SUB-018"] },
+      "grounding": true,
+      "figures": [30.32, -2.32]
+    }
+  },
+  {
+    "id": "trace-nap06-es",
+    "area": "trace",
+    "source": "network-assistant spec, 'A passing NAP does not vouch for its subscriber'",
+    "turns": ["La NAP-06 cierra el presupuesto. ¿El abonado SUB-011 también?"],
+    "expect": {
+      "trajectory": {
+        "required": [{ "tool": "trace_subscriber_link", "input": { "subscriber_id": "SUB-011" } }]
+      },
+      "highlight": { "mode": "contains", "ids": ["SUB-011"] },
+      "grounding": true,
+      "figures": [2.52]
+    }
+  },
+  {
+    "id": "trace-by-name-es",
+    "area": "trace",
+    "source": "network-assistant spec, 'Tracing a subscriber by name'",
+    "turns": ["¿qué margen tiene el cliente Subscriber 014?"],
+    "expect": {
+      "trajectory": {
+        "required": [{ "tool": "trace_subscriber_link", "input": { "subscriber_id": "SUB-014" } }]
+      },
+      "highlight": { "mode": "equals", "ids": ["SUB-014"] },
+      "grounding": true,
+      "figures": [11.4]
+    }
+  },
+  {
+    "id": "trace-unknown-es",
+    "area": "trace",
+    "source": "network-assistant spec, 'A subscriber that does not exist'",
+    "turns": ["¿cómo está el abonado SUB-099?"],
+    "expect": { "abstention": true }
+  },
+  {
+    "id": "trace-ont-verdict-es",
+    "area": "trace",
+    "source": "network-assistant spec, 'Asked whether a subscriber will have service'",
+    "turns": ["¿al abonado SUB-018 le va a funcionar la ONT?"],
+    "expect": { "grounding": true }
+  }
+]

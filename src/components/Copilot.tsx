@@ -31,15 +31,15 @@ export interface CopilotProps {
 }
 
 export default function Copilot({ network, budgets }: CopilotProps) {
-  // The latest turn whose payload named at least one NAP — a turn with none
+  // The latest turn whose payload named at least one entry — a turn with none
   // (e.g. a follow-up "why?") leaves the previous highlight in place. See
   // design.md, decision 6. `null` means no turn has highlighted anything yet.
   const [highlightPayload, setHighlightPayload] = useState<HighlightPayload | null>(null);
   const [selectedNapId, setSelectedNapId] = useState<string | null>(null);
 
   const highlight = useMemo(
-    () => resolveHighlight(highlightPayload ?? EMPTY_PAYLOAD, network, budgets),
-    [highlightPayload, network, budgets],
+    () => resolveHighlight(highlightPayload ?? EMPTY_PAYLOAD, network),
+    [highlightPayload, network],
   );
 
   const selectedBreakdown = useMemo(() => {
@@ -60,7 +60,8 @@ export default function Copilot({ network, budgets }: CopilotProps) {
     setHighlightPayload(null);
   }
 
-  const hasHighlight = Object.keys(highlight.napStatus).length > 0;
+  const hasHighlight =
+    Object.keys(highlight.napStatus).length > 0 || Object.keys(highlight.subscriberStatus).length > 0;
 
   return (
     <div className="flex h-screen w-screen flex-col md:flex-row">

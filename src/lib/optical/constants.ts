@@ -44,6 +44,26 @@ export const SPLITTER_DB: Record<SplitterRatio, number> = {
 };
 
 /**
+ * Route length of a subscriber's drop over its straight-line distance from the
+ * NAP. Dimensionless. A drop follows poles and facades, not the great circle.
+ *
+ * Source: owner decision 2 of the 2026-10-07 map-user-capabilities handoff, an
+ * industry-typical starting point. No published source is cited. PENDING
+ * VALIDATION.
+ */
+export const DROP_SLACK_FACTOR = 1.3;
+
+/**
+ * Connectors a subscriber's drop adds: one at the NAP port and one at the ONT.
+ * Count (each costs `CONNECTOR_DB`).
+ *
+ * Source: owner decision 2 of the 2026-10-07 map-user-capabilities handoff, an
+ * industry-typical starting point. No published source is cited. PENDING
+ * VALIDATION.
+ */
+export const DROP_CONNECTORS = 2;
+
+/**
  * Per-GPON-class link budget, in dB. An object rather than a bare number so a
  * second per-class figure — receiver sensitivity, say — is additive later
  * rather than a change to every call site. No such figure is added here: no

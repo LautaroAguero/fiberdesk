@@ -8,7 +8,7 @@
  * user rather than being swallowed".
  *
  * `content` is `Anthropic.ToolResultBlockParam["content"]` — a JSON string
- * for the three tools that return plain data, or an array of content blocks
+ * for the four tools that return plain data, or an array of content blocks
  * for documentation search. The two cannot share one shape: citations work
  * off structural `search_result` blocks, not off a string the model would
  * have to re-parse, so that tool's content is never stringified.
@@ -24,9 +24,11 @@ import {
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
   SEARCH_DOCUMENTATION_TOOL_NAME,
   SUMMARIZE_TOOL_NAME,
+  TRACE_TOOL_NAME,
 } from "@/lib/assistant/tool-definitions";
 import type { SearchIndex } from "@/lib/corpus/search";
 import type { Network } from "@/lib/network/types";
+import { traceSubscriber } from "@/lib/optical/trace";
 
 /** Parsed arguments of `summarize_optical_budgets`. */
 interface SummarizeInput {
@@ -39,6 +41,11 @@ interface DetailInput {
   min_margin_db?: number;
 }
 
+/** Parsed arguments of `trace_subscriber_link`. */
+interface TraceInput {
+  subscriber_id: string;
+}
+
 /** Parsed arguments of `search_documentation`. */
 interface SearchInput {
   query: string;
@@ -46,6 +53,10 @@ interface SearchInput {
 
 function isDetailInput(input: unknown): input is DetailInput {
   return typeof input === "object" && input !== null && typeof (input as DetailInput).nap_id === "string";
+}
+
+function isTraceInput(input: unknown): input is TraceInput {
+  return typeof input === "object" && input !== null && typeof (input as TraceInput).subscriber_id === "string";
 }
 
 function isSearchInput(input: unknown): input is SearchInput {
@@ -92,6 +103,14 @@ export function dispatchTool(
           ),
           isError: false,
         };
+      }
+      case TRACE_TOOL_NAME: {
+        if (!isTraceInput(input)) {
+          return errorResult("trace_subscriber_link requires a subscriber_id");
+        }
+        // An id the network lacks makes the engine throw, naming it: the catch below
+        // turns that into an errored result, never a zeroed or partial trace.
+        return { content: JSON.stringify(traceSubscriber(network, input.subscriber_id)), isError: false };
       }
       case SEARCH_DOCUMENTATION_TOOL_NAME: {
         if (!isSearchInput(input)) {
