@@ -17,7 +17,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
       - SUB-025's drop (0.383 km, 0.498 km, 0.12 + 0.80 = 0.92 dB);
       - the drop is identical to the one in SUB-025's trace;
       - `drop.ts` contains no literal loss figure.
-- [ ] 1.2 Add `MAX_DROP_ROUTE_M = 600` to `src/lib/optical/constants.ts`, in the operational block
+- [x] 1.2 Add `MAX_DROP_ROUTE_M = 600` to `src/lib/optical/constants.ts`, in the operational block
       under `MIN_MARGIN_DB` (design.md, decision 4). Its comment states the unit, route rather than
       straight line, the owner-decision source, the rejected ~300 m and why, and PENDING
       VALIDATION. Expose it in `src/lib/assistant/optical-constants.ts` as `max_drop_route_m`,

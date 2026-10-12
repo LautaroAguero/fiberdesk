@@ -66,4 +66,13 @@ describe("5.2 the optical constants snapshot", () => {
     expect(snapshot.gpon_class_budget["B+"].value).toBe(28.0);
     expect(snapshot.gpon_class_budget["C+"].value).toBe(32.0);
   });
+
+  test("the maximum drop route reads 600 m, operational and pending validation", () => {
+    const snapshot = getOpticalConstantsSnapshot();
+    expect(snapshot.max_drop_route_m).toEqual({
+      value: 600,
+      unit: "m (route length, not straight line)",
+      status: "operational_limit_pending_validation",
+    });
+  });
 });

@@ -87,3 +87,23 @@ export const GPON_CLASS: Record<GponClass, { budget_db: number }> = {
  * call site that uses it accepts an override rather than being locked to it.
  */
 export const MIN_MARGIN_DB = 3.0;
+
+/**
+ * Maximum modelled route length of a new customer's drop, in metres. A drop
+ * longer than this is not offered as a connection (`too_far`). It applies to
+ * the ROUTE length (straight line times `DROP_SLACK_FACTOR`), not to the
+ * straight line, and is compared against the route as reported, rounded to the
+ * metre.
+ *
+ * Like `MIN_MARGIN_DB`, this is an operational limit, not a physical loss:
+ * nothing in the optics forbids a longer drop, an operator simply will not
+ * build one.
+ *
+ * Source: owner decision of 2026-10-12 (add-feasibility). The map-user
+ * capabilities handoff suggested ~300 m, which was rejected: all 28 seed
+ * subscribers sit 450-498 m of modelled drop from their NAP (346-383 m in a
+ * straight line), so ~300 m would put every existing customer out of reach of
+ * its own NAP. 600 m keeps the longest seed drop (498 m, SUB-025) inside with
+ * about 100 m to spare. No published source is cited. PENDING VALIDATION.
+ */
+export const MAX_DROP_ROUTE_M = 600;

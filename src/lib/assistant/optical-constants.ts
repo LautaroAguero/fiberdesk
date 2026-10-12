@@ -15,6 +15,7 @@ import {
   DROP_SLACK_FACTOR,
   FIBER_DB_PER_KM,
   GPON_CLASS,
+  MAX_DROP_ROUTE_M,
   MIN_MARGIN_DB,
   SPLICE_DB,
   SPLITTER_DB,
@@ -24,7 +25,10 @@ import type { GponClass, SplitterRatio } from "@/lib/network/types";
 interface ConstantValue {
   value: number;
   unit: string;
-  status: "industry_typical_pending_validation" | "operational_recommendation";
+  status:
+    | "industry_typical_pending_validation"
+    | "operational_recommendation"
+    | "operational_limit_pending_validation";
 }
 
 export interface OpticalConstantsSnapshot {
@@ -38,6 +42,11 @@ export interface OpticalConstantsSnapshot {
   splitter_insertion_loss: Record<SplitterRatio, ConstantValue>;
   gpon_class_budget: Record<GponClass, ConstantValue>;
   min_recommended_margin: ConstantValue;
+  /**
+   * Longest modelled drop route a new customer may have, in metres: an
+   * operational limit, not a physical loss (add-feasibility).
+   */
+  max_drop_route_m: ConstantValue;
 }
 
 const PENDING = "industry_typical_pending_validation" as const;
@@ -69,6 +78,11 @@ export function getOpticalConstantsSnapshot(): OpticalConstantsSnapshot {
       value: MIN_MARGIN_DB,
       unit: "dB",
       status: "operational_recommendation",
+    },
+    max_drop_route_m: {
+      value: MAX_DROP_ROUTE_M,
+      unit: "m (route length, not straight line)",
+      status: "operational_limit_pending_validation",
     },
   };
 }
