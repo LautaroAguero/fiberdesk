@@ -3,7 +3,9 @@ import { describe, expect, test } from "vitest";
 import { dispatchTool } from "@/lib/assistant/dispatcher";
 import { projectHighlight } from "@/lib/assistant/highlight";
 import type { ToolCallRecord } from "@/lib/assistant/loop";
+import type { MapContext } from "@/lib/assistant/map-context";
 import {
+  CONNECTION_CANDIDATES_TOOL_NAME,
   CUT_IMPACT_TOOL_NAME,
   DETAIL_TOOL_NAME,
   SUMMARIZE_TOOL_NAME,
@@ -17,8 +19,8 @@ const network = loadNetwork();
 const searchIndex = buildSearchIndex([]); // empty: highlight projection never reads documentation results
 
 /** Builds a ToolCallRecord the way loop.ts would, from a real dispatch. */
-function record(name: string, input: unknown): ToolCallRecord {
-  const { content, isError } = dispatchTool(name, input, network, searchIndex);
+function record(name: string, input: unknown, mapContext: MapContext = {}): ToolCallRecord {
+  const { content, isError } = dispatchTool(name, input, network, searchIndex, mapContext);
   return {
     name,
     input,
@@ -243,5 +245,74 @@ describe("2.2 a cut impact is projected as the cut element and what it takes out
 
   test("fit_bounds is true for a cut run entry alone", () => {
     expect(projectHighlight([cutRecord("FR-12")]).fit_bounds).toBe(true);
+  });
+});
+
+describe("3.4 connection candidates are projected as a point and candidates", () => {
+  const at = (lat: number, lon: number): MapContext => ({ selected_point: { lat, lon } });
+  const candidates = (mapContext: MapContext) => record(CONNECTION_CANDIDATES_TOOL_NAME, {}, mapContext);
+
+  test("two feasible candidates (point E)", () => {
+    const payload = projectHighlight([candidates(at(-27.4659, -58.97))]);
+
+    expect(payload.highlight).toEqual([
+      { kind: "point", id: "selected-point", lat: -27.4659, lon: -58.97, best_nap_id: "NAP-11" },
+      { kind: "candidate", id: "NAP-11", rank: 1, feasibility: "feasible" },
+      { kind: "candidate", id: "NAP-05", rank: 2, feasibility: "feasible" },
+      { kind: "candidate", id: "NAP-04", rank: 3, feasibility: "not_feasible" },
+    ]);
+    expect(payload.highlight.some((entry) => entry.kind === "nap")).toBe(false);
+  });
+
+  test("a feasible candidate with a caveat (point D)", () => {
+    const payload = projectHighlight([candidates(at(-27.493, -59.0338))]);
+
+    expect(payload.highlight).toContainEqual({
+      kind: "candidate",
+      id: "NAP-06",
+      rank: 1,
+      feasibility: "marginal",
+    });
+  });
+
+  test("no feasible candidate: the point names no best NAP", () => {
+    const payload = projectHighlight([candidates(at(-27.4165, -59.018))]);
+
+    expect(payload.highlight[0]).toMatchObject({ kind: "point", best_nap_id: null });
+  });
+
+  test("no point, no entries", () => {
+    const payload = projectHighlight([candidates({})]);
+
+    expect(payload.highlight).toEqual([]);
+    expect(payload.fit_bounds).toBe(false);
+  });
+
+  test("candidate entries do not merge with a NAP entry for the same NAP", () => {
+    const payload = projectHighlight([
+      record(DETAIL_TOOL_NAME, { nap_id: "NAP-11" }),
+      candidates(at(-27.4659, -58.97)),
+    ]);
+
+    expect(payload.highlight.filter((e) => e.id === "NAP-11").map((e) => e.kind).sort()).toEqual([
+      "candidate",
+      "nap",
+    ]);
+    expect(payload.highlight).toContainEqual(expect.objectContaining({ kind: "nap", id: "NAP-11" }));
+  });
+
+  test("fit_bounds is true with a point entry", () => {
+    expect(projectHighlight([candidates(at(-27.4659, -58.97))]).fit_bounds).toBe(true);
+  });
+
+  test("a later call for the same candidates replaces the earlier entries", () => {
+    const payload = projectHighlight([
+      candidates(at(-27.4659, -58.97)),
+      candidates(at(-27.4165, -59.018)),
+    ]);
+
+    expect(payload.highlight.filter((e) => e.kind === "point")).toHaveLength(1);
+    expect(payload.highlight.find((e) => e.kind === "point")).toMatchObject({ lat: -27.4165 });
+    expect(payload.highlight).toContainEqual({ kind: "candidate", id: "NAP-03", rank: 1, feasibility: "not_feasible" });
   });
 });

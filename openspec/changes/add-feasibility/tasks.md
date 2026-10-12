@@ -94,7 +94,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
       - seven tools in total;
       - with point E the dispatched result is the engine's;
       - with no point it is an `is_error` result carrying the "No point is selected" message.
-- [ ] 3.4 Add the `point` and `candidate` kinds to `HighlightEntry`, and extend `projectHighlight`
+- [x] 3.4 Add the `point` and `candidate` kinds to `HighlightEntry`, and extend `projectHighlight`
       (design.md, decision 7). Tests:
       - the spec scenarios "Two feasible candidates" (E), "A feasible candidate with a caveat" (D)
         and "No point, no entries";
