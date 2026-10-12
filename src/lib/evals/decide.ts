@@ -89,7 +89,8 @@ export interface DecideInput {
   candidate: RunRecord;
 }
 
-function noVerdict(reasons: string[]): DecideResult {
+/** The result for a rule that cannot be applied: no verdict, and why. */
+export function noVerdict(reasons: string[]): DecideResult {
   return { verdict: "no_verdict", reasons, checks: [], toRead: [], passes: null, mcnemar: null, cost: null };
 }
 

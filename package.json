@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "eval": "tsx --env-file-if-exists=.env.local evals/run.ts",
     "eval:compare": "tsx evals/compare.ts",
+    "eval:decide": "tsx evals/decide.ts",
     "eval:regrade": "tsx evals/regrade.ts"
   },
   "dependencies": {

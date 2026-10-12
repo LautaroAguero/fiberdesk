@@ -92,7 +92,7 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
       against $0.0376; inert caching rejects; mismatched prompt hash gives no verdict; all checks
       passing with three discordant cases gives `accept_provisional` with three listed. Add an
       abstention-veto test mirroring the grounding one.
-- [ ] 4.2 Add `evals/decide.ts` and `"eval:decide": "tsx evals/decide.ts"`. It reads three record
+- [x] 4.2 Add `evals/decide.ts` and `"eval:decide": "tsx evals/decide.ts"`. It reads three record
       files, re-grades all three in memory with `regradeRecord` against the current seed, corpus
       and cases, and gives `no_verdict` if any case refuses to re-grade. It then calls `decide` and
       prints the verdict, each reason, the cases to read with their answer text, McNemar, and cost
