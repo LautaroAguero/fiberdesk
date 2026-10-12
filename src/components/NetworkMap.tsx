@@ -12,9 +12,12 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import type { ExpressionSpecification, Map as MaplibreMap } from "maplibre-gl";
+import type { ExpressionSpecification, GeoJSONSource, Map as MaplibreMap } from "maplibre-gl";
 
 import {
+  CANDIDATE_COLOR,
+  CANDIDATE_RING_OPACITY,
+  CANDIDATE_RING_WIDTH,
   CUT_COLOR,
   CUT_RUN_WIDTH,
   DARK_RUN_OPACITY,
@@ -29,9 +32,16 @@ import {
   NEUTRAL_NAP_COLOR,
   OLT_COLOR,
   OUT_OF_SERVICE_COLOR,
+  POINT_COLOR,
   STATUS_COLOR,
   SUBSCRIBER_COLOR,
 } from "@/lib/map/config";
+import {
+  feasibilityToGeoJson,
+  selectedPointToGeoJson,
+  type FeasibilityGeoJson,
+  type SelectedPointGeoJson,
+} from "@/lib/map/feasibility-geojson";
 import { networkToGeoJson, type NetworkGeoJson } from "@/lib/map/geojson";
 import type { ResolvedHighlight } from "@/lib/map/highlight";
 import { pointFromClick } from "@/lib/map/point";
@@ -50,6 +60,8 @@ export interface NetworkMapProps {
   onSelectNap: (napId: string) => void;
   /** Called with the clicked location when a click lands on empty space inside the city (add-feasibility, decision 8). */
   onSelectPoint: (point: SelectedPoint) => void;
+  /** The point the user selected, drawn as a marker; `null` when none (add-feasibility, decision 8). */
+  selectedPoint: SelectedPoint | null;
 }
 
 /**
@@ -99,17 +111,66 @@ const RUN_OPACITY_EXPRESSION: ExpressionSpecification = [
   1,
 ];
 
+/** Picks the entry of `table` for a candidate's feasibility (feature-state `candidate`), else `fallback`. */
+function candidateExpression(
+  table: Record<"feasible" | "marginal" | "not_feasible", string | number>,
+  fallback: string | number,
+): ExpressionSpecification {
+  return [
+    "match",
+    ["feature-state", "candidate"],
+    "feasible",
+    table.feasible,
+    "marginal",
+    table.marginal,
+    "not_feasible",
+    table.not_feasible,
+    fallback,
+  ];
+}
+
+/**
+ * The ring around a NAP. A cut NAP keeps its translucent magenta ring; otherwise a candidate
+ * gets a ring by feasibility, and any other NAP none. The ring never touches the fill, which
+ * stays the NAP's own status colour.
+ */
+const NAP_STROKE_COLOR: ExpressionSpecification = [
+  "case",
+  ["==", ["feature-state", "status"], "cut"],
+  CUT_COLOR,
+  candidateExpression(CANDIDATE_COLOR, CUT_COLOR),
+];
+const NAP_STROKE_WIDTH: ExpressionSpecification = [
+  "case",
+  ["==", ["feature-state", "status"], "cut"],
+  4,
+  candidateExpression(CANDIDATE_RING_WIDTH, 0),
+];
+const NAP_STROKE_OPACITY: ExpressionSpecification = [
+  "case",
+  ["==", ["feature-state", "status"], "cut"],
+  0.35,
+  candidateExpression(CANDIDATE_RING_OPACITY, 0.35),
+];
+
 /**
  * Adds the four network sources and their layers to `map`'s *current* style.
  * Called on every `style.load` — the initial one, and again if the base
  * style fails and `handleStyleError` swaps in the fallback background, since
  * a style swap discards whatever sources and layers the previous style had.
  */
-function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
+function addNetworkOverlay(
+  map: MaplibreMap,
+  geojson: NetworkGeoJson,
+  selectedPoint: SelectedPointGeoJson,
+  feasibility: FeasibilityGeoJson,
+): void {
   map.addSource("runs", { type: "geojson", data: geojson.runs, promoteId: "id" });
   map.addSource("subscribers", { type: "geojson", data: geojson.subscribers, promoteId: "id" });
   map.addSource("naps", { type: "geojson", data: geojson.naps, promoteId: "id" });
   map.addSource("olt", { type: "geojson", data: geojson.olt, promoteId: "id" });
+  map.addSource("selected-point", { type: "geojson", data: selectedPoint });
+  map.addSource("feasibility", { type: "geojson", data: feasibility });
 
   map.addLayer({
     id: "runs-line",
@@ -120,6 +181,15 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
       "line-width": RUN_WIDTH_EXPRESSION,
       "line-opacity": RUN_OPACITY_EXPRESSION,
     },
+  });
+
+  // The drop line from the evaluated point to the best candidate, under the NAPs.
+  map.addLayer({
+    id: "feasibility-drop",
+    type: "line",
+    source: "feasibility",
+    filter: ["==", ["get", "kind"], "drop"],
+    paint: { "line-color": POINT_COLOR, "line-width": 3, "line-dasharray": [2, 2] },
   });
 
   map.addLayer({
@@ -140,10 +210,12 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
     paint: {
       "circle-radius": 7,
       "circle-color": statusColorExpression("status", NEUTRAL_NAP_COLOR),
-      // A cut NAP gets a translucent ring in the cut colour, on top of its fill.
-      "circle-stroke-color": CUT_COLOR,
-      "circle-stroke-width": ["case", ["==", ["feature-state", "status"], "cut"], 4, 0],
-      "circle-stroke-opacity": 0.35,
+      // A cut NAP gets a translucent ring in the cut colour, on top of its fill; a
+      // connection candidate gets a ring by feasibility. Both are rings, so the fill
+      // stays the NAP's own status.
+      "circle-stroke-color": NAP_STROKE_COLOR,
+      "circle-stroke-width": NAP_STROKE_WIDTH,
+      "circle-stroke-opacity": NAP_STROKE_OPACITY,
     },
   });
   map.addLayer({
@@ -179,9 +251,57 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
     },
     paint: { "text-color": LABEL_COLOR },
   });
+
+  // On top of everything: the evaluated point, the candidates' rank labels, and the
+  // user's own marker (a hollow ring, so the evaluated dot shows inside it).
+  map.addLayer({
+    id: "feasibility-point",
+    type: "circle",
+    source: "feasibility",
+    filter: ["==", ["get", "kind"], "point"],
+    paint: {
+      "circle-radius": 4,
+      "circle-color": POINT_COLOR,
+      "circle-stroke-color": "#ffffff",
+      "circle-stroke-width": 1.5,
+    },
+  });
+  map.addLayer({
+    id: "feasibility-rank",
+    type: "symbol",
+    source: "feasibility",
+    filter: ["==", ["get", "kind"], "rank"],
+    layout: {
+      "text-field": ["get", "label"],
+      "text-font": LABEL_FONT,
+      "text-size": 13,
+      "text-offset": [0, -1.3],
+      "text-anchor": "bottom",
+      "text-allow-overlap": true,
+    },
+    paint: { "text-color": LABEL_COLOR, "text-halo-color": "#ffffff", "text-halo-width": 1.5 },
+  });
+  map.addLayer({
+    id: "selected-point-circle",
+    type: "circle",
+    source: "selected-point",
+    paint: {
+      "circle-radius": 9,
+      "circle-color": POINT_COLOR,
+      "circle-opacity": 0,
+      "circle-stroke-color": POINT_COLOR,
+      "circle-stroke-width": 3,
+    },
+  });
 }
 
-export default function NetworkMap({ network, highlight, onSelectNap, onSelectPoint }: NetworkMapProps) {
+export default function NetworkMap({
+  network,
+  highlight,
+  onSelectNap,
+  onSelectPoint,
+  selectedPoint,
+}: NetworkMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MaplibreMap | null>(null);
   // Flips once the sources/layers exist, so the highlight effect below knows
@@ -201,6 +321,10 @@ export default function NetworkMap({ network, highlight, onSelectNap, onSelectPo
   useEffect(() => {
     onSelectPointRef.current = onSelectPoint;
   }, [onSelectPoint]);
+  // The latest data of the two point sources. A style swap (the fallback) discards
+  // the sources, and the overlay is re-added from these rather than left empty.
+  const selectedPointDataRef = useRef<SelectedPointGeoJson>(selectedPointToGeoJson(null));
+  const feasibilityDataRef = useRef<FeasibilityGeoJson>(feasibilityToGeoJson(highlight, network));
 
   useEffect(() => {
     if (mapRef.current !== null || containerRef.current === null) return;
@@ -285,7 +409,7 @@ export default function NetworkMap({ network, highlight, onSelectNap, onSelectPo
       let overlayAdded = false;
       map.on("style.load", () => {
         styleSettled = true;
-        addNetworkOverlay(map, geojson);
+        addNetworkOverlay(map, geojson, selectedPointDataRef.current, feasibilityDataRef.current);
 
         if (!overlayAdded) {
           overlayAdded = true;
@@ -325,8 +449,13 @@ export default function NetworkMap({ network, highlight, onSelectNap, onSelectPo
       map.removeFeatureState({ source: "runs", id: runId });
     }
 
-    for (const [napId, status] of Object.entries(highlight.napStatus)) {
-      map.setFeatureState({ source: "naps", id: napId }, { status });
+    // A NAP can carry both a status (its own entry) and a candidate feasibility.
+    const napIds = [...new Set([...Object.keys(highlight.napStatus), ...Object.keys(highlight.candidateFeasibility)])];
+    for (const napId of napIds) {
+      const state: Record<string, string> = {};
+      if (highlight.napStatus[napId] !== undefined) state.status = highlight.napStatus[napId];
+      if (highlight.candidateFeasibility[napId] !== undefined) state.candidate = highlight.candidateFeasibility[napId];
+      map.setFeatureState({ source: "naps", id: napId }, state);
     }
     for (const [subscriberId, status] of Object.entries(highlight.subscriberStatus)) {
       map.setFeatureState({ source: "subscribers", id: subscriberId }, { status });
@@ -336,7 +465,7 @@ export default function NetworkMap({ network, highlight, onSelectNap, onSelectPo
     }
 
     previousHighlightRef.current = {
-      napIds: Object.keys(highlight.napStatus),
+      napIds,
       subscriberIds: Object.keys(highlight.subscriberStatus),
       runIds: highlight.runIds,
     };
@@ -346,6 +475,21 @@ export default function NetworkMap({ network, highlight, onSelectNap, onSelectPo
       map.fitBounds(highlight.bounds, { padding: FIT_BOUNDS_PADDING_PX, maxZoom: FIT_BOUNDS_MAX_ZOOM });
     }
   }, [highlight, isReady]);
+
+  // The evaluated point, the drop line and the rank labels follow the highlight; the
+  // user's marker follows the selected point. Data goes through `setData`, not
+  // feature-state, since both are a handful of features that come and go.
+  useEffect(() => {
+    feasibilityDataRef.current = feasibilityToGeoJson(highlight, network);
+    const source = mapRef.current?.getSource<GeoJSONSource>("feasibility");
+    if (isReady && source !== undefined) source.setData(feasibilityDataRef.current);
+  }, [highlight, network, isReady]);
+
+  useEffect(() => {
+    selectedPointDataRef.current = selectedPointToGeoJson(selectedPoint);
+    const source = mapRef.current?.getSource<GeoJSONSource>("selected-point");
+    if (isReady && source !== undefined) source.setData(selectedPointDataRef.current);
+  }, [selectedPoint, isReady]);
 
   return <div ref={containerRef} className="h-full w-full" />;
 }

@@ -86,6 +86,7 @@ export default function Copilot({ network, budgets }: CopilotProps) {
           highlight={highlight}
           onSelectNap={setSelectedNapId}
           onSelectPoint={handleSelectPoint}
+          selectedPoint={selectedPoint}
         />
 
         <div className="absolute top-3 left-3 flex gap-2">
