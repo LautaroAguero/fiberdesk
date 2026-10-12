@@ -113,7 +113,7 @@ pass before it is ticked.
 
 ## 5. Live verification (by hand)
 
-- [ ] 5.1 Smoke run: `npm run eval -- --cases 'cut-*' --max-usd 0.40`. Verify that every
+- [x] 5.1 Smoke run: `npm run eval -- --cases 'cut-*' --max-usd 0.40`. Verify that every
       `list_cut_impact` call names a valid element, that no call names the OLT or a substitute, and
       that payloads hold the cut entries. Read the declines of `cut-unknown-es` and `cut-olt-es` by
       hand. Commit the record.
