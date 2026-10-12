@@ -48,7 +48,7 @@ pass before it is ticked.
       - "An outage outranks a budget classification" (detail NAP-12, then cut FR-03: one NAP-12
         entry, `out_of_service`, no margin);
       - the existing detail and trace scenarios, unchanged.
-- [ ] 2.3 Update `resolveHighlight` to type its maps by `HighlightStatus` and merge by the shared
+- [x] 2.3 Update `resolveHighlight` to type its maps by `HighlightStatus` and merge by the shared
       order. Add `CUT_COLOR` and `OUT_OF_SERVICE_COLOR` to `src/lib/map/config.ts`, with a comment
       on why they sit outside the budget palette. In `NetworkMap.tsx`:
       - extend the colour expressions;

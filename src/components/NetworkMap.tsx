@@ -73,19 +73,21 @@ function statusColorExpression(featureStateKey: "status" | "onPath", fallback: s
   ];
 }
 
-/** Line width of a run: the cut run wide, a run on a path medium, the rest (and dark runs) thin. */
+/**
+ * Line width of a run: the cut run widest, a run on a path or a dark run medium, the rest thin.
+ * A dark run is drawn as wide as a path: at the neutral width its slate would read as just
+ * another grey run (verified in the browser, add-cut-impact task 2.3).
+ */
 const RUN_WIDTH_EXPRESSION: ExpressionSpecification = [
   "case",
   ["==", ["feature-state", "onPath"], "cut"],
   CUT_RUN_WIDTH,
-  ["==", ["feature-state", "onPath"], "out_of_service"],
-  2,
   ["!=", ["feature-state", "onPath"], null],
   4,
   2,
 ];
 
-/** Opacity of a run: a dark run is faded so the subtree reads as switched off. */
+/** Opacity of a run: a dark run is slightly faded, so the subtree reads as switched off. */
 const RUN_OPACITY_EXPRESSION: ExpressionSpecification = [
   "case",
   ["==", ["feature-state", "onPath"], "out_of_service"],

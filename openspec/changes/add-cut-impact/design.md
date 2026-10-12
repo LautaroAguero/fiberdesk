@@ -150,7 +150,10 @@ Two new style constants go in `src/lib/map/config.ts`, beside the status colours
 - **`CUT_COLOR`:** a saturated magenta, used for a run at width 6 and for a NAP circle ring. It
   sits outside the green, amber and red family of the budget colours.
 - **`OUT_OF_SERVICE_COLOR`:** a dark slate grey, used for NAPs, subscribers and dark runs. Dark
-  runs are drawn at the normal width with reduced opacity, so the subtree reads as switched off.
+  runs are drawn at a path's width (4) and 0.85 opacity, so the subtree reads as switched off.
+  *Changed during task 2.3:* the first version drew them at the neutral width and 0.4 opacity, and
+  in the browser that washed out to the neutral fiber grey, so it could not be told apart from an
+  unaffected run.
 
 `statusColorExpression` gains the two keys. Line width and opacity get their own feature-state
 expressions, because a dash cannot be data-driven. `resolveHighlight` keeps its shape, with maps
