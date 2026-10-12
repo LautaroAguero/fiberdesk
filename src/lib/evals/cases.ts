@@ -44,12 +44,18 @@ const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === "string");
 
 /**
- * Every id a highlight oracle may name: NAPs and subscribers. Run entries only
- * describe the path of the entity they belong to and are never compared (see
- * `highlightIds`), so an oracle naming one could never be met.
+ * Every id a highlight oracle may name: NAPs, subscribers and fiber runs. Only
+ * a run whose status is `cut` is compared (see `highlightIds`), so an oracle
+ * naming any other run could never be met; but whether a run is the cut one
+ * depends on the question, which the validator cannot know, so it accepts every
+ * run the network contains (design.md, add-cut-impact, decision 7).
  */
 function oracleIds(network: Network): Set<string> {
-  return new Set([...network.splitters.map((nap) => nap.id), ...network.subscribers.map((sub) => sub.id)]);
+  return new Set([
+    ...network.splitters.map((nap) => nap.id),
+    ...network.subscribers.map((sub) => sub.id),
+    ...network.fiber_runs.map((run) => run.id),
+  ]);
 }
 
 /** Validates one case's fields. Returns its problems; empty when valid. */
@@ -119,7 +125,7 @@ function validateCase(raw: unknown, toolNames: Set<string>, entities: Set<string
       problems.push("`highlight` must be { mode: \"equals\" | \"contains\", ids: string[] }");
     } else {
       for (const id of h.ids) {
-        if (!entities.has(id)) problems.push(`highlight oracle names ${id}, which is not a NAP or subscriber the network contains`);
+        if (!entities.has(id)) problems.push(`highlight oracle names ${id}, which is not a NAP, subscriber or fiber run the network contains`);
       }
       if (h.oracle !== undefined && h.oracle !== "non_passing") {
         problems.push(`unknown highlight oracle tag ${JSON.stringify(h.oracle)}`);

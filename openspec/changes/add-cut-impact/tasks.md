@@ -71,7 +71,7 @@ pass before it is ticked.
 
       Attach a screenshot of (a). An agent without browser tools implements and commits the code,
       and leaves this box unticked for the browser check.
-- [ ] 2.4 In `src/lib/evals`, add `cut` runs to `highlightIds` and accept fiber run ids in the case
+- [x] 2.4 In `src/lib/evals`, add `cut` runs to `highlightIds` and accept fiber run ids in the case
       validator (design.md, decision 7). Tests:
       - "A cut is compared by its element and what it takes out";
       - "A dark downstream run is not compared";

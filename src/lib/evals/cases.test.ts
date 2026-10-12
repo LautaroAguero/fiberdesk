@@ -81,16 +81,21 @@ describe("loadCases", () => {
     expect(error.message).toContain("SUB-099");
   });
 
-  test("an oracle naming a subscriber loads, and one naming a run does not", () => {
+  test("an oracle naming a subscriber or a fiber run loads, and one naming FR-99 does not", () => {
     const withSubscriber = caseDir({
       "trace.json": [validCase({ expect: { highlight: { mode: "equals", ids: ["SUB-025"] } } })],
     });
     expect(loadCases(network, withSubscriber)).toHaveLength(1);
 
-    const error = loadError({
-      "trace.json": [validCase({ expect: { highlight: { mode: "equals", ids: ["FR-03"] } } })],
+    const withRun = caseDir({
+      "cut.json": [validCase({ expect: { highlight: { mode: "equals", ids: ["FR-03", "NAP-03"] } } })],
     });
-    expect(error.message).toContain("FR-03");
+    expect(loadCases(network, withRun)).toHaveLength(1);
+
+    const error = loadError({
+      "cut.json": [validCase({ expect: { highlight: { mode: "equals", ids: ["FR-99"] } } })],
+    });
+    expect(error.message).toContain("FR-99");
   });
 
   test("an unknown tool name fails", () => {
