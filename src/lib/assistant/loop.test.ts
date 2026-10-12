@@ -1,8 +1,9 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import type Anthropic from "@anthropic-ai/sdk";
 
 import { THINKING } from "@/lib/assistant/config";
+import * as dispatcher from "@/lib/assistant/dispatcher";
 import { runAssistantLoop } from "@/lib/assistant/loop";
 import { buildToolDefinitions, DETAIL_TOOL_NAME, SUMMARIZE_TOOL_NAME } from "@/lib/assistant/tool-definitions";
 import { buildSearchIndex } from "@/lib/corpus/search";
@@ -286,5 +287,38 @@ describe("prompt caching (reduce-cost-per-question, task 2.2)", () => {
     expect(input).toEqual(snapshot);
     expect(input).toHaveLength(1);
     expect(JSON.stringify(requests.map((request) => request.messages))).not.toContain("cache_control");
+  });
+});
+
+describe("3.1 the map context is passed to tool calls (add-feasibility)", () => {
+  test("every dispatched call receives the request's map context", async () => {
+    const spy = vi.spyOn(dispatcher, "runToolUse");
+    const mapContext = { selected_point: { lat: -27.4659, lon: -58.97 } };
+    const { client } = createFakeModelClient([
+      {
+        message: makeFixtureMessage({
+          content: [toolUseBlock("toolu_1", SUMMARIZE_TOOL_NAME, {})],
+          stop_reason: "tool_use",
+        }),
+      },
+      { message: makeFixtureMessage({ content: [textBlock("Done.")], stop_reason: "end_turn" }) },
+    ]);
+
+    await runAssistantLoop({ ...baseParams(client, "survey"), mapContext });
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0][3]).toEqual(mapContext);
+    spy.mockRestore();
+  });
+
+  test("the map context never enters the request sent to the model", async () => {
+    const { client, requests } = createFakeModelClient([
+      { message: makeFixtureMessage({ content: [textBlock("Hi.")], stop_reason: "end_turn" }) },
+    ]);
+    const mapContext = { selected_point: { lat: -27.4659, lon: -58.97 } };
+
+    await runAssistantLoop({ ...baseParams(client, "hi"), mapContext });
+
+    expect(JSON.stringify(requests)).not.toContain("-27.4659");
   });
 });

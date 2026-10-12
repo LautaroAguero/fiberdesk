@@ -19,6 +19,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { THINKING } from "@/lib/assistant/config";
 import { runToolUse } from "@/lib/assistant/dispatcher";
 import type { AssistantEvent } from "@/lib/assistant/events";
+import type { MapContext } from "@/lib/assistant/map-context";
 import type { AssistantModelClient } from "@/lib/assistant/model-client";
 import type { SearchIndex } from "@/lib/corpus/search";
 import type { Network } from "@/lib/network/types";
@@ -65,6 +66,12 @@ export interface RunAssistantLoopParams {
    * Nothing is added inside `messages`.
    */
   promptCaching?: boolean;
+  /**
+   * The request's map state, handed to every tool call and to nothing else:
+   * it never enters the system prompt or `messages`. See design.md
+   * (add-feasibility), decision 5.
+   */
+  mapContext?: MapContext;
 }
 
 export interface RunAssistantLoopResult {
@@ -98,8 +105,19 @@ function cacheableSystem(
 export async function runAssistantLoop(
   params: RunAssistantLoopParams,
 ): Promise<RunAssistantLoopResult> {
-  const { client, model, maxTokens, system, tools, network, searchIndex, onEvent, effort, promptCaching } =
-    params;
+  const {
+    client,
+    model,
+    maxTokens,
+    system,
+    tools,
+    network,
+    searchIndex,
+    onEvent,
+    effort,
+    promptCaching,
+    mapContext = {},
+  } = params;
   const maxIterations = params.maxIterations ?? DEFAULT_MAX_ITERATIONS;
 
   const messages: Anthropic.MessageParam[] = [...params.messages];
@@ -136,7 +154,7 @@ export async function runAssistantLoop(
     for (const block of toolUseBlocks) {
       onEvent({ type: "tool_start", tool_use_id: block.id, name: block.name, input: block.input });
 
-      const resultBlock = runToolUse(block, network, searchIndex);
+      const resultBlock = runToolUse(block, network, searchIndex, mapContext);
       toolResults.push(resultBlock);
       toolCalls.push({
         name: block.name,

@@ -266,3 +266,21 @@ describe("3.2 / 5.3 error paths", () => {
     expect(Array.isArray(result.content)).toBe(true);
   });
 });
+
+describe("3.1 the map context reaches the dispatcher (add-feasibility)", () => {
+  const withPoint = { selected_point: { lat: -27.4659, lon: -58.97 } };
+  const calls: Array<[string, unknown]> = [
+    [SUMMARIZE_TOOL_NAME, {}],
+    [DETAIL_TOOL_NAME, { nap_id: "NAP-12" }],
+    [TRACE_TOOL_NAME, { subscriber_id: "SUB-025" }],
+    [CUT_IMPACT_TOOL_NAME, { element_id: "FR-03" }],
+    [SEARCH_DOCUMENTATION_TOOL_NAME, { query: "splitter loss" }],
+    [GET_OPTICAL_CONSTANTS_TOOL_NAME, {}],
+  ];
+
+  test.each(calls)("%s gives a byte-identical result with or without a selected point", (name, input) => {
+    const without = dispatchTool(name, input, network, searchIndex);
+    const withContext = dispatchTool(name, input, network, searchIndex, withPoint);
+    expect(JSON.stringify(withContext)).toBe(JSON.stringify(without));
+  });
+});

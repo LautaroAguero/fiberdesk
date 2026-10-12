@@ -18,6 +18,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 
 import { detailOpticalBudget, summarizeOpticalBudgets } from "@/lib/assistant/budgets";
 import { searchDocumentation } from "@/lib/assistant/documentation-search";
+import type { MapContext } from "@/lib/assistant/map-context";
 import { getOpticalConstantsSnapshot } from "@/lib/assistant/optical-constants";
 import {
   CUT_IMPACT_TOOL_NAME,
@@ -88,12 +89,19 @@ const errorResult = (message: string): DispatchResult => ({
  * Runs the tool named `name` against `network` and `searchIndex`. Never
  * throws: a failure is reported as `{ content, isError: true }` for the
  * caller to wrap into a tool_result.
+ *
+ * `mapContext` is the request's map state, for a tool that evaluates what the
+ * user selected rather than an argument the model wrote. It defaults to no
+ * point, so every caller that predates it is unchanged. See design.md
+ * (add-feasibility), decision 5.
  */
 export function dispatchTool(
   name: string,
   input: unknown,
   network: Network,
   searchIndex: SearchIndex,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- read by list_connection_candidates (add-feasibility 3.3)
+  mapContext: MapContext = {},
 ): DispatchResult {
   try {
     switch (name) {
@@ -160,8 +168,9 @@ export function runToolUse(
   toolUse: Anthropic.ToolUseBlock,
   network: Network,
   searchIndex: SearchIndex,
+  mapContext: MapContext = {},
 ): Anthropic.ToolResultBlockParam {
-  const { content, isError } = dispatchTool(toolUse.name, toolUse.input, network, searchIndex);
+  const { content, isError } = dispatchTool(toolUse.name, toolUse.input, network, searchIndex, mapContext);
   return {
     type: "tool_result",
     tool_use_id: toolUse.id,

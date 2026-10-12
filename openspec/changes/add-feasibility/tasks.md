@@ -29,7 +29,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
       - NAP-03 has 0 free ports, NAP-10 has 2, NAP-12 has 12, NAP-06 has 29;
       - the twelve seed values match design.md's Context list;
       - a hand-built 1:2 NAP with two subscribers and a child throws, naming it.
-- [ ] 1.4 Move the city bounds check into an exported `isInsideCity(position)` beside
+- [x] 1.4 Move the city bounds check into an exported `isInsideCity(position)` beside
       `CITY_BOUNDS`, and make the loader use it. Verify that every existing loader and validator
       test passes unchanged. Add a test: (-27.4659, -58.9700) is inside, (-34.6037, -58.3816) is
       outside, and NaN is outside.
@@ -71,14 +71,14 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 
 ## 3. Map context, tool and payload (`network-assistant`)
 
-- [ ] 3.1 Thread the map context (design.md, decision 5):
+- [x] 3.1 Thread the map context (design.md, decision 5):
       - a `MapContext` type;
       - `dispatchTool(…, mapContext = {})` and `runToolUse` take it;
       - `RunAssistantLoopParams.mapContext` is passed to them.
 
       Tests: the five existing tools give byte-identical results with and without a context; the
       loop passes the context through to a dispatched call (fake client).
-- [ ] 3.2 Parse and validate `map_context` in `src/app/api/chat/route.ts`, and pass it to the loop.
+- [x] 3.2 Parse and validate `map_context` in `src/app/api/chat/route.ts`, and pass it to the loop.
       Move the validation into a tested pure function, `parseMapContext(body)`, in
       `src/lib/assistant/`. The route stays wiring only. Tests:
       - a valid point is accepted;
