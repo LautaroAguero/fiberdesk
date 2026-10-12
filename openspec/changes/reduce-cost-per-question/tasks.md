@@ -111,7 +111,7 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
       (c) the record says `prompt_caching: true`.
       If (b) fails, find the varying byte in the prefix before going on (design.md, decision 2).
       Commit the record.
-- [ ] 5.2 Full run of `claude-sonnet-5-5` at effort `low`, with a cap of about 4× the smoke run's
+- [x] 5.2 Full run of `claude-sonnet-5-5` at effort `low`, with a cap of about 4× the smoke run's
       cost per question × 24, never above $1.5. Commit the record and run `npm run eval:decide`
       against B1 and B2. If the verdict is `accept_provisional`, read every listed case and record
       the reading in `evals/decision-log.md` (design.md, decision 4). A reading that finds a figure

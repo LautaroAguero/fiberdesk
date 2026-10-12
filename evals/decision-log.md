@@ -77,3 +77,48 @@ grounding, which matches the baseline's known weakness: arithmetic done in prose
 
 One flip in 21 is well inside the design's threshold (more than 4 would make the eval too noisy to
 mean much). The net-loss bar for a candidate is min(16, 17) − 1 = **15 passes**.
+
+## Candidate 1: `claude-sonnet-5-5`, effort `low`, caching on (task 5.2)
+
+Record: `evals/runs/2026-10-12T11-33-18Z.json`. Status `complete`, $0.1561 spent under a $0.85 cap,
+prompt hash `fa57f136375a…` (same as B1 and B2). Smoke run before it (task 5.1):
+`evals/runs/2026-10-12T11-32-46Z.json` — the first call wrote 2,457 cache tokens and every later
+call read (2,457 / 2,372 / 2,465).
+
+`npm run eval:decide -- B1 B2 <candidate>`:
+
+- **Verdict: reject — veto.** The grounding grader is stable on `budget-failing-en` and
+  `budget-failing-es` (it passes in both baseline runs) and fails on both in the candidate.
+- Net loss: pass (17 against a floor of 15). Concentrated loss: pass. Inert caching: pass.
+- Cost: pass. Cold median $0.0103 is 27.4% of B1's $0.0376 (limit $0.0188). Measured median is
+  $0.0046, 12.4%.
+- McNemar against B1 (context only): pass → fail 1, fail → pass 2, p = 1.0000.
+
+### Reading
+
+The verdict is a reject, so no reading can turn it into an accept. The readings are recorded
+because they decide whether the veto reflects a real regression or a flaw in the rule.
+
+- `budget-failing-en` (listed as a veto case; fail in all three runs). The flagged figure is the 9
+  in "Los otros 9 NAPs pasan con holgura": 12 − 3, a subtraction the model did. B1 and B2 wrote
+  "All other NAPs pass" and stated no count. Separately, **this answer is in Spanish for a
+  question asked in English**, which no grader checks. That is a regression from both baselines.
+- `budget-failing-es` (pass, pass → fail). The flagged figure is the 12 in "De las 12 cajas",
+  which comes from counting the survey's rows. No tool states it. B2 also wrote "las 12 NAPs" and
+  its grounding passed, but only because that turn also called the detail tool, whose result
+  happens to contain a 12 (NAP-12, FR-12). That is the documented "membership, not attribution"
+  limit of the grader, not a grounded count. The candidate also stops at the survey, so the
+  trajectory and highlight graders fail too.
+- `budget-rx-nap09-es` (fail, fail → pass). Every figure is in the NAP-09 detail result:
+  −26.4 dBm, 29.4 / −1.4 dB, the four by-source losses, two 1:8 splitters of 10.5 dB, 12 km and
+  8.8 km. No figure was produced by the model.
+- `conv-and-nap12-es` (fail, pass → pass). The figures all come from the NAP-12 detail result. One
+  ratio is written in words: "unas dos terceras partes de la pérdida total" (17 / 25.23). That is
+  arithmetic, but in words, which the grader cannot see (grader-validation.md, "Counts written as
+  words").
+
+**Does the veto reflect a flaw in the rule?** No. Both vetoes catch a number the model derived,
+by subtraction or by counting rows, which is the bug `CLAUDE.md` names. The baselines avoided the
+digits rather than the behaviour: B1 and B2 wrote counts in words or not at all. The rule stands.
+
+**Next:** the cost check passed, so task 5.3 runs effort `medium`.
