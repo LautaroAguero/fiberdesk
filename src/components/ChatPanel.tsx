@@ -23,6 +23,7 @@ import { useRef, useState } from "react";
 import type Anthropic from "@anthropic-ai/sdk";
 
 import type { AssistantEvent, HighlightPayload } from "@/lib/assistant/events";
+import type { MapContext, SelectedPoint } from "@/lib/assistant/map-context";
 import { createFrameSplitter, decodeSseEvent } from "@/lib/assistant/stream";
 
 /** One line of the visible transcript. Derived from `history`, never the other way round. */
@@ -41,15 +42,22 @@ interface ActivityLine {
 function toolActivityLabel(name: string): string {
   if (name === "summarize_optical_budgets") return "Surveying every NAP";
   if (name === "detail_optical_budget") return "Pulling the detailed breakdown";
+  if (name === "list_connection_candidates") return "Evaluating the selected point";
   return name;
 }
 
 export interface ChatPanelProps {
   /** Called with the terminal payload of every turn, including empty ones. */
   onTurnDone: (payload: HighlightPayload) => void;
+  /**
+   * The point selected on the map when a question is sent, or `null`. It travels as
+   * `map_context` with every request and never enters the conversation, so the
+   * model reads it only through a tool result (add-feasibility, decision 5).
+   */
+  selectedPoint: SelectedPoint | null;
 }
 
-export default function ChatPanel({ onTurnDone }: ChatPanelProps) {
+export default function ChatPanel({ onTurnDone, selectedPoint }: ChatPanelProps) {
   const [history, setHistory] = useState<Anthropic.MessageParam[]>([]);
   const [transcript, setTranscript] = useState<DisplayTurn[]>([]);
   const [activity, setActivity] = useState<ActivityLine[]>([]);
@@ -67,11 +75,13 @@ export default function ChatPanel({ onTurnDone }: ChatPanelProps) {
     const nextHistory: Anthropic.MessageParam[] = [...history, { role: "user", content: question }];
     setTranscript((prev) => [...prev, { role: "user", text: question }, { role: "assistant", text: "" }]);
 
+    const mapContext: MapContext = selectedPoint === null ? {} : { selected_point: selectedPoint };
+
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextHistory }),
+        body: JSON.stringify({ messages: nextHistory, map_context: mapContext }),
       });
 
       if (!response.ok || !response.body) {

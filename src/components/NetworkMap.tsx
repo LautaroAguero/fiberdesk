@@ -34,6 +34,8 @@ import {
 } from "@/lib/map/config";
 import { networkToGeoJson, type NetworkGeoJson } from "@/lib/map/geojson";
 import type { ResolvedHighlight } from "@/lib/map/highlight";
+import { pointFromClick } from "@/lib/map/point";
+import type { SelectedPoint } from "@/lib/assistant/map-context";
 import type { Network } from "@/lib/network/types";
 
 const LABEL_COLOR = "#27272a"; // Tailwind zinc-800 — legible on the light Positron base.
@@ -46,6 +48,8 @@ export interface NetworkMapProps {
   highlight: ResolvedHighlight;
   /** Called with a NAP's id when the user clicks it — any NAP, highlighted or not (spec: "Clicking a NAP shows its optical budget"). */
   onSelectNap: (napId: string) => void;
+  /** Called with the clicked location when a click lands on empty space inside the city (add-feasibility, decision 8). */
+  onSelectPoint: (point: SelectedPoint) => void;
 }
 
 /**
@@ -177,7 +181,7 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
   });
 }
 
-export default function NetworkMap({ network, highlight, onSelectNap }: NetworkMapProps) {
+export default function NetworkMap({ network, highlight, onSelectNap, onSelectPoint }: NetworkMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MaplibreMap | null>(null);
   // Flips once the sources/layers exist, so the highlight effect below knows
@@ -193,6 +197,10 @@ export default function NetworkMap({ network, highlight, onSelectNap }: NetworkM
   useEffect(() => {
     onSelectNapRef.current = onSelectNap;
   }, [onSelectNap]);
+  const onSelectPointRef = useRef(onSelectPoint);
+  useEffect(() => {
+    onSelectPointRef.current = onSelectPoint;
+  }, [onSelectPoint]);
 
   useEffect(() => {
     if (mapRef.current !== null || containerRef.current === null) return;
@@ -227,6 +235,18 @@ export default function NetworkMap({ network, highlight, onSelectNap }: NetworkM
       map.on("click", "naps-circle", (mouseEvent) => {
         const napId = mouseEvent.features?.[0]?.properties?.id as string | undefined;
         if (napId !== undefined) onSelectNapRef.current(napId);
+      });
+
+      // A click on empty space selects a point. The NAP handler above has already run
+      // for a click on a NAP, and that click must not also move the point, so this one
+      // asks the map whether a NAP is under the cursor. The rule itself is
+      // `pointFromClick`, tested apart from the browser.
+      map.on("click", (mouseEvent) => {
+        const hitNap =
+          map.getLayer("naps-circle") !== undefined &&
+          map.queryRenderedFeatures(mouseEvent.point, { layers: ["naps-circle"] }).length > 0;
+        const point = pointFromClick({ lat: mouseEvent.lngLat.lat, lon: mouseEvent.lngLat.lng }, hitNap);
+        if (point !== null) onSelectPointRef.current(point);
       });
 
       // Spec: "The base map is unavailable" — if the OpenFreeMap style never

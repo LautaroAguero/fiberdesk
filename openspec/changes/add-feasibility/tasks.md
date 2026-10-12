@@ -121,7 +121,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
         NAP-12);
       - a NAP with both a nap entry and a candidate entry keeps the nap entry's style;
       - every existing resolver test passes unchanged.
-- [ ] 4.2 Point selection:
+- [x] 4.2 Point selection:
       - a general click handler in `NetworkMap.tsx` that ignores NAP hits and clicks outside the
         city;
       - `selectedPoint` state, a "Clear point" button, and clearing a feasibility payload on a new
