@@ -352,3 +352,95 @@ describe("5.2 candidate ids in a highlight oracle", () => {
     expect(cases[0].expect.highlight?.ids).toEqual(["NAP-03", "NAP-08", "NAP-12"]);
   });
 });
+
+describe("5.3 the feasibility cases agree with seed/expected-feasibility.json", () => {
+  interface ExpectedCandidate {
+    nap_id: string;
+    rank: number;
+    route_m: number;
+    projected: { margin_db: number };
+  }
+  interface ExpectedPoint {
+    point: { lat: number; lon: number };
+    candidates: ExpectedCandidate[];
+  }
+  const oracle = JSON.parse(
+    readFileSync(path.join(process.cwd(), "seed", "expected-feasibility.json"), "utf8"),
+  ) as { points: Record<string, ExpectedPoint> };
+  const feasCases = loadCases(network).filter((c) => c.id.startsWith("feas-"));
+
+  /** Every number anywhere in a candidate of the oracle. */
+  function numbersOf(value: unknown): number[] {
+    if (typeof value === "number") return [value];
+    if (Array.isArray(value)) return value.flatMap(numbersOf);
+    if (typeof value === "object" && value !== null) return Object.values(value).flatMap(numbersOf);
+    return [];
+  }
+
+  function pointOf(evalCase: (typeof feasCases)[number]): ExpectedPoint {
+    const selected = evalCase.map_context!.selected_point!;
+    const found = Object.values(oracle.points).find(
+      (entry) => entry.point.lat === selected.lat && entry.point.lon === selected.lon,
+    );
+    expect(found, `${evalCase.id}: ${selected.lat}, ${selected.lon}`).toBeDefined();
+    return found!;
+  }
+
+  test("the eight feasibility cases are present and all in the feasibility area", () => {
+    expect(feasCases.map((c) => c.id).sort()).toEqual([
+      "feas-budget-fail-es",
+      "feas-full-es",
+      "feas-marginal-es",
+      "feas-no-point-es",
+      "feas-ok-en",
+      "feas-out-of-coverage-es",
+      "feas-second-option-es",
+      "feas-two-options-es",
+    ]);
+    expect(feasCases.every((c) => c.area === "feasibility")).toBe(true);
+  });
+
+  test("every declared point is one of the oracle points A to F", () => {
+    for (const evalCase of feasCases.filter((c) => c.map_context !== undefined)) pointOf(evalCase);
+  });
+
+  test("every highlight oracle is exactly the candidates of the oracle point", () => {
+    const withHighlight = feasCases.filter((c) => c.expect.highlight !== undefined);
+    expect(withHighlight).toHaveLength(6);
+    for (const evalCase of withHighlight) {
+      expect(evalCase.expect.highlight!.mode, evalCase.id).toBe("equals");
+      expect([...evalCase.expect.highlight!.ids].sort(), evalCase.id).toEqual(
+        pointOf(evalCase)
+          .candidates.map((c) => c.nap_id)
+          .sort(),
+      );
+    }
+  });
+
+  test("every figure is a figure of the oracle point's candidates", () => {
+    const withFigures = feasCases.filter((c) => c.expect.figures !== undefined);
+    expect(withFigures.length).toBeGreaterThan(0);
+    for (const evalCase of withFigures) {
+      const available = pointOf(evalCase).candidates.flatMap(numbersOf);
+      for (const figure of evalCase.expect.figures!) {
+        expect(available, `${evalCase.id}: ${figure}`).toContain(figure);
+      }
+    }
+  });
+
+  test("the follow-up states the second candidate's route and projected margin", () => {
+    const evalCase = feasCases.find((c) => c.id === "feas-second-option-es")!;
+    const second = pointOf(evalCase).candidates.find((c) => c.rank === 2)!;
+    expect(evalCase.expect.figures).toEqual([second.projected.margin_db, second.route_m]);
+    expect(evalCase.turns).toHaveLength(2);
+  });
+
+  test("the no-point case declares no point, requires the tool, and names no highlight or figure", () => {
+    const evalCase = feasCases.find((c) => c.id === "feas-no-point-es")!;
+    expect(evalCase.map_context).toBeUndefined();
+    expect(evalCase.expect.abstention).toBe(true);
+    expect(evalCase.expect.trajectory?.required).toEqual(["list_connection_candidates"]);
+    expect(evalCase.expect.highlight).toBeUndefined();
+    expect(evalCase.expect.figures).toBeUndefined();
+  });
+});

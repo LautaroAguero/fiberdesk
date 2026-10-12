@@ -16,6 +16,7 @@ import {
   SUMMARIZE_TOOL_NAME,
 } from "@/lib/assistant/tool-definitions";
 import { dispatchTool } from "@/lib/assistant/dispatcher";
+import { loadCases } from "@/lib/evals/cases";
 import { network, searchIndex } from "@/lib/evals/graders/test-helpers";
 import { sha256Json } from "@/lib/evals/hash";
 import { promptHash, runEvalSuite, type EvalConfig } from "@/lib/evals/runner";
@@ -385,5 +386,22 @@ describe("5.1 map context in the runner", () => {
     // tools and the question. The point reaches the model later, echoed by the tool.
     expect(JSON.stringify([requests[0].system, requests[0].tools, requests[0].messages])).not.toContain("27.4659");
     expect(JSON.stringify(requests[1].messages)).toContain("27.4659");
+  });
+});
+
+describe("5.3 a run's summary has a feasibility row", () => {
+  test("a fake run of the feasibility cases reports the area", async () => {
+    const cases = loadCases(network).filter((c) => c.area === "feasibility" && c.turns.length === 1).slice(0, 2);
+    expect(cases).toHaveLength(2);
+    const { client } = createFakeModelClient(
+      cases.flatMap(() => [
+        toolTurn([toolUseBlock("t1", CONNECTION_CANDIDATES_TOOL_NAME, {})]),
+        answer("Respuesta."),
+      ]),
+    );
+
+    const record = await runEvalSuite({ cases, client, network, searchIndex, config, maxUsd: 5 });
+
+    expect(record.summary.by_area.feasibility).toMatchObject({ completed: 2 });
   });
 });

@@ -168,7 +168,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 - [x] 5.2 Add candidate ids to `highlightIds`, skip the point entry, and accept candidate ids as NAP
       ids in the case validator. Tests: the scenario "Candidates are compared, the point is not",
       and the existing grader scenarios, unchanged.
-- [ ] 5.3 Add `feasibility` to `AREAS`, and write `evals/cases/feasibility.json` with the eight cases
+- [x] 5.3 Add `feasibility` to `AREAS`, and write `evals/cases/feasibility.json` with the eight cases
       of design.md, decision 9, by hand. Add a test that every figure, oracle id and point in a
       `feas-*` case agrees with `seed/expected-feasibility.json`. Verify that the cases load and
       that a fake run's summary has a `feasibility` row.

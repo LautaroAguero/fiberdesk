@@ -1,0 +1,98 @@
+[
+  {
+    "id": "feas-full-es",
+    "area": "feasibility",
+    "source": "connection-feasibility spec, 'Full, not far'",
+    "turns": ["¿puedo conectar un cliente acá?"],
+    "map_context": { "selected_point": { "lat": -27.4165, "lon": -59.018 } },
+    "expect": {
+      "trajectory": { "required": ["list_connection_candidates"] },
+      "highlight": { "mode": "equals", "ids": ["NAP-03", "NAP-08", "NAP-12"] },
+      "grounding": true
+    }
+  },
+  {
+    "id": "feas-budget-fail-es",
+    "area": "feasibility",
+    "source": "connection-feasibility spec, 'Close, with ports, failing'",
+    "turns": ["¿se puede conectar un cliente en este punto?"],
+    "map_context": { "selected_point": { "lat": -27.4955, "lon": -58.938 } },
+    "expect": {
+      "trajectory": { "required": ["list_connection_candidates"] },
+      "highlight": { "mode": "equals", "ids": ["NAP-09", "NAP-04", "NAP-05"] },
+      "grounding": true,
+      "figures": [-2.25]
+    }
+  },
+  {
+    "id": "feas-ok-en",
+    "area": "feasibility",
+    "source": "connection-feasibility spec, 'A comfortable connection'",
+    "turns": ["can I connect a new customer here?"],
+    "map_context": { "selected_point": { "lat": -27.4432, "lon": -58.977 } },
+    "expect": {
+      "trajectory": { "required": ["list_connection_candidates"] },
+      "highlight": { "mode": "equals", "ids": ["NAP-01", "NAP-11", "NAP-05"] },
+      "grounding": true,
+      "figures": [14.81]
+    }
+  },
+  {
+    "id": "feas-marginal-es",
+    "area": "feasibility",
+    "source": "connection-feasibility spec, 'Feasible with a caveat'",
+    "turns": ["¿puedo dar de alta un cliente acá?"],
+    "map_context": { "selected_point": { "lat": -27.493, "lon": -59.0338 } },
+    "expect": {
+      "trajectory": { "required": ["list_connection_candidates"] },
+      "highlight": { "mode": "equals", "ids": ["NAP-06", "NAP-02", "NAP-08"] },
+      "grounding": true,
+      "figures": [2.51]
+    }
+  },
+  {
+    "id": "feas-two-options-es",
+    "area": "feasibility",
+    "source": "connection-feasibility spec, 'Two NAPs are feasible'",
+    "turns": ["¿puedo conectar un cliente acá?"],
+    "map_context": { "selected_point": { "lat": -27.4659, "lon": -58.97 } },
+    "expect": {
+      "trajectory": { "required": ["list_connection_candidates"] },
+      "highlight": { "mode": "equals", "ids": ["NAP-11", "NAP-05", "NAP-04"] },
+      "grounding": true
+    }
+  },
+  {
+    "id": "feas-second-option-es",
+    "area": "feasibility",
+    "source": "network-assistant spec, 'The second option, as a follow-up'",
+    "turns": ["¿puedo conectar un cliente acá?", "¿y si lo conecto a la segunda opción?"],
+    "map_context": { "selected_point": { "lat": -27.4659, "lon": -58.97 } },
+    "expect": {
+      "grounding": true,
+      "figures": [13.83, 593]
+    }
+  },
+  {
+    "id": "feas-out-of-coverage-es",
+    "area": "feasibility",
+    "source": "connection-feasibility spec, 'Out of coverage'",
+    "turns": ["¿llega la red hasta acá?"],
+    "map_context": { "selected_point": { "lat": -27.43, "lon": -58.94 } },
+    "expect": {
+      "trajectory": { "required": ["list_connection_candidates"] },
+      "highlight": { "mode": "equals", "ids": ["NAP-10", "NAP-07", "NAP-01"] },
+      "grounding": true
+    }
+  },
+  {
+    "id": "feas-no-point-es",
+    "area": "feasibility",
+    "source": "network-assistant spec, 'No point selected'",
+    "turns": ["¿puedo conectar un cliente acá?"],
+    "expect": {
+      "trajectory": { "required": ["list_connection_candidates"] },
+      "abstention": true
+    }
+  }
+]

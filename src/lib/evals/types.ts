@@ -8,7 +8,7 @@ import type { MapContext } from "@/lib/assistant/map-context";
 import type { ModelCallRecord } from "@/lib/assistant/usage";
 
 /** The areas cases are grouped into. Each capability change adds its own. */
-export const AREAS = ["budget", "docs", "abstention", "conversation", "trace", "cut"] as const;
+export const AREAS = ["budget", "docs", "abstention", "conversation", "trace", "cut", "feasibility"] as const;
 export type Area = (typeof AREAS)[number];
 
 /** One tool a case requires, optionally pinned to input values or a non-empty result. */
