@@ -112,7 +112,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 
 ## 4. The map (`network-map`)
 
-- [ ] 4.1 Extend `resolveHighlight` with `candidateFeasibility`, `candidateRank`, `point`,
+- [x] 4.1 Extend `resolveHighlight` with `candidateFeasibility`, `candidateRank`, `point`,
       `dropLine` and bounds that include the point and the candidates (design.md, decision 8).
       Unknown candidate NAPs are dropped. Tests:
       - the network-map scenarios "Connection candidates", "No feasible candidate, no drop line"
