@@ -46,7 +46,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
       −2.25 and reasons `[budget_fail]`; D's NAP-06 is feasible with margin 2.51 `marginal`; E ranks
       NAP-11 then NAP-05; F has three `too_far`. Every subscriber position's own NAP is within
       600 m.
-- [ ] 2.2 Add `src/lib/feasibility/feasibility.ts`, with `evaluateConnection(network, point)`, the
+- [x] 2.2 Add `src/lib/feasibility/feasibility.ts`, with `evaluateConnection(network, point)`, the
       result types and `CANDIDATE_COUNT = 3` (design.md, decision 3). It is pure, with no literal
       from the seed. Tests in `feasibility.test.ts`, one per spec scenario:
       (a) A: NAP-03 `[no_free_ports]`, route 217, margin 19.17; NAP-08 3252 and NAP-12 3549
