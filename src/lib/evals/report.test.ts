@@ -70,3 +70,13 @@ describe("formatComparison", () => {
     expect(text).toContain("McNemar exact p (two-sided): 1.0000");
   });
 });
+
+describe("4.1 the trace area", () => {
+  test("the summary has a trace row on a fake run", () => {
+    const traceCase: CaseRecord = { ...caseRecord("trace-cascade-es", "pass", 0.02), area: "trace" };
+    const text = formatSummary(record([caseRecord("a", "pass", 0.02), traceCase]));
+
+    expect(text).toContain("| trace | 1/1 | 100.0% |");
+    expect(text).toContain("| budget | 1/1 | 100.0% |");
+  });
+});

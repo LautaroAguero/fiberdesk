@@ -143,7 +143,7 @@ pass before it is ticked.
 
 ## 4. Eval cases (`assistant-evals`)
 
-- [ ] 4.1 Add `trace` to `AREAS` and write `evals/cases/trace.json` with the seven cases of
+- [x] 4.1 Add `trace` to `AREAS` and write `evals/cases/trace.json` with the seven cases of
       design.md, decision 9, by hand. Add a test that every figure in a `trace-*` case equals
       `seed/expected-traces.json` for the subscriber it names. Verify that the cases load (`npm
       test`) and that the summary has a `trace` row on a fake run.

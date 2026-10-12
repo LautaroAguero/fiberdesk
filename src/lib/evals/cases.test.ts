@@ -167,3 +167,60 @@ describe("the committed case set", () => {
     expect(tagged).toEqual(expect.arrayContaining(["budget-failing-en", "budget-failing-es"]));
   });
 });
+
+describe("the trace cases agree with seed/expected-traces.json", () => {
+  interface ExpectedTraces {
+    subscribers: Record<string, Record<string, unknown>>;
+  }
+  const traces = JSON.parse(
+    readFileSync(path.join(process.cwd(), "seed", "expected-traces.json"), "utf8"),
+  ) as ExpectedTraces;
+  const traceCases = loadCases(network).filter((c) => c.id.startsWith("trace-"));
+
+  /** The subscriber a case pins its trace call to, if any. */
+  function tracedSubscriber(evalCase: (typeof traceCases)[number]): string | undefined {
+    for (const item of evalCase.expect.trajectory?.required ?? []) {
+      if (typeof item !== "string" && item.tool === "trace_subscriber_link") {
+        return item.input?.subscriber_id as string | undefined;
+      }
+    }
+    return undefined;
+  }
+
+  test("the seven trace cases are present and all in the trace area", () => {
+    expect(traceCases.map((c) => c.id).sort()).toEqual([
+      "trace-by-name-es",
+      "trace-cascade-es",
+      "trace-direct-en",
+      "trace-failing-es",
+      "trace-nap06-es",
+      "trace-ont-verdict-es",
+      "trace-unknown-es",
+    ]);
+    expect(traceCases.every((c) => c.area === "trace")).toBe(true);
+  });
+
+  test("every figure in a trace case equals a figure of the oracle for the subscriber it names", () => {
+    const withFigures = traceCases.filter((c) => c.expect.figures !== undefined);
+    expect(withFigures.length).toBeGreaterThan(0);
+
+    for (const evalCase of withFigures) {
+      const subscriberId = tracedSubscriber(evalCase);
+      expect(subscriberId, evalCase.id).toBeDefined();
+      const oracle = traces.subscribers[subscriberId!];
+      expect(oracle, evalCase.id).toBeDefined();
+
+      const oracleFigures = Object.values(oracle).filter((value): value is number => typeof value === "number");
+      for (const figure of evalCase.expect.figures!) {
+        expect(oracleFigures, `${evalCase.id}: ${figure}`).toContain(figure);
+      }
+    }
+  });
+
+  test("a trace case that highlights names the subscriber it traces", () => {
+    for (const evalCase of traceCases.filter((c) => c.expect.highlight !== undefined)) {
+      const subscriberId = tracedSubscriber(evalCase);
+      expect(evalCase.expect.highlight!.ids, evalCase.id).toContain(subscriberId);
+    }
+  });
+});
