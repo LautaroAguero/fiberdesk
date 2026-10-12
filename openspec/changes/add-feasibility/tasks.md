@@ -175,7 +175,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 
 ## 6. Live verification (by hand)
 
-- [ ] 6.1 Smoke run: `npm run eval -- --cases 'feas-*' --max-usd 0.50`. Verify:
+- [x] 6.1 Smoke run: `npm run eval -- --cases 'feas-*' --max-usd 0.50`. Verify:
       - every `list_connection_candidates` call is made with no arguments;
       - `feas-no-point-es` gets the error and asks for a click, naming no NAP;
       - the payloads hold the point and the candidates.

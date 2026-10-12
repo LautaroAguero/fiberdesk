@@ -58,3 +58,31 @@ reference question and the FR-03 cut. No model was called.
 - With DOM event logging on, five further attempts behaved correctly at the first screenshot.
 - This reads as paint timing in the browser pane's captures. The selection logic is not
   implicated.
+
+## Task 6.1 — smoke run of the feasibility cases
+
+`evals/runs/2026-10-12T18-55-40Z.json`, prompt `5bb26aa37361`, `claude-opus-5`, effort `low`,
+caching on. It passed 8/8 (Wilson 67.6–100.0%) and spent $0.2249 of a $0.50 cap. Median measured
+cost per question was $0.0233, and p95 latency 12.5 s.
+
+Read by hand:
+
+- **The tool calls.** Every `list_connection_candidates` call had empty input `{}`. No call named
+  a coordinate, and no other tool was called in place of it.
+- **`feas-no-point-es`.** The tool returned the "No point is selected" error. The answer asks the
+  user to click the map, and names no NAP and no figure.
+- **The answers to points A, B, C, D, E and F.** Each states the verdict, every reason, the
+  distances in metres, the free ports and the projected margin exactly as the tool returned them.
+  - D's NAP-06 is reported as feasible but marginal (2.51 dB, under 3.00 dB), and the answer notes
+    that the NAP itself passes with 3.44 dB.
+  - B explains that NAP-09 has 5 free ports but projects −2.25 dB.
+  - Every answer calls the drop a modelled estimate and declines to say whether the ONT will work.
+- **`feas-second-option-es`.** The follow-up made no tool call. It answers about NAP-05 from the
+  first turn's result: 593 m of route, 6 free ports, a 0.95 dB drop, 14.17 dB and 13.83 dB. It notes
+  that 593 m is close to the 600 m maximum. Every figure, including the by-source split, is in the
+  tool result.
+- **A known weakness, seen again.** Several answers open with an English sentence before
+  answering in Spanish ("I'll check the point you selected on the map."). In `feas-full-es`, the
+  answer also opens with "I need the map point" before calling the tool, although a point was
+  selected. `evals/decision-log.md` already records that no grader checks the language of an
+  answer. This change adds no grader for it.
