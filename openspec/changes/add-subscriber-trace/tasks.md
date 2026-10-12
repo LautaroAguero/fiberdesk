@@ -120,7 +120,7 @@ pass before it is ticked.
       - the schema is strict with `additionalProperties: false`;
       - the description names the `SUB-014` ↔ "Subscriber 014" correspondence;
       - the tool count is five.
-- [ ] 3.2 Dispatch it in `src/lib/assistant/dispatcher.ts`, returning `traceSubscriber`'s result as
+- [x] 3.2 Dispatch it in `src/lib/assistant/dispatcher.ts`, returning `traceSubscriber`'s result as
       JSON, and an `is_error` result naming the id for an unknown one. Extend `projectHighlight` for
       trace results: the subscriber plus `nap.hops` runs with the subscriber's status, and no NAP
       entry. Tests:
