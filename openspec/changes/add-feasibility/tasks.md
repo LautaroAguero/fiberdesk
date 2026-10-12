@@ -101,7 +101,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
       - candidate entries do not merge with a NAP entry for the same NAP;
       - `fit_bounds` is true with a point entry;
       - every existing projection test passes unchanged.
-- [ ] 3.5 Update `system-prompt.ts`:
+- [x] 3.5 Update `system-prompt.ts`:
       - one paragraph on when to call `list_connection_candidates`, and that a follow-up about
         another candidate is answered from the result already returned;
       - add to the "cannot answer" list a location typed as coordinates or an address (ask for a

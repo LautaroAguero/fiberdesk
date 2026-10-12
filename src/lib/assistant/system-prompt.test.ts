@@ -1,7 +1,11 @@
 import { describe, expect, test } from "vitest";
 
 import { SYSTEM_PROMPT } from "@/lib/assistant/system-prompt";
-import { CUT_IMPACT_TOOL_NAME, TRACE_TOOL_NAME } from "@/lib/assistant/tool-definitions";
+import {
+  CONNECTION_CANDIDATES_TOOL_NAME,
+  CUT_IMPACT_TOOL_NAME,
+  TRACE_TOOL_NAME,
+} from "@/lib/assistant/tool-definitions";
 
 describe("3.4 the system prompt covers the subscriber trace", () => {
   test("it names the trace tool and when to call it", () => {
@@ -33,5 +37,26 @@ describe("3.3 the system prompt covers the cut impact", () => {
     expect(SYSTEM_PROMPT).toContain("do not state how many NAPs or subscribers it would affect");
     expect(SYSTEM_PROMPT).toContain("A fiber run or NAP identifier the network does not contain");
     expect(SYSTEM_PROMPT).toContain("with another element in its place");
+  });
+});
+
+describe("3.5 the system prompt covers connection feasibility", () => {
+  test("it names the tool, that it takes no arguments, and when to call it", () => {
+    expect(SYSTEM_PROMPT).toContain(CONNECTION_CANDIDATES_TOOL_NAME);
+    expect(SYSTEM_PROMPT).toContain("It takes no arguments");
+    expect(SYSTEM_PROMPT).toContain("whether a new customer can be connected");
+  });
+
+  test("it answers a follow-up about another candidate from the result already returned", () => {
+    expect(SYSTEM_PROMPT).toContain("answer from the result you already have");
+  });
+
+  test("it asks for a click instead of accepting coordinates or an address", () => {
+    expect(SYSTEM_PROMPT).toContain("A location given as coordinates or an address");
+    expect(SYSTEM_PROMPT).toContain("ask the user to select the point on the map");
+  });
+
+  test("it declines whether the new customer's ONT will work", () => {
+    expect(SYSTEM_PROMPT).toContain("whether the ONT at a candidate location will work");
   });
 });
