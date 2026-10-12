@@ -21,19 +21,30 @@
 import type Anthropic from "@anthropic-ai/sdk";
 
 import type { BudgetStatus } from "@/lib/optical/budget";
+import type { ImpactStatus } from "@/lib/optical/status";
+
+export type { HighlightStatus, ImpactStatus } from "@/lib/optical/status";
 
 /**
  * One entity the map should draw attention to, named by kind. Every entry uses
  * `id`; only a subscriber entry carries `nap_id`, the NAP that serves it. A run
- * entry marks a span on the path of a highlighted NAP or subscriber and takes
- * that entity's classification. See design.md (add-subscriber-trace),
- * decision 7: the payload states everything to paint, so the map derives
- * nothing, and a new kind is a new member of the union rather than a reshape.
+ * entry with a budget classification marks a span on the path of a highlighted
+ * NAP or subscriber and takes that entity's classification. See design.md
+ * (add-subscriber-trace), decision 7: the payload states everything to paint, so
+ * the map derives nothing, and a new kind is a new member of the union rather
+ * than a reshape.
+ *
+ * The last two variants are the impact entries of a cut (design.md,
+ * add-cut-impact, decision 5): `cut` for the cut element, `out_of_service` for
+ * what is downstream of it. They carry no margin, because an outage has none.
+ * The earlier variants are unchanged, so recorded runs re-project as before.
  */
 export type HighlightEntry =
   | { kind: "nap"; id: string; status: BudgetStatus; margin_db: number }
   | { kind: "subscriber"; id: string; nap_id: string; status: BudgetStatus; margin_db: number }
-  | { kind: "run"; id: string; status: BudgetStatus };
+  | { kind: "run"; id: string; status: BudgetStatus }
+  | { kind: "nap" | "run"; id: string; status: ImpactStatus }
+  | { kind: "subscriber"; id: string; nap_id: string; status: ImpactStatus };
 
 /** The terminal payload of a turn — see design.md, decision 5: projected, never emitted. */
 export interface HighlightPayload {

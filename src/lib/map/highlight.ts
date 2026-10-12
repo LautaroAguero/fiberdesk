@@ -14,8 +14,7 @@
 
 import { toLngLat } from "@/lib/map/geojson";
 import type { HighlightPayload } from "@/lib/assistant/events";
-import type { BudgetStatus } from "@/lib/optical/budget";
-import { worseStatus } from "@/lib/optical/status";
+import { worseStatus, type HighlightStatus } from "@/lib/optical/status";
 import type { Network } from "@/lib/network/types";
 
 /** A LngLat bounding box as MapLibre's `fitBounds` expects it: `[[west, south], [east, north]]`. */
@@ -23,14 +22,14 @@ export type LngLatBoundsTuple = [[number, number], [number, number]];
 
 export interface ResolvedHighlight {
   /** Status to paint each known, highlighted NAP with, keyed by its id. */
-  napStatus: Record<string, BudgetStatus>;
+  napStatus: Record<string, HighlightStatus>;
   /** Status to paint each known, highlighted subscriber with, keyed by its id. */
-  subscriberStatus: Record<string, BudgetStatus>;
+  subscriberStatus: Record<string, HighlightStatus>;
   /**
    * Status to paint each known, listed run with, keyed by run id. When two
    * entries mark the same run with different statuses, the worse one.
    */
-  runStatus: Record<string, BudgetStatus>;
+  runStatus: Record<string, HighlightStatus>;
   /** Ids of every known, listed fiber run (the keys of `runStatus`). */
   runIds: string[];
   /** Payload ids that name no NAP, subscriber or run in `network`: ignored, never drawn at an invented position. */
@@ -45,9 +44,9 @@ export function resolveHighlight(payload: HighlightPayload, network: Network): R
   const subscriberById = new Map(network.subscribers.map((subscriber) => [subscriber.id, subscriber]));
   const runById = new Map(network.fiber_runs.map((run) => [run.id, run]));
 
-  const napStatus: Record<string, BudgetStatus> = {};
-  const subscriberStatus: Record<string, BudgetStatus> = {};
-  const runStatus: Record<string, BudgetStatus> = {};
+  const napStatus: Record<string, HighlightStatus> = {};
+  const subscriberStatus: Record<string, HighlightStatus> = {};
+  const runStatus: Record<string, HighlightStatus> = {};
   const unknownIds: string[] = [];
 
   for (const entry of payload.highlight) {

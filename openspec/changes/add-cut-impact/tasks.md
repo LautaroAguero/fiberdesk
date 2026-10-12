@@ -33,7 +33,7 @@ pass before it is ticked.
 
 ## 2. Impact statuses, projection, map and grader (`network-assistant`, `network-map`, `assistant-evals`)
 
-- [ ] 2.1 Widen `src/lib/optical/status.ts` to `HighlightStatus`, ordered pass < marginal < fail <
+- [x] 2.1 Widen `src/lib/optical/status.ts` to `HighlightStatus`, ordered pass < marginal < fail <
       out_of_service < cut, and extend `HighlightEntry` in `src/lib/assistant/events.ts` with the
       impact variants (design.md, decision 5). Tests: the full order, and `worseStatus` on mixed
       pairs (`marginal` vs `cut` → `cut`). Verify that every existing test still passes unchanged.
