@@ -74,7 +74,15 @@ The function holds the exact code now inside `traceSubscriber`:
   CONNECTOR_DB)`, `loss_db = round2(fiber + connectors)`;
 - km rounded to three decimals.
 
-`traceSubscriber` calls it and changes nothing else. `SubscriberDrop` moves with it and is
+`traceSubscriber` calls it and changes nothing else.
+
+*Changed during task 6.2:* the drop also states `straight_line_m` and `length_m`, the reported km
+restated in whole metres. In the first full live run, `trace-by-name-es` had passed in the three
+runs before it. This time it wrote "383 m en línea recta", converting the trace's 0.383 km into
+metres, a figure no tool returned. The likely trigger is the new tool's metres. This applies decision
+3's rule, "both units, so the model never converts", to the trace as well. The trace's figures are
+unchanged, but its result gains two fields. Recorded trace results therefore no longer hash the
+same, and older runs re-grade those cases as recorded. `SubscriberDrop` moves with it and is
 re-exported from `trace.ts`, so no import breaks. A new subscriber at a point gets a link computed
 the way a subscriber's link is. That shared step goes in one helper too:
 

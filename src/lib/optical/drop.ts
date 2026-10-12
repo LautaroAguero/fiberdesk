@@ -35,14 +35,30 @@ function round3(value: number): number {
   return Math.round(value * 1000) / 1000;
 }
 
+/**
+ * A reported length in km, restated in whole metres: the same figure, never a
+ * second rounding (0.383 km is 383 m).
+ */
+function kmToMetres(reportedKm: number): number {
+  return Math.round(reportedKm * 1000);
+}
+
 /** The drop from the serving NAP to the customer. A modelled estimate. */
 export interface SubscriberDrop {
   /** Great-circle distance from the NAP to the customer, in km. */
   straight_line_km: number;
+  /**
+   * `straight_line_km` in metres. Both units are stated so an answer never has
+   * to convert one into the other: a converted figure is one no tool returned.
+   * See design.md (add-feasibility), decision 1.
+   */
+  straight_line_m: number;
   /** The slack factor applied (route length over straight-line distance). */
   slack_factor: number;
   /** Modelled route length of the drop, in km. */
   length_km: number;
+  /** `length_km` in metres. */
+  length_m: number;
   /** Fiber loss over `length_km`, in dB. */
   fiber_db: number;
   /** Connectors the drop adds. */
@@ -74,10 +90,15 @@ export function modelDrop(from: Position, to: Position): SubscriberDrop {
   const dropConnectorsDb = round2(DROP_CONNECTORS * CONNECTOR_DB);
   const dropLossDb = round2(dropFiberDb + dropConnectorsDb);
 
+  const straightLineKm = round3(straightKm);
+  const lengthKm = round3(routeKm);
+
   return {
-    straight_line_km: round3(straightKm),
+    straight_line_km: straightLineKm,
+    straight_line_m: kmToMetres(straightLineKm),
     slack_factor: DROP_SLACK_FACTOR,
-    length_km: round3(routeKm),
+    length_km: lengthKm,
+    length_m: kmToMetres(lengthKm),
     fiber_db: dropFiberDb,
     connectors: DROP_CONNECTORS,
     connectors_db: dropConnectorsDb,

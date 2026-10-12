@@ -24,6 +24,8 @@ describe("1.1 the shared drop model", () => {
 
     expect(drop.straight_line_km).toBe(0.383);
     expect(drop.length_km).toBe(0.498);
+    expect(drop.straight_line_m).toBe(383);
+    expect(drop.length_m).toBe(498);
     expect(drop.fiber_db).toBe(0.12);
     expect(drop.connectors_db).toBe(0.8);
     expect(drop.loss_db).toBe(0.92);
@@ -58,5 +60,18 @@ describe("1.1 the shared drop model", () => {
       (n) => !["0", "100", "1000"].includes(n),
     );
     expect(literals).toEqual([]);
+  });
+});
+
+describe("the drop states its lengths in metres too (add-feasibility 6.2)", () => {
+  test("every seed subscriber's metres are its reported km, restated", () => {
+    for (const subscriber of network.subscribers) {
+      const nap = network.splitters.find((n) => n.id === subscriber.nap);
+      if (nap === undefined) throw new Error(`no NAP for ${subscriber.id}`);
+      const drop = modelDrop(nap, subscriber);
+      expect(drop.straight_line_m, subscriber.id).toBe(Math.round(drop.straight_line_km * 1000));
+      expect(drop.length_m, subscriber.id).toBe(Math.round(drop.length_km * 1000));
+      expect(String(drop.straight_line_m / 1000), subscriber.id).toBe(String(drop.straight_line_km));
+    }
   });
 });

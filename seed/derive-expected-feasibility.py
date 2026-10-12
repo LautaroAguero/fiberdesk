@@ -176,8 +176,10 @@ def main():
                         "ports": ports[nap["id"]],
                         "drop": {
                             "straight_line_km": straight_km,
+                            "straight_line_m": round_m(straight_km),
                             "slack_factor": DROP_SLACK_FACTOR,
                             "length_km": length_km,
+                            "length_m": route_m,
                             "fiber_db": drop_fiber_db,
                             "connectors": DROP_CONNECTORS,
                             "connectors_db": drop_connectors_db,

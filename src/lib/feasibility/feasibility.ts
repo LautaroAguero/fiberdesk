@@ -76,11 +76,6 @@ export interface ConnectionFeasibility {
   feasible_count: number;
 }
 
-/** Whole metres, halves up: the convention of every other figure the engine reports. */
-function toMetres(km: number): number {
-  return Math.round(km * 1000);
-}
-
 /**
  * Evaluates the three NAPs nearest to `point`.
  *
@@ -114,7 +109,7 @@ export function evaluateConnection(
     const napPorts = ports.get(nap.id);
     if (napPorts === undefined) throw new Error(`No ports computed for ${nap.id}`);
 
-    const routeM = toMetres(drop.length_km);
+    const routeM = drop.length_m;
     const reasons: InfeasibleReason[] = [];
     if (routeM > MAX_DROP_ROUTE_M) reasons.push("too_far");
     if (napPorts.free <= 0) reasons.push("no_free_ports");
@@ -125,7 +120,7 @@ export function evaluateConnection(
       nap_id: nap.id,
       nap_name: nap.name,
       ratio: nap.ratio,
-      straight_line_m: toMetres(drop.straight_line_km),
+      straight_line_m: drop.straight_line_m,
       route_m: routeM,
       ports: napPorts,
       drop,
