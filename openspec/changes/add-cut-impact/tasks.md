@@ -84,7 +84,7 @@ pass before it is ticked.
 
 ## 3. The tool (`network-assistant`)
 
-- [ ] 3.1 Add `list_cut_impact` to `src/lib/assistant/tool-definitions.ts` (design.md, decision 4):
+- [x] 3.1 Add `list_cut_impact` to `src/lib/assistant/tool-definitions.ts` (design.md, decision 4):
       `strict: true`, with `element_id` an enum of the 12 run ids then the 12 NAP ids, and the
       description as specified. Tests:
       - the enum is exactly those 24 and excludes OLT-RES-01;

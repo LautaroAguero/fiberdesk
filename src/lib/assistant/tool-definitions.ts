@@ -1,5 +1,5 @@
 /**
- * The five tools exposed to the model.
+ * The six tools exposed to the model.
  *
  * The first two are named for the shape of their answer, not the operation
  * — see design.md (add-optical-budget-engine), decision 2. Their
@@ -7,7 +7,7 @@
  * 1): nothing in code sequences the two calls, so the wording below has to
  * carry that strategy on its own.
  *
- * All five schemas are `strict: true`: the model's arguments are valid by
+ * All six schemas are `strict: true`: the model's arguments are valid by
  * construction, not by validation after the fact. The detail tool's
  * identifier is an enum built from the loaded network, so an identifier the
  * dataset does not contain cannot be produced — see the cost of that
@@ -24,6 +24,12 @@
  * traced end to end. Its identifier is an enum of the network's subscribers
  * (design.md, decisions 6 and 11: the enum is fine for 28 subscribers and
  * would not scale to thousands).
+ *
+ * The sixth, `list_cut_impact`, is added by add-cut-impact. `list_` names the
+ * shape of its answer like the others: a list of what one cut takes out, with
+ * counts (design.md, add-cut-impact, decision 4). Its identifier is an enum of
+ * the network's fiber runs then NAPs, which is also what keeps the OLT out: a
+ * cut at the OLT cannot be requested, and the description says why.
  */
 
 import type Anthropic from "@anthropic-ai/sdk";
@@ -178,5 +184,43 @@ export function buildToolDefinitions(network: Network): Anthropic.Tool[] {
     },
   };
 
-  return [summarize, detail, searchDocumentation, getOpticalConstants, traceSubscriberLink];
+  const cutElementIds = [
+    ...network.fiber_runs.map((run) => run.id),
+    ...network.splitters.map((nap) => nap.id),
+  ];
+
+  const listCutImpact: Anthropic.Tool = {
+    name: CUT_IMPACT_TOOL_NAME,
+    description:
+      "Returns everything that loses service downstream of a cut of ONE fiber run or ONE NAP, " +
+      "through splitter cascades: the NAPs, the subscribers and the fiber runs that go dark, " +
+      "with their counts. Use it for any question about what a cut, a break or an outage of a " +
+      "fiber run (identifiers like \"FR-03\") or of a NAP (like \"NAP-04\") takes down, or how " +
+      "many customers it affects. Cutting a fiber run and losing the NAP at its far end take " +
+      "out the same NAPs and subscribers; the difference is only which element is reported as " +
+      "the cut one. When you state how many NAPs or subscribers lose service, cite the figure " +
+      "in the result's \"counts\" object, never a number you counted from a list yourself. " +
+      "A cut at the OLT is NOT supported: if the user asks about the OLT going down, do not " +
+      "call this tool, say plainly that a cut at the OLT is not supported, and state no count " +
+      "of what it would affect. The identifier list below is every fiber run and NAP the " +
+      "network has: if the element the user names is not in it, it does not exist, so do NOT " +
+      "call this tool at all, not with another identifier, and say that no such element " +
+      "exists. A cut here is total and hypothetical: there is no partial damage, rerouting, " +
+      "repair time or restoration plan, and nothing in the network changes.",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: {
+        element_id: {
+          type: "string",
+          enum: cutElementIds,
+          description: "Identifier of the fiber run or NAP that is cut, e.g. \"FR-03\" or \"NAP-04\".",
+        },
+      },
+      required: ["element_id"],
+      additionalProperties: false,
+    },
+  };
+
+  return [summarize, detail, searchDocumentation, getOpticalConstants, traceSubscriberLink, listCutImpact];
 }
