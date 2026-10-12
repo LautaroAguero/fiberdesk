@@ -80,3 +80,13 @@ describe("4.1 the trace area", () => {
     expect(text).toContain("| budget | 1/1 | 100.0% |");
   });
 });
+
+describe("4.1 the cut area", () => {
+  test("the summary has a cut row on a fake run", () => {
+    const cutCase: CaseRecord = { ...caseRecord("cut-feeder-cascade-es", "pass", 0.02), area: "cut" };
+    const text = formatSummary(record([caseRecord("a", "pass", 0.02), cutCase]));
+
+    expect(text).toContain("| cut | 1/1 | 100.0% |");
+    expect(text).toContain("| budget | 1/1 | 100.0% |");
+  });
+});

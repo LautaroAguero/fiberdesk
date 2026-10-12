@@ -106,7 +106,7 @@ pass before it is ticked.
 
 ## 4. Eval cases (`assistant-evals`)
 
-- [ ] 4.1 Add `cut` to `AREAS` and write `evals/cases/cut.json` with the six cases of design.md,
+- [x] 4.1 Add `cut` to `AREAS` and write `evals/cases/cut.json` with the six cases of design.md,
       decision 7, by hand. Add a test that every figure and oracle id in a `cut-*` case agrees with
       `seed/expected-cut-impacts.json`. Verify that the cases load and that a fake run's summary
       has a `cut` row.
