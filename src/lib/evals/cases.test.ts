@@ -73,6 +73,26 @@ describe("loadCases", () => {
     expect(error.message).toContain("NAP-13");
   });
 
+  test("an oracle naming SUB-099 fails, naming the case", () => {
+    const error = loadError({
+      "budget.json": [validCase({ expect: { highlight: { mode: "equals", ids: ["SUB-099"] } } })],
+    });
+    expect(error.message).toContain("[budget-failing-es]");
+    expect(error.message).toContain("SUB-099");
+  });
+
+  test("an oracle naming a subscriber loads, and one naming a run does not", () => {
+    const withSubscriber = caseDir({
+      "trace.json": [validCase({ expect: { highlight: { mode: "equals", ids: ["SUB-025"] } } })],
+    });
+    expect(loadCases(network, withSubscriber)).toHaveLength(1);
+
+    const error = loadError({
+      "trace.json": [validCase({ expect: { highlight: { mode: "equals", ids: ["FR-03"] } } })],
+    });
+    expect(error.message).toContain("FR-03");
+  });
+
   test("an unknown tool name fails", () => {
     const error = loadError({
       "budget.json": [validCase({ expect: { trajectory: { required: ["summarise_budgets"] } } })],

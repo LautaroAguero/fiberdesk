@@ -101,7 +101,7 @@ pass before it is ticked.
       (d) no console errors.
 
       Attach a screenshot of (b).
-- [ ] 2.4 In `src/lib/evals`, make `highlightIds` return only NAP and subscriber ids (design.md,
+- [x] 2.4 In `src/lib/evals`, make `highlightIds` return only NAP and subscriber ids (design.md,
       decision 9), and let the case validator accept oracle ids that are NAPs or subscribers.
       Tests:
       - the spec scenario "A traced subscriber is compared by its identifier";

@@ -1,6 +1,8 @@
 /**
- * The highlight grader: the entities in the payload the server projected,
- * against a hand-written oracle set. Applied only where the reference
+ * The highlight grader: the NAPs and subscribers in the payload the server
+ * projected, against a hand-written oracle set. Run entries only describe the
+ * paths of those subjects and are not compared (design.md, add-subscriber-trace,
+ * decision 9). Applied only where the reference
  * behaviour requires a detail call — a survey-only answer projects nothing,
  * by design. See design.md (add-eval-harness), decision 7.
  */
