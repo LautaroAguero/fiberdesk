@@ -41,8 +41,9 @@ NAP can be clicked for its optical budget breakdown — see *The map*, below.
 
 **Phase 4 — production — in progress.** A live eval suite measures the assistant (see *Evals*),
 prompt caching cuts what repeated calls cost, and the assistant can now trace one subscriber's
-link end to end — see *Tracing one subscriber*, below. Two more map capabilities (what a fiber cut
-takes down, and whether a point on the map can be connected) come next. There is no deploy yet.
+link end to end and say what a fiber cut takes down — see *Tracing one subscriber* and *What a cut
+takes down*, below. One more map capability (whether a point on the map can be connected) comes
+next. There is no deploy yet.
 
 ## Getting started
 
@@ -175,12 +176,37 @@ language, written from the spec rather than from this code.
 **Scale limit.** The trace tool lists all 28 subscriber ids in its schema. That works for a seed
 this size; with thousands of subscribers it would need a search tool in front of it instead.
 
+### What a cut takes down
+
+`cutImpact(network, elementId)` in `src/lib/topology/` answers "if this breaks, who loses
+service?" for one fiber run or one NAP. It walks the tree downstream, through cascades, and returns
+every NAP, subscriber and fiber run left without service, with the counts. It computes no light,
+only topology, so it lives apart from the optical engine.
+
+```ts
+const impact = cutImpact(network, "FR-03");
+// naps_out_of_service:        NAP-03, NAP-12 (through the cascade)
+// subscribers_out_of_service: SUB-006, SUB-025, SUB-026, SUB-027, SUB-028
+// runs_out_of_service:        FR-12
+// counts: { naps: 2, subscribers: 5, runs: 1 }
+```
+
+NAP-03 serves one subscriber of its own, but cutting the run that feeds it takes out five, because
+NAP-12 hangs below it. **The counts are part of the result** so the model can cite them: a model
+that counts a list itself is doing arithmetic, which this project does not allow.
+
+Losing a NAP and cutting its feeder run take out the same elements. They differ only in which one
+is reported as cut. A cut at the OLT is refused as not supported, and so is an element the network
+does not have. A cut here is total and hypothetical: no partial damage, no rerouting (the network
+is a tree) and no repair times. The 24 possible cuts are checked against a hand-derived oracle,
+`seed/expected-cut-impacts.json`.
+
 ## The assistant
 
 `src/lib/assistant/` and `src/app/api/chat/route.ts` are the copilot: a route handler that streams
 an answer while orchestrating the optical budget engine and the documentation corpus through tool
 calls. **The model never computes a number and never states a documented figure it did not just
-retrieve.** Every figure it states comes from one of five tools, named for the shape of their
+retrieve.** Every figure it states comes from one of six tools, named for the shape of their
 answer rather than the operation:
 
 - **`summarize_optical_budgets`** — one thin row per NAP (id, name, total loss, margin, status).
@@ -192,6 +218,8 @@ answer rather than the operation:
 - **`trace_subscriber_link`** — one subscriber's link traced end to end, from the OLT through its
   NAP and the drop to its ONT, with the subscriber's own status beside its NAP's. Its argument is
   one of the 28 subscriber ids, so an id the network lacks cannot be traced.
+- **`list_cut_impact`** — what a cut of one fiber run or NAP takes out of service downstream, with
+  the counts. Its argument is one of the 12 runs or 12 NAPs; the OLT is not on the list.
 - **`search_documentation`** — the passages in the technical corpus that match a query, returned
   as citable `search_result` blocks. See *The documentation corpus*, below.
 - **`get_optical_constants`** — what the system itself computes with, so a documented figure can
@@ -202,8 +230,9 @@ for a survey plus detail on the two links that actually fail — and firing all 
 require the model to already know every identifier, which the survey exists to avoid.
 
 **The map highlight is projected in code, never emitted by the model.** Each entry names its kind
-— a NAP, a subscriber or a fiber run on a highlighted path — with its status, and every field in
-it — identifier, status, margin — already exists in a tool result. Asking the model to repeat it back
+— a NAP, a subscriber or a fiber run — with its status: a budget classification, or `cut` /
+`out_of_service` for an outage, which outranks it. Every field in it — identifier, status, margin —
+already exists in a tool result. Asking the model to repeat it back
 would be asking it to copy numbers, and copying is exactly where a model writes 2.7 for 2.77.
 
 There is no server-side conversation store. Each streamed turn ends with the exact updated message
@@ -229,34 +258,38 @@ between a document and the constants. Those are measured by the live eval suite 
 
 ### Evals
 
-`npm run eval` asks the real model 28 cases (31 questions, counting follow-ups) and checks every
-answer with deterministic graders — which tools it called and in what order, which NAPs and
-subscribers the map highlighted, whether every figure in the prose came from a tool, whether it
+`npm run eval` asks the real model 34 cases (38 questions, counting follow-ups) and checks every
+answer with deterministic graders — which tools it called and in what order, which NAPs,
+subscribers and cut runs the map highlighted, whether every figure in the prose came from a tool, whether it
 declined what the system does not model. It calls the API under a mandatory spend cap and is never
 part of `npm test`. How it works, and what each grader does *not* check:
 [`evals/README.md`](evals/README.md).
 
 **Latest run** — `claude-opus-5`, effort `low`, prompt caching on, from
-[`evals/runs/2026-10-12T14-05-31Z.regraded.json`](evals/runs/2026-10-12T14-05-31Z.regraded.json):
+[`evals/runs/2026-10-12T17-12-15Z.regraded.json`](evals/runs/2026-10-12T17-12-15Z.regraded.json):
 
 | Area | Passed | Rate | 95% Wilson interval |
 |---|---|---|---|
+| What a cut takes down | 6/6 | 100.0% | 61.0%–100.0% |
 | Tracing one subscriber | 7/7 | 100.0% | 64.6%–100.0% |
 | Declining what the system cannot answer | 5/5 | 100.0% | 56.6%–100.0% |
 | Documentation | 5/5 | 100.0% | 56.6%–100.0% |
 | Optical budget questions | 5/8 | 62.5% | 30.6%–86.3% |
-| Multi-turn follow-ups | 1/3 | 33.3% | 6.1%–79.2% |
-| **Overall** | **23/28** | **82.1%** | **64.4%–92.1%** |
+| Multi-turn follow-ups | 2/3 | 66.7% | 20.8%–93.9% |
+| **Overall** | **30/34** | **88.2%** | **73.4%–95.3%** |
 
-Per question, the median cost is **$0.0190** as measured (**$0.0385** cold, with nothing in the
-prompt cache), and p95 latency is **12.1 s**. The run cost $0.63.
+Per question, the median cost is **$0.0157** as measured (**$0.0410** cold, with nothing in the
+prompt cache), and p95 latency is **10.7 s**. The run cost $0.63.
 
-The trace cases include a subscriber whose NAP passes while it does not, a lookup by name, an id
-the network lacks, and a question on whether an ONT will work. Every failure in this run is on the
-older cases, and each one is the model doing arithmetic in prose: "20.8 km" for 12 + 8.8, for
-instance. Between two runs of nearly the same configuration, those 21 older cases moved by three
-(19/21, then 16/21), so a single run is a rough measure. Every reading is in
-[`openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md`](openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md).
+The cut cases include a feeder cut through a cascade, a NAP down, a cut at the OLT, an element the
+network lacks, and the follow-up "¿cuántos clientes son?". The trace cases include a subscriber
+whose NAP passes while it does not, a lookup by name, an id the network lacks, and a question on
+whether an ONT will work. Every failure in this run is on the older cases: twice the model answers
+from the survey without fetching the breakdown, and twice it does arithmetic in prose ("19.8 km",
+"20 km"). Between two runs of nearly the same configuration, those 21 older cases have moved by
+three, so a single run is a rough measure. The readings are in
+[`openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md`](openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md)
+and `openspec/changes/add-cut-impact/verification.md`.
 
 **Can a cheaper model do this?** Not yet. The change `reduce-cost-per-question` tried to halve the
 cost per question. Every configuration was judged by a rule fixed before any of them ran
@@ -346,9 +379,11 @@ server component: it loads the network and computes every NAP's budget once, wit
 assistant's `HighlightPayload` names every NAP, subscriber and fiber run to paint, each with its
 status. `src/lib/map/highlight.ts` (`resolveHighlight`) resolves it against the loaded network. It
 is a pure, unit-tested function that decides which NAPs and subscribers to colour, which runs to
-mark (a run shared by two highlighted paths takes the worse status), and where to fit the view. It
-derives no path of its own: the payload lists the runs. The map component only calls MapLibre's `setFeatureState` with that result; it
-never recolours, reclassifies or recomputes anything itself.
+mark (an element named twice takes the more severe status), and where to fit the view. It derives
+no path or downstream set of its own: the payload lists the runs. A cut is drawn apart from the
+budget colours: the cut element in magenta, everything out of service in a dark slate. The map
+component only calls MapLibre's `setFeatureState` with that result; it never recolours,
+reclassifies or recomputes anything itself.
 
 **Clicking any NAP** — highlighted or not, before or after asking a question — opens its full
 optical budget breakdown: `src/lib/map/breakdown.ts` (`formatBreakdown`) formats a `BudgetResult`

@@ -134,7 +134,7 @@ pass before it is ticked.
 
 ## 6. Docs
 
-- [ ] 6.1 Update the README:
+- [x] 6.1 Update the README:
       - a cut-impact section with FR-03 as the worked example, figures copied from the oracle;
       - six tools;
       - the payload's impact statuses;
