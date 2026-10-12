@@ -129,7 +129,8 @@ export function buildToolDefinitions(network: Network): Anthropic.Tool[] {
     name: GET_OPTICAL_CONSTANTS_TOOL_NAME,
     description:
       "Returns the project's own optical constants — fiber attenuation, connector loss, " +
-      "splice loss, splitter insertion loss per ratio, GPON class budgets, and the " +
+      "splice loss, the subscriber drop model (slack factor and connectors per drop), " +
+      "splitter insertion loss per ratio, GPON class budgets, and the " +
       "recommended minimum margin — each with its unit and its standing as industry-typical " +
       "and pending validation. Call this to state what the system computes with, especially " +
       "when a documented figure needs to be compared against it. This returns configuration, " +

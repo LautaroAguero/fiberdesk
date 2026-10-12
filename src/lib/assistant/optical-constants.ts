@@ -11,6 +11,8 @@
 
 import {
   CONNECTOR_DB,
+  DROP_CONNECTORS,
+  DROP_SLACK_FACTOR,
   FIBER_DB_PER_KM,
   GPON_CLASS,
   MIN_MARGIN_DB,
@@ -29,6 +31,10 @@ export interface OpticalConstantsSnapshot {
   fiber_attenuation: ConstantValue & { wavelength_nm: 1490; direction: "downstream" };
   connector_loss: ConstantValue;
   splice_loss: ConstantValue;
+  /** Route length of a subscriber drop over its straight-line distance (add-subscriber-trace). */
+  drop_slack_factor: ConstantValue;
+  /** Connectors a subscriber drop adds: the NAP port and the ONT (add-subscriber-trace). */
+  drop_connectors: ConstantValue;
   splitter_insertion_loss: Record<SplitterRatio, ConstantValue>;
   gpon_class_budget: Record<GponClass, ConstantValue>;
   min_recommended_margin: ConstantValue;
@@ -48,6 +54,8 @@ export function getOpticalConstantsSnapshot(): OpticalConstantsSnapshot {
     },
     connector_loss: { value: CONNECTOR_DB, unit: "dB", status: PENDING },
     splice_loss: { value: SPLICE_DB, unit: "dB", status: PENDING },
+    drop_slack_factor: { value: DROP_SLACK_FACTOR, unit: "ratio (dimensionless)", status: PENDING },
+    drop_connectors: { value: DROP_CONNECTORS, unit: "connectors per drop", status: PENDING },
     splitter_insertion_loss: Object.fromEntries(
       Object.entries(SPLITTER_DB).map(([ratio, value]) => [ratio, { value, unit: "dB", status: PENDING }]),
     ) as Record<SplitterRatio, ConstantValue>,

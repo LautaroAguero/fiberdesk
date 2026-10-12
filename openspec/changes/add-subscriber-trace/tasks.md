@@ -129,7 +129,7 @@ pass before it is ticked.
       - the spec scenario "A traced subscriber" for the payload;
       - a turn that traces SUB-025 and details NAP-12 gives a subscriber entry, a NAP entry, and
         FR-03/FR-12 `marginal`.
-- [ ] 3.3 Add `drop_slack_factor` and `drop_connectors` to the `get_optical_constants` result in
+- [x] 3.3 Add `drop_slack_factor` and `drop_connectors` to the `get_optical_constants` result in
       `src/lib/assistant/optical-constants.ts`, each with its unit and the pending-validation
       status. Verify with an extended test in `optical-constants.test.ts`.
 - [ ] 3.4 Update `src/lib/assistant/system-prompt.ts` (design.md, decision 6):
