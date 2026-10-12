@@ -18,7 +18,7 @@ pass before it is ticked.
       `src/lib/optical/constants.ts`, each with unit, source (owner decision 2 of the 2026-10-07
       handoff, no published source) and the pending-validation mark (design.md, decision 4). Verify
       with a test that both are exported with those values.
-- [ ] 1.3 Write `seed/derive-expected-traces.py`, standard library only. It must not import the
+- [x] 1.3 Write `seed/derive-expected-traces.py`, standard library only. It must not import the
       TypeScript engine, and must implement the spec's drop requirement and design.md decision 2's
       rounding table from scratch. It reads `seed/network.json` and the NAP totals from
       `seed/expected-budgets.json`. Run it to produce `seed/expected-traces.json`, which holds:
