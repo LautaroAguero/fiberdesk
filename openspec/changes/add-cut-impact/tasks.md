@@ -37,7 +37,7 @@ pass before it is ticked.
       out_of_service < cut, and extend `HighlightEntry` in `src/lib/assistant/events.ts` with the
       impact variants (design.md, decision 5). Tests: the full order, and `worseStatus` on mixed
       pairs (`marginal` vs `cut` → `cut`). Verify that every existing test still passes unchanged.
-- [ ] 2.2 Extend `projectHighlight` for `list_cut_impact` results:
+- [x] 2.2 Extend `projectHighlight` for `list_cut_impact` results:
       - the element as `cut`, and every out-of-service NAP, subscriber and run as `out_of_service`,
         with no margin;
       - a merge into an impact status replaces the entry whole;

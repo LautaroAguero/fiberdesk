@@ -35,6 +35,7 @@ export const DETAIL_TOOL_NAME = "detail_optical_budget";
 export const SEARCH_DOCUMENTATION_TOOL_NAME = "search_documentation";
 export const GET_OPTICAL_CONSTANTS_TOOL_NAME = "get_optical_constants";
 export const TRACE_TOOL_NAME = "trace_subscriber_link";
+export const CUT_IMPACT_TOOL_NAME = "list_cut_impact";
 
 /**
  * Builds both tool definitions against `network`. Rebuilt whenever the
