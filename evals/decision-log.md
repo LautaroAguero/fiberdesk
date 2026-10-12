@@ -122,3 +122,54 @@ by subtraction or by counting rows, which is the bug `CLAUDE.md` names. The base
 digits rather than the behaviour: B1 and B2 wrote counts in words or not at all. The rule stands.
 
 **Next:** the cost check passed, so task 5.3 runs effort `medium`.
+
+## Candidate 2: `claude-sonnet-5-5`, effort `medium`, caching on (task 5.3)
+
+Record: `evals/runs/2026-10-12T11-36-14Z.json`. Status `complete`, $0.1629 spent under a $0.85 cap.
+Its prompt hash is `267254a35afb…`, not B1's, because effort is one of the hashed request
+settings. Only the two baselines must match each other, and they do.
+
+`npm run eval:decide -- B1 B2 <candidate>`:
+
+- **Verdict: reject — veto.** The grounding grader is stable and fails in the candidate on three
+  cases: `budget-failing-en`, `budget-failing-es` and `docs-attenuation-en`.
+- Net loss: pass, but only just (15 against a floor of 15). Concentrated loss: pass. Inert
+  caching: pass.
+- Cost: pass. Cold median $0.0121 is 32.1% of B1's $0.0376. Measured median is $0.0064, 17.0%.
+- McNemar against B1 (context only): pass → fail 2, fail → pass 1, p = 1.0000.
+
+### Reading
+
+- `budget-failing-en` (veto). "The other 9 NAPs pass": 12 − 3 again, after a survey-only turn.
+  The answer is in English this time.
+- `budget-failing-es` (pass, pass → fail; veto). "De las 12 cajas" and "Las otras 9 cajas": a row
+  count and a subtraction. The turn stops at the survey.
+- `docs-attenuation-en` (pass, pass → fail; veto). "The two figures disagree by 0.03 dB/km":
+  0.25 − 0.22, subtracted by the model. Otherwise the answer is what the case wants: it names both
+  values, attributes each one, and says which one the budgets use.
+- `budget-rx-nap09-es` (fail, fail → pass). Every figure is in the NAP-09 detail result.
+- `conv-and-nap12-es` (fail, pass → fail). "habría que recuperar 0.23 dB": 3.00 − 2.77, the same
+  subtraction B1 made.
+
+The vetoes are the same behaviour as at effort `low`, and more of it. Medium effort does not stop
+the model doing arithmetic in prose.
+
+## Outcome
+
+No candidate is accepted. Under the rule fixed before the runs, neither Sonnet 5.5 configuration
+can replace Opus 5:
+
+| Configuration | Passes | Cold median | % of B1 | Verdict |
+|---|---|---|---|---|
+| `claude-sonnet-5-5`, `low` | 17/21 | $0.0103 | 27.4% | reject (veto: 2 cases) |
+| `claude-sonnet-5-5`, `medium` | 15/21 | $0.0121 | 32.1% | reject (veto: 3 cases) |
+
+Both pass the cost target with room to spare. Both fail on the project's hardest rule: no number
+may come from the model. Following tasks 5.3 and 5.4, the confirming run (5.4) and the model switch
+(6.1) are skipped. The assistant stays on `claude-opus-5` at effort `low`. Prompt caching ships
+anyway (design.md, decision 8).
+
+The failures are prompt work, not model choice. Every veto is a count or a difference written as
+digits after a tool call. That is the baseline's own known weakness, made more frequent. Fixing it
+is a separate change with its own runs (proposal, non-goals). After that change, both Sonnet
+configurations can be judged again from new runs under the same rule.

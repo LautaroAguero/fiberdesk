@@ -116,22 +116,24 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
       against B1 and B2. If the verdict is `accept_provisional`, read every listed case and record
       the reading in `evals/decision-log.md` (design.md, decision 4). A reading that finds a figure
       no tool produced turns the verdict into a reject; write that down.
-- [ ] 5.3 Only if 5.2 is rejected and its cost check passed: the same as 5.2 for effort `medium`.
+- [x] 5.3 Only if 5.2 is rejected and its cost check passed: the same as 5.2 for effort `medium`.
       If 5.2 failed the cost check, `medium` (which thinks more) cannot pass it either. Record that
       in the decision log, skip 5.3 and 5.4, and go to 6.2. Either way, if no candidate is accepted,
       skip 5.4 and 6.1.
-- [ ] 5.4 Confirming run of the accepted configuration: a second full run with the same flags.
+- [x] 5.4 Confirming run of the accepted configuration: a second full run with the same flags.
       `decide` must also accept it against B1 and B2, and its listed cases are read and recorded the
       same way. Verify the log shows two accepting verdicts for the same configuration before
       group 6 switches anything.
+      **Skipped:** no candidate was accepted (evals/decision-log.md, "Outcome").
 
 ## 6. Ship and document
 
-- [ ] 6.1 Only with two accepting verdicts from 5.4: set `MODEL` and `EFFORT` in
+- [x] 6.1 Only with two accepting verdicts from 5.4: set `MODEL` and `EFFORT` in
       `src/lib/assistant/config.ts` to the accepted configuration, with a comment pointing to the
       decision log. Run `npm run dev` and ask one question in the chat ("¿qué cajas no cierran el
       presupuesto óptico?"). Verify the answer streams, the map highlights NAP-09 and NAP-12, and
       the server log line shows the new model and non-zero cache reads on the second call.
+      **Skipped:** no candidate was accepted; the model stays `claude-opus-5`.
 - [ ] 6.2 Replace the README's baseline section with the comparison table (proposal, What
       Changes). Include every configuration in this change:
       (a) the two baseline runs;
