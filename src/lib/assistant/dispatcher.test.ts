@@ -5,6 +5,7 @@ import * as budgets from "@/lib/assistant/budgets";
 import * as documentationSearch from "@/lib/assistant/documentation-search";
 import { projectHighlight } from "@/lib/assistant/highlight";
 import {
+  CONNECTION_CANDIDATES_TOOL_NAME,
   CUT_IMPACT_TOOL_NAME,
   DETAIL_TOOL_NAME,
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
@@ -14,6 +15,7 @@ import {
 } from "@/lib/assistant/tool-definitions";
 import { buildSearchIndex } from "@/lib/corpus/search";
 import { loadCorpus } from "@/lib/corpus/load";
+import { evaluateConnection } from "@/lib/feasibility/feasibility";
 import { loadNetwork } from "@/lib/network/load";
 
 const network = loadNetwork();
@@ -282,5 +284,39 @@ describe("3.1 the map context reaches the dispatcher (add-feasibility)", () => {
     const without = dispatchTool(name, input, network, searchIndex);
     const withContext = dispatchTool(name, input, network, searchIndex, withPoint);
     expect(JSON.stringify(withContext)).toBe(JSON.stringify(without));
+  });
+});
+
+describe("3.3 dispatch covers the connection candidates tool", () => {
+  const pointE = { lat: -27.4659, lon: -58.97 };
+
+  test("with point E the result is the engine's", () => {
+    const result = dispatchTool(CONNECTION_CANDIDATES_TOOL_NAME, {}, network, searchIndex, {
+      selected_point: pointE,
+    });
+    expect(result.isError).toBe(false);
+    expect(JSON.parse(result.content as string)).toEqual(
+      JSON.parse(JSON.stringify(evaluateConnection(network, pointE))),
+    );
+  });
+
+  test("with no point it is an error result asking for a click, with no candidates", () => {
+    const result = dispatchTool(CONNECTION_CANDIDATES_TOOL_NAME, {}, network, searchIndex);
+    expect(result.isError).toBe(true);
+    const message = (JSON.parse(result.content as string) as { error: string }).error;
+    expect(message.startsWith("No point is selected on the map.")).toBe(true);
+    expect(message).toContain("click the map");
+    expect(result.content as string).not.toContain("candidates");
+  });
+
+  test("arguments the model invents are ignored: the point is always the selected one", () => {
+    const result = dispatchTool(
+      CONNECTION_CANDIDATES_TOOL_NAME,
+      { lat: -27.4165, lon: -59.018 },
+      network,
+      searchIndex,
+      { selected_point: pointE },
+    );
+    expect(JSON.parse(result.content as string).point).toEqual(pointE);
   });
 });

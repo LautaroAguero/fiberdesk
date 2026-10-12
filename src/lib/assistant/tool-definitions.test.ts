@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
   buildToolDefinitions,
   DETAIL_TOOL_NAME,
+  CONNECTION_CANDIDATES_TOOL_NAME,
   CUT_IMPACT_TOOL_NAME,
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
   SEARCH_DOCUMENTATION_TOOL_NAME,
@@ -19,6 +20,7 @@ const searchDocs = tools.find((t) => t.name === SEARCH_DOCUMENTATION_TOOL_NAME)!
 const getConstants = tools.find((t) => t.name === GET_OPTICAL_CONSTANTS_TOOL_NAME)!;
 const trace = tools.find((t) => t.name === TRACE_TOOL_NAME)!;
 const cut = tools.find((t) => t.name === CUT_IMPACT_TOOL_NAME)!;
+const candidates = tools.find((t) => t.name === CONNECTION_CANDIDATES_TOOL_NAME)!;
 
 describe("2.4 strict schemas and the identifier enum", () => {
   test("both tools declare strict: true", () => {
@@ -138,8 +140,7 @@ describe("3.1 the subscriber trace tool", () => {
 });
 
 describe("3.1 the cut impact tool", () => {
-  test("is the sixth tool, and there are six", () => {
-    expect(tools).toHaveLength(6);
+  test("is the sixth tool", () => {
     expect(tools[5]).toBe(cut);
     expect(cut.name).toBe("list_cut_impact");
   });
@@ -174,5 +175,39 @@ describe("3.1 the cut impact tool", () => {
   test("the description forbids substituting another element", () => {
     expect(cut.description).toContain("do NOT call this tool");
     expect(cut.description).toContain("not with another identifier");
+  });
+});
+
+describe("3.3 the connection candidates tool", () => {
+  test("is the seventh tool, and there are seven", () => {
+    expect(tools).toHaveLength(7);
+    expect(tools[6]).toBe(candidates);
+    expect(candidates.name).toBe("list_connection_candidates");
+  });
+
+  test("is strict, takes no arguments and forbids additional properties", () => {
+    expect(candidates.strict).toBe(true);
+    expect(candidates.input_schema.properties).toEqual({});
+    expect(candidates.input_schema.required).toEqual([]);
+    expect(candidates.input_schema.additionalProperties).toBe(false);
+  });
+
+  test("the description says it reads the selected point and takes no arguments", () => {
+    expect(candidates.description).toContain("selected on the map");
+    expect(candidates.description).toContain("takes NO arguments");
+  });
+
+  test("the description says to ask for a click when no point is selected, never to guess", () => {
+    expect(candidates.description).toContain("ask the user to click the map");
+    expect(candidates.description).toContain("NEVER guess a location");
+  });
+
+  test("the description refuses typed coordinates and addresses", () => {
+    expect(candidates.description).toContain("do not accept coordinates or an address typed");
+  });
+
+  test("the description gives distances in metres and says nothing about the ONT working", () => {
+    expect(candidates.description).toContain("Distances are in metres");
+    expect(candidates.description).toContain("says nothing about whether the customer's ONT will work");
   });
 });

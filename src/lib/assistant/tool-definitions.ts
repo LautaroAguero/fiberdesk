@@ -1,5 +1,5 @@
 /**
- * The six tools exposed to the model.
+ * The seven tools exposed to the model.
  *
  * The first two are named for the shape of their answer, not the operation
  * — see design.md (add-optical-budget-engine), decision 2. Their
@@ -7,7 +7,7 @@
  * 1): nothing in code sequences the two calls, so the wording below has to
  * carry that strategy on its own.
  *
- * All six schemas are `strict: true`: the model's arguments are valid by
+ * All seven schemas are `strict: true`: the model's arguments are valid by
  * construction, not by validation after the fact. The detail tool's
  * identifier is an enum built from the loaded network, so an identifier the
  * dataset does not contain cannot be produced — see the cost of that
@@ -30,6 +30,11 @@
  * counts (design.md, add-cut-impact, decision 4). Its identifier is an enum of
  * the network's fiber runs then NAPs, which is also what keeps the OLT out: a
  * cut at the OLT cannot be requested, and the description says why.
+ *
+ * The seventh, `list_connection_candidates`, is added by add-feasibility. It
+ * takes NO arguments: the point it evaluates is the one the user selected on the
+ * map, read from the request's map context, so the model never copies a
+ * coordinate (design.md, add-feasibility, decisions 5 and 6).
  */
 
 import type Anthropic from "@anthropic-ai/sdk";
@@ -42,6 +47,7 @@ export const SEARCH_DOCUMENTATION_TOOL_NAME = "search_documentation";
 export const GET_OPTICAL_CONSTANTS_TOOL_NAME = "get_optical_constants";
 export const TRACE_TOOL_NAME = "trace_subscriber_link";
 export const CUT_IMPACT_TOOL_NAME = "list_cut_impact";
+export const CONNECTION_CANDIDATES_TOOL_NAME = "list_connection_candidates";
 
 /**
  * Builds both tool definitions against `network`. Rebuilt whenever the
@@ -222,5 +228,39 @@ export function buildToolDefinitions(network: Network): Anthropic.Tool[] {
     },
   };
 
-  return [summarize, detail, searchDocumentation, getOpticalConstants, traceSubscriberLink, listCutImpact];
+  const listConnectionCandidates: Anthropic.Tool = {
+    name: CONNECTION_CANDIDATES_TOOL_NAME,
+    description:
+      "Evaluates whether a new customer can be connected at the point the user selected on " +
+      "the map, and takes NO arguments: the point is read from the map, never from you. Use " +
+      "it for any question about connecting, serving or giving service to a customer at \"here\" " +
+      "or \"this point\". It always returns the three NAPs nearest to the point, each with its " +
+      "verdict (feasible or not), every reason it is not feasible (too far, no free ports, " +
+      "budget fails), its free ports, its distances, and the projected link of a new " +
+      "subscriber there, plus the best candidate and how many are feasible. Distances are in " +
+      "metres, and the drop is a modelled estimate. Report the figures exactly as returned, " +
+      "never a number you computed, and state a candidate's \"marginal\" caveat when it has " +
+      "one. If no point is selected the tool returns an error: then ask the user to click the " +
+      "map where the customer would connect, and name no NAP and state no figure for the " +
+      "location. NEVER guess a location, and do not accept coordinates or an address typed " +
+      "into the chat: ask for a click instead. The result says nothing about whether the " +
+      "customer's ONT will work, so do not claim it.",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: {},
+      required: [],
+      additionalProperties: false,
+    },
+  };
+
+  return [
+    summarize,
+    detail,
+    searchDocumentation,
+    getOpticalConstants,
+    traceSubscriberLink,
+    listCutImpact,
+    listConnectionCandidates,
+  ];
 }

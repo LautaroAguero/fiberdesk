@@ -85,7 +85,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
       - an absent field gives `{}`;
       - an out-of-city point, a non-number and a NaN are each rejected with a message naming the
         problem.
-- [ ] 3.3 Add `list_connection_candidates` to `tool-definitions.ts` and dispatch it (design.md,
+- [x] 3.3 Add `list_connection_candidates` to `tool-definitions.ts` and dispatch it (design.md,
       decision 6): `strict: true`, no properties, and the description as specified. Tests:
       - the schema is strict and has no properties;
       - the description says it reads the selected point, to ask for a click when there is none,

@@ -21,6 +21,7 @@ import { searchDocumentation } from "@/lib/assistant/documentation-search";
 import type { MapContext } from "@/lib/assistant/map-context";
 import { getOpticalConstantsSnapshot } from "@/lib/assistant/optical-constants";
 import {
+  CONNECTION_CANDIDATES_TOOL_NAME,
   CUT_IMPACT_TOOL_NAME,
   DETAIL_TOOL_NAME,
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
@@ -29,6 +30,7 @@ import {
   TRACE_TOOL_NAME,
 } from "@/lib/assistant/tool-definitions";
 import type { SearchIndex } from "@/lib/corpus/search";
+import { evaluateConnection } from "@/lib/feasibility/feasibility";
 import type { Network } from "@/lib/network/types";
 import { traceSubscriber } from "@/lib/optical/trace";
 import { cutImpact } from "@/lib/topology/cut";
@@ -80,6 +82,11 @@ export interface DispatchResult {
   isError: boolean;
 }
 
+/** What the model reads when it asks about a location and the user has not clicked one. */
+export const NO_POINT_MESSAGE =
+  "No point is selected on the map. Ask the user to click the map where the new customer " +
+  "would connect. Do not guess a location.";
+
 const errorResult = (message: string): DispatchResult => ({
   content: JSON.stringify({ error: message }),
   isError: true,
@@ -100,7 +107,6 @@ export function dispatchTool(
   input: unknown,
   network: Network,
   searchIndex: SearchIndex,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- read by list_connection_candidates (add-feasibility 3.3)
   mapContext: MapContext = {},
 ): DispatchResult {
   try {
@@ -139,6 +145,15 @@ export function dispatchTool(
         // message: the catch below turns it into an errored result, never an empty
         // or guessed impact.
         return { content: JSON.stringify(cutImpact(network, input.element_id)), isError: false };
+      }
+      case CONNECTION_CANDIDATES_TOOL_NAME: {
+        // No arguments: the point is the one the user selected, read from the request
+        // (design.md, add-feasibility, decision 5). The model never supplies a coordinate.
+        const point = mapContext.selected_point;
+        if (point === undefined) {
+          return errorResult(NO_POINT_MESSAGE);
+        }
+        return { content: JSON.stringify(evaluateConnection(network, point)), isError: false };
       }
       case SEARCH_DOCUMENTATION_TOOL_NAME: {
         if (!isSearchInput(input)) {
