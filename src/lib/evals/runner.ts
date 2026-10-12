@@ -270,6 +270,7 @@ export async function runEvalSuite(params: RunEvalSuiteParams): Promise<RunRecor
     model: config.model,
     effort: config.effort,
     overridden: config.overridden,
+    prompt_caching: config.promptCaching,
     prompt_hash: promptHash(config.system, config.tools, {
       max_tokens: config.maxTokens,
       thinking: config.thinking,

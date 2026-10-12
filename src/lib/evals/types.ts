@@ -149,6 +149,11 @@ export interface RunRecord {
   model: string;
   effort: string;
   overridden: { model: boolean; effort: boolean };
+  /**
+   * Whether the run sent prompt-cache markers. Absent from records written before
+   * reduce-cost-per-question: read it through `promptCachingOn`, never directly.
+   */
+  prompt_caching?: boolean;
   prompt_hash: string;
   max_usd: number;
   spent_usd: number;

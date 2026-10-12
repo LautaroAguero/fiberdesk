@@ -50,7 +50,7 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
 
 ## 3. Records and statistics (`assistant-evals`)
 
-- [ ] 3.1 Add `prompt_caching: boolean` to `RunRecord`, written by the runner from `EvalConfig`.
+- [x] 3.1 Add `prompt_caching: boolean` to `RunRecord`, written by the runner from `EvalConfig`.
       Records without the field are read as `false`, through one helper used by every reader.
       Keep the field out of `promptHash`: the hash covers what the model reads, and caching is
       billing (design.md, decision 2). Tests:

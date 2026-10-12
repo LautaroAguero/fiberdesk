@@ -5,6 +5,7 @@
  */
 
 import type { RunComparison } from "@/lib/evals/compare";
+import { promptCachingOn } from "@/lib/evals/record";
 import type { RateSummary, RunRecord } from "@/lib/evals/types";
 
 const percent = (x: number | null) => (x === null ? "—" : `${(x * 100).toFixed(1)}%`);
@@ -22,7 +23,8 @@ function rateRow(label: string, rate: RateSummary): string {
 export function formatSummary(record: RunRecord): string {
   const { summary } = record;
   const lines = [
-    `Run ${record.started_at} — ${record.model}, effort ${record.effort}, prompt ${record.prompt_hash.slice(0, 12)}`,
+    `Run ${record.started_at} — ${record.model}, effort ${record.effort}, ` +
+      `caching ${promptCachingOn(record) ? "on" : "off"}, prompt ${record.prompt_hash.slice(0, 12)}`,
     `Status: ${record.status}${record.stopped_reason ? ` (${record.stopped_reason})` : ""}. ` +
       `Spent ${usd(record.spent_usd)} of a $${record.max_usd} cap.`,
     "",

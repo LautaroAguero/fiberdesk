@@ -213,6 +213,29 @@ describe("prompt caching reaches the model client (reduce-cost-per-question, tas
   });
 });
 
+describe("the record states whether caching was on (reduce-cost-per-question, task 3.1)", () => {
+  async function runWith(promptCaching: boolean) {
+    const { client } = createFakeModelClient(surveyThenDetail("NAP-09 fails; NAP-12 is marginal."));
+    return runEvalSuite({
+      cases: [failingCase],
+      client,
+      network,
+      searchIndex,
+      config: { ...config, promptCaching },
+      maxUsd: 5,
+    });
+  }
+
+  test("a run with caching records true, and one without records false", async () => {
+    expect((await runWith(true)).prompt_caching).toBe(true);
+    expect((await runWith(false)).prompt_caching).toBe(false);
+  });
+
+  test("the prompt hash is the same with and without caching", async () => {
+    expect((await runWith(true)).prompt_hash).toBe((await runWith(false)).prompt_hash);
+  });
+});
+
 describe("6.2 the spend cap and the record", () => {
   test("cap $1.00, $0.90 spent, most expensive case $0.15: the rest are skipped and the run is partial", async () => {
     // 30,000 input tokens on Opus 5 at $5/MTok = $0.15 per case.
