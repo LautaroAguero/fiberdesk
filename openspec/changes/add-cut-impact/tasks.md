@@ -141,7 +141,7 @@ pass before it is ticked.
       - the eval table with the `cut` area, from the committed record.
 
       Verify each figure against its source.
-- [ ] 6.2 Update the status section of `CLAUDE.md`:
+- [x] 6.2 Update the status section of `CLAUDE.md`:
       - six tools;
       - the impact statuses;
       - the new test count and eval result;
