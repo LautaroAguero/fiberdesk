@@ -42,7 +42,7 @@ pass before it is ticked.
       `seed/expected-traces.json` with `DROP_SLACK_FACTOR`, `DROP_CONNECTORS`, `FIBER_DB_PER_KM` and
       `CONNECTOR_DB`, as it does for `expected-budgets.json`. Verify that the test fails when one
       value in the fixture is edited, then restore it.
-- [ ] 1.5 Add `src/lib/optical/trace.ts` with `traceSubscriber(network, subscriberId)` and its
+- [x] 1.5 Add `src/lib/optical/trace.ts` with `traceSubscriber(network, subscriberId)` and its
       result type, as described in design.md, decisions 1, 2 and 6. It uses `calculateBudget` for
       the NAP part and never walks the tree itself, and it contains no literal loss figure. Tests in
       `trace.test.ts`, one per spec scenario:

@@ -15,7 +15,7 @@ import { GPON_CLASS, CONNECTOR_DB, FIBER_DB_PER_KM, MIN_MARGIN_DB, SPLICE_DB, SP
 import type { Nap, Network, GponClass } from "@/lib/network/types";
 
 /** Rounds to two decimal places. The single place precision policy lives. */
-function round2(value: number): number {
+export function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
