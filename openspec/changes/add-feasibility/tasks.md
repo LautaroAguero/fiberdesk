@@ -36,7 +36,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 
 ## 2. The feasibility engine (`connection-feasibility`)
 
-- [ ] 2.1 Write `seed/derive-expected-feasibility.py`, independent of `src/`, beside
+- [x] 2.1 Write `seed/derive-expected-feasibility.py`, independent of `src/`, beside
       `derive-expected-traces.py` (design.md, decision 10). Run it to produce
       `seed/expected-feasibility.json`, with a `_note`, the constants it used, points A–F and the
       28 subscriber positions. Each entry holds the point, the ranked candidates with every field
