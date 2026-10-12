@@ -153,7 +153,7 @@ pass before it is ticked.
 - [x] 5.1 Smoke run: `npm run eval -- --cases 'trace-*' --max-usd 0.40`. Verify that the
       `trace_subscriber_link` calls carry valid ids, that payloads hold subscriber entries, and that
       every call after the first reads from the cache. Commit the record.
-- [ ] 5.2 Full run: `npm run eval -- --max-usd 2.00`. Commit the record, re-grade it, and run
+- [x] 5.2 Full run: `npm run eval -- --max-usd 2.00`. Commit the record, re-grade it, and run
       `npm run eval:compare` against B2 (`evals/runs/2026-10-12T11-08-31Z.regraded.json`). Write
       `openspec/changes/add-subscriber-trace/verification.md` with:
       - the `trace` area's pass rate and interval;
@@ -164,7 +164,7 @@ pass before it is ticked.
 
       A stable case that regresses because of the new tool is fixed before group 6, and a fix that
       changes the prompt means a new run.
-- [ ] 5.3 In the app (`fiberdesk-dev` preview), ask "¿por qué el abonado SUB-025 tiene poca
+- [x] 5.3 In the app (`fiberdesk-dev` preview), ask "¿por qué el abonado SUB-025 tiene poca
       señal?". Verify that the answer streams, that SUB-025 and FR-03 → FR-12 are painted marginal,
       that the view reframes, and that the server log shows the trace call. Record it in
       `verification.md`, with a screenshot.
