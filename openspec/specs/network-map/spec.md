@@ -35,15 +35,18 @@ subscribers.
 ### Requirement: The assistant's highlight is drawn on the map
 
 When a turn ends, the system SHALL apply the map payload from that turn's `done` event. Each listed
-NAP and each listed subscriber SHALL be marked with a colour for its classification — one colour
-each for `pass`, `marginal` and `fail`. Each listed fiber run SHALL be marked as a path, in the
-colour of its own entry's classification. When two entries mark the same run with different
-classifications, the run SHALL take the worse one (`fail` over `marginal` over `pass`). NAPs,
-subscribers and runs not listed SHALL remain in the neutral un-highlighted style.
+NAP and each listed subscriber SHALL be marked with a colour for its status: one colour each for
+`pass`, `marginal` and `fail`, and two more styles, distinct from those three and from each other,
+for `cut` and `out_of_service`. Each listed fiber run SHALL be marked in the style of its own
+entry's status. A run with a budget classification SHALL be marked as a path. A run with status
+`cut` SHALL be marked as the cut. A run with status `out_of_service` SHALL be marked as dark. When
+two entries mark the same element with different statuses, it SHALL take the more severe one, in
+the order `cut`, `out_of_service`, `fail`, `marginal`, `pass`. NAPs, subscribers and runs not listed
+SHALL remain in the neutral un-highlighted style.
 
-The classifications and margins shown SHALL be the ones in the payload. The map SHALL NOT
-reclassify an entity, recompute a margin, derive a path the payload does not list, or take any
-figure from the assistant's prose.
+The statuses and margins shown SHALL be the ones in the payload. The map SHALL NOT reclassify an
+entity, recompute a margin, derive a path or a downstream set the payload does not list, or take
+any figure from the assistant's prose.
 
 #### Scenario: The reference question
 
@@ -62,10 +65,23 @@ figure from the assistant's prose.
   marginal colour
 - **AND** NAP-12 and every other subscriber stay neutral
 
+#### Scenario: A cut through a cascade
+
+- **WHEN** a turn ends with a payload listing FR-03 as `cut`, and NAP-03, NAP-12, SUB-006, SUB-025
+  to SUB-028 and FR-12 as `out_of_service`
+- **THEN** FR-03 is drawn in the cut style
+- **AND** NAP-03, NAP-12, FR-12 and the five subscribers are drawn in the out-of-service style
+- **AND** the other ten NAPs, the other runs and the other subscribers stay neutral
+
 #### Scenario: A shared run takes the worse classification
 
 - **WHEN** a payload lists SUB-006 as `pass` and NAP-12 as `marginal`, and both mark FR-03
 - **THEN** FR-03 is drawn in the marginal colour
+
+#### Scenario: An outage outranks a classification on the same element
+
+- **WHEN** a payload marks FR-03 both as `marginal` and as `cut`
+- **THEN** FR-03 is drawn in the cut style
 
 #### Scenario: A highlight is replaced by the next one
 
@@ -81,7 +97,7 @@ figure from the assistant's prose.
 #### Scenario: The highlight can be cleared
 
 - **WHEN** a highlight is on the map and the user clears it
-- **THEN** every NAP and subscriber returns to the neutral style and no path is marked
+- **THEN** every NAP, subscriber and run returns to the neutral style
 
 #### Scenario: A payload names a NAP the map does not know
 
@@ -99,7 +115,7 @@ figure from the assistant's prose.
 
 When a payload has `fit_bounds` true and at least one NAP or subscriber entry the map knows, the
 system SHALL move the view so that every highlighted NAP and subscriber, the OLT, and every run the
-payload lists are visible. When `fit_bounds` is false the view SHALL NOT move.
+payload lists, including a cut run, are visible. When `fit_bounds` is false the view SHALL NOT move.
 
 #### Scenario: Reframing on the reference question
 
@@ -111,6 +127,12 @@ payload lists are visible. When `fit_bounds` is false the view SHALL NOT move.
 
 - **WHEN** a payload lists SUB-025 and runs FR-03 and FR-12, with `fit_bounds` true
 - **THEN** the view contains SUB-025, the OLT and every vertex of FR-03 and FR-12
+
+#### Scenario: Reframing on a cut
+
+- **WHEN** a payload lists the cut of FR-03 and its out-of-service subtree, with `fit_bounds` true
+- **THEN** the view contains NAP-03, NAP-12, SUB-006, SUB-025 to SUB-028, the OLT and every vertex
+  of FR-03 and FR-12
 
 #### Scenario: No reframe requested
 
