@@ -263,9 +263,16 @@ different question, so it gets a different kind.
     a position and never chooses a NAP.
 - **Candidate styles:** they use a NAP ring (`circle-stroke-*` via feature-state) rather than the
   fill, so a NAP keeps its fill and a nap-entry style can win the fill without conflict. Feasible
-  is a teal ring, marginal an amber ring, not feasible a dashed-looking grey ring at reduced
-  opacity. Rings are not data-driven dashes; the "dashed" look is a thinner, lighter stroke. The
-  rank appears in a `naps-label` variant, `"NAP-11 · #1"`, also by feature-state.
+  is a teal ring and marginal a yellow ring. Not feasible is a dark grey ring, slightly thinner.
+  Rings cannot be data-driven dashes.
+  *Changed during task 4.3:* the first not-feasible ring was gray-500 at 2 px and 0.6 opacity,
+  and in the browser it vanished against the neutral NAP fill. It is now zinc-700, 3 px, at 0.9
+  opacity.
+- **Rank labels.** The rank is drawn as its own label, `#1`, above the NAP.
+  *Changed during task 4.3:* the plan was a `naps-label` variant driven by feature-state, but
+  MapLibre cannot drive a layout property such as `text-field` from feature-state. The labels
+  are features of the `feasibility` GeoJSON source, built from the resolved payload by
+  `src/lib/map/feasibility-geojson.ts`.
 - **Resolver:** `resolveHighlight` returns `candidateFeasibility`, `candidateRank`, `point` and
   `dropLine`, and drops entries for unknown NAPs. Bounds include the point and the candidates.
 

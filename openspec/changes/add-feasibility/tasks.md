@@ -130,7 +130,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 
       Put the pure rule, "does a new point clear this payload?", in `src/lib/map/` with tests: a
       payload with a point entry is cleared, and one without is kept.
-- [ ] 4.3 Drawing:
+- [x] 4.3 Drawing:
       - the `selected-point` and `feasibility` sources and layers;
       - the candidate ring styles and rank labels by feature-state;
       - the colours in `src/lib/map/config.ts`, with a comment on why they sit apart from the

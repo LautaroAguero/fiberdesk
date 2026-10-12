@@ -104,21 +104,25 @@ export const DARK_RUN_OPACITY = 0.85;
  * and the rings use teal, yellow and grey, none of which is a budget or cut
  * colour. The point and its drop line are blue, the one hue nothing else but the
  * OLT's indigo uses, and the OLT is a larger solid disc. A not-feasible ring is
- * thinner and fainter rather than dashed, because MapLibre cannot drive a dash
- * from feature-state. The exact hues are settled in the browser against the
- * budget and cut colours (add-feasibility task 4.3), as the cut colours were.
+ * a dark grey, slightly thinner, rather than dashed, because MapLibre cannot
+ * drive a dash from feature-state.
+ *
+ * Changed during task 4.3: the first version drew the not-feasible ring in
+ * gray-500 at 2 px and 0.6 opacity. In the browser it vanished against the
+ * neutral NAP fill, so a not-feasible candidate looked like a NAP that was not
+ * a candidate at all. It is now zinc-700, 3 px, nearly opaque.
  */
 export const CANDIDATE_COLOR = {
   feasible: "#0d9488", // teal-600
   marginal: "#ca8a04", // yellow-600: feasible, with a marginal projection
-  not_feasible: "#6b7280", // gray-500
+  not_feasible: "#3f3f46", // zinc-700
 } as const;
 
 /** Ring width, in pixels, of each candidate style: not feasible is the thinnest. */
-export const CANDIDATE_RING_WIDTH = { feasible: 4, marginal: 4, not_feasible: 2 } as const;
+export const CANDIDATE_RING_WIDTH = { feasible: 4, marginal: 4, not_feasible: 3 } as const;
 
-/** Opacity of a candidate ring; a not-feasible one is fainter. */
-export const CANDIDATE_RING_OPACITY = { feasible: 1, marginal: 1, not_feasible: 0.6 } as const;
+/** Opacity of a candidate ring. */
+export const CANDIDATE_RING_OPACITY = { feasible: 1, marginal: 1, not_feasible: 0.9 } as const;
 
 /** Colour of the selected point's marker, the evaluated point and the drop line. Tailwind blue-600. */
 export const POINT_COLOR = "#2563eb";
