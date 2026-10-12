@@ -24,7 +24,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
       marked operational. Tests:
       - the snapshot reports 600 m, operational and pending validation;
       - the longest seed drop in `seed/expected-traces.json` is within the maximum.
-- [ ] 1.3 Add `src/lib/topology/ports.ts` with `freePorts(network)` (design.md, decision 2).
+- [x] 1.3 Add `src/lib/topology/ports.ts` with `freePorts(network)` (design.md, decision 2).
       Tests in `ports.test.ts`:
       - NAP-03 has 0 free ports, NAP-10 has 2, NAP-12 has 12, NAP-06 has 29;
       - the twelve seed values match design.md's Context list;
