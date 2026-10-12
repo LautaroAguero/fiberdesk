@@ -134,7 +134,7 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
       presupuesto óptico?"). Verify the answer streams, the map highlights NAP-09 and NAP-12, and
       the server log line shows the new model and non-zero cache reads on the second call.
       **Skipped:** no candidate was accepted; the model stays `claude-opus-5`.
-- [ ] 6.2 Replace the README's baseline section with the comparison table (proposal, What
+- [x] 6.2 Replace the README's baseline section with the comparison table (proposal, What
       Changes). Include every configuration in this change:
       (a) the two baseline runs;
       (b) each candidate that ran, with median and p95 cost (cold and measured), p95 latency, pass
