@@ -23,6 +23,10 @@ describe("extractNumbers", () => {
     expect(readings("FR-03, OLT-RES-01 and SUB-014")).toEqual([]);
   });
 
+  test("an identifier's placeholder form is not a figure", () => {
+    expect(readings("el trazado de un abonado (SUB-0XX) o de NAP-XX")).toEqual([]);
+  });
+
   test("a subscriber's seed name is an identifier, not a figure", () => {
     expect(readings("el cliente Subscriber 014 tiene 11.40 dB")).toEqual([[11.4]]);
   });
