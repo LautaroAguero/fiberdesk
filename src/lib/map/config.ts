@@ -71,6 +71,29 @@ export const STATUS_COLOR: Record<BudgetStatus, string> = {
   fail: "#dc2626", // red-600
 };
 
+/**
+ * The two styles of a cut (design.md, add-cut-impact, decision 6). They sit
+ * outside the budget palette on purpose: the green, amber and red family reads
+ * as "how good is this link", and an outage is a different fact, so it must not
+ * be mistakable for a classification. Magenta marks the cut element; a dark
+ * slate marks what is switched off below it. MapLibre cannot drive
+ * `line-dasharray` from feature-state, so a cut run also differs by width, and a
+ * dark run by a path's width and a near-black colour (see `NetworkMap.tsx`), not
+ * by dash.
+ */
+export const CUT_COLOR = "#c026d3"; // fuchsia-600
+export const OUT_OF_SERVICE_COLOR = "#1e293b"; // slate-800
+
+/** Line width of the cut run, against 4 for a run on a path or a dark run and 2 for the rest. */
+export const CUT_RUN_WIDTH = 6;
+
+/**
+ * Opacity of a run that goes dark downstream of a cut; every other run is opaque.
+ * Kept high: at 0.4 the slate washed out to the neutral fiber grey on the light
+ * base map (add-cut-impact task 2.3).
+ */
+export const DARK_RUN_OPACITY = 0.85;
+
 /** Colour for a NAP not named in the current highlight. Tailwind slate-400. */
 export const NEUTRAL_NAP_COLOR = "#94a3b8";
 

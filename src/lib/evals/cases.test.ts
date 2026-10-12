@@ -81,16 +81,21 @@ describe("loadCases", () => {
     expect(error.message).toContain("SUB-099");
   });
 
-  test("an oracle naming a subscriber loads, and one naming a run does not", () => {
+  test("an oracle naming a subscriber or a fiber run loads, and one naming FR-99 does not", () => {
     const withSubscriber = caseDir({
       "trace.json": [validCase({ expect: { highlight: { mode: "equals", ids: ["SUB-025"] } } })],
     });
     expect(loadCases(network, withSubscriber)).toHaveLength(1);
 
-    const error = loadError({
-      "trace.json": [validCase({ expect: { highlight: { mode: "equals", ids: ["FR-03"] } } })],
+    const withRun = caseDir({
+      "cut.json": [validCase({ expect: { highlight: { mode: "equals", ids: ["FR-03", "NAP-03"] } } })],
     });
-    expect(error.message).toContain("FR-03");
+    expect(loadCases(network, withRun)).toHaveLength(1);
+
+    const error = loadError({
+      "cut.json": [validCase({ expect: { highlight: { mode: "equals", ids: ["FR-99"] } } })],
+    });
+    expect(error.message).toContain("FR-99");
   });
 
   test("an unknown tool name fails", () => {
@@ -221,6 +226,87 @@ describe("the trace cases agree with seed/expected-traces.json", () => {
     for (const evalCase of traceCases.filter((c) => c.expect.highlight !== undefined)) {
       const subscriberId = tracedSubscriber(evalCase);
       expect(evalCase.expect.highlight!.ids, evalCase.id).toContain(subscriberId);
+    }
+  });
+});
+
+describe("the cut cases agree with seed/expected-cut-impacts.json", () => {
+  interface ExpectedCut {
+    naps_out_of_service: string[];
+    subscribers_out_of_service: string[];
+    runs_out_of_service: string[];
+    counts: { naps: number; subscribers: number; runs: number };
+  }
+  const oracle = JSON.parse(
+    readFileSync(path.join(process.cwd(), "seed", "expected-cut-impacts.json"), "utf8"),
+  ) as { elements: Record<string, ExpectedCut> };
+  const cutCases = loadCases(network).filter((c) => c.id.startsWith("cut-"));
+
+  /** The element a case cuts: the one its tool call pins, else the first fiber run or NAP its first turn names. */
+  function cutElement(evalCase: (typeof cutCases)[number]): string | undefined {
+    for (const item of evalCase.expect.trajectory?.required ?? []) {
+      if (typeof item !== "string" && item.tool === "list_cut_impact") {
+        return item.input?.element_id as string | undefined;
+      }
+    }
+    return evalCase.turns[0].match(/\b(?:FR|NAP)-\d+\b/)?.[0];
+  }
+
+  test("the six cut cases are present and all in the cut area", () => {
+    expect(cutCases.map((c) => c.id).sort()).toEqual([
+      "cut-count-followup-es",
+      "cut-feeder-cascade-es",
+      "cut-leaf-en",
+      "cut-nap-es",
+      "cut-olt-es",
+      "cut-unknown-es",
+    ]);
+    expect(cutCases.every((c) => c.area === "cut")).toBe(true);
+  });
+
+  test("every figure is a count of the oracle for the element the case cuts", () => {
+    const withFigures = cutCases.filter((c) => c.expect.figures !== undefined);
+    expect(withFigures.length).toBeGreaterThan(0);
+
+    for (const evalCase of withFigures) {
+      const element = cutElement(evalCase);
+      expect(element, evalCase.id).toBeDefined();
+      const expected = oracle.elements[element!];
+      expect(expected, evalCase.id).toBeDefined();
+      for (const figure of evalCase.expect.figures!) {
+        expect(Object.values(expected.counts), `${evalCase.id}: ${figure}`).toContain(figure);
+      }
+      // The figure that answers "how many customers" is the subscribers count.
+      expect(evalCase.expect.figures, evalCase.id).toContain(expected.counts.subscribers);
+    }
+  });
+
+  test("every highlight oracle is the cut element plus its NAPs and subscribers, and no dark run", () => {
+    const withHighlight = cutCases.filter((c) => c.expect.highlight !== undefined);
+    expect(withHighlight.length).toBeGreaterThan(0);
+
+    for (const evalCase of withHighlight) {
+      const element = cutElement(evalCase)!;
+      const expected = oracle.elements[element];
+      expect(expected, evalCase.id).toBeDefined();
+      expect(evalCase.expect.highlight!.mode, evalCase.id).toBe("equals");
+      expect([...evalCase.expect.highlight!.ids].sort(), evalCase.id).toEqual(
+        [
+          ...new Set([element, ...expected.naps_out_of_service, ...expected.subscribers_out_of_service]),
+        ].sort(),
+      );
+      for (const runId of expected.runs_out_of_service) {
+        expect(evalCase.expect.highlight!.ids, evalCase.id).not.toContain(runId);
+      }
+    }
+  });
+
+  test("the abstention cases name no highlight and no figure", () => {
+    for (const id of ["cut-unknown-es", "cut-olt-es"]) {
+      const evalCase = cutCases.find((c) => c.id === id)!;
+      expect(evalCase.expect.abstention, id).toBe(true);
+      expect(evalCase.expect.highlight, id).toBeUndefined();
+      expect(evalCase.expect.figures, id).toBeUndefined();
     }
   });
 });

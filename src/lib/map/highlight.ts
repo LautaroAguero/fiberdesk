@@ -9,13 +9,14 @@
  * runs are entries of their own, so this module derives no path and walks no
  * tree. The status shown is always the payload's own; the map colours only what
  * the payload names and reclassifies nothing. The one thing it decides is the
- * colour of a run that two entries mark differently: the worse one wins.
+ * colour of an element that two entries mark differently: the more severe
+ * status wins, an outage over any classification (add-cut-impact, decision 5).
+ * A cut run is bounded like any other run, so a reframe on a cut contains it.
  */
 
 import { toLngLat } from "@/lib/map/geojson";
 import type { HighlightPayload } from "@/lib/assistant/events";
-import type { BudgetStatus } from "@/lib/optical/budget";
-import { worseStatus } from "@/lib/optical/status";
+import { worseStatus, type HighlightStatus } from "@/lib/optical/status";
 import type { Network } from "@/lib/network/types";
 
 /** A LngLat bounding box as MapLibre's `fitBounds` expects it: `[[west, south], [east, north]]`. */
@@ -23,14 +24,14 @@ export type LngLatBoundsTuple = [[number, number], [number, number]];
 
 export interface ResolvedHighlight {
   /** Status to paint each known, highlighted NAP with, keyed by its id. */
-  napStatus: Record<string, BudgetStatus>;
+  napStatus: Record<string, HighlightStatus>;
   /** Status to paint each known, highlighted subscriber with, keyed by its id. */
-  subscriberStatus: Record<string, BudgetStatus>;
+  subscriberStatus: Record<string, HighlightStatus>;
   /**
    * Status to paint each known, listed run with, keyed by run id. When two
    * entries mark the same run with different statuses, the worse one.
    */
-  runStatus: Record<string, BudgetStatus>;
+  runStatus: Record<string, HighlightStatus>;
   /** Ids of every known, listed fiber run (the keys of `runStatus`). */
   runIds: string[];
   /** Payload ids that name no NAP, subscriber or run in `network`: ignored, never drawn at an invented position. */
@@ -45,28 +46,31 @@ export function resolveHighlight(payload: HighlightPayload, network: Network): R
   const subscriberById = new Map(network.subscribers.map((subscriber) => [subscriber.id, subscriber]));
   const runById = new Map(network.fiber_runs.map((run) => [run.id, run]));
 
-  const napStatus: Record<string, BudgetStatus> = {};
-  const subscriberStatus: Record<string, BudgetStatus> = {};
-  const runStatus: Record<string, BudgetStatus> = {};
+  const napStatus: Record<string, HighlightStatus> = {};
+  const subscriberStatus: Record<string, HighlightStatus> = {};
+  const runStatus: Record<string, HighlightStatus> = {};
   const unknownIds: string[] = [];
+
+  // Two entries naming one element keep the more severe status, in the shared
+  // order (`cut`, `out_of_service`, `fail`, `marginal`, `pass`).
+  const merge = (statuses: Record<string, HighlightStatus>, id: string, status: HighlightStatus) => {
+    const existing = statuses[id];
+    statuses[id] = existing === undefined ? status : worseStatus(existing, status);
+  };
 
   for (const entry of payload.highlight) {
     switch (entry.kind) {
       case "nap":
-        if (napById.has(entry.id)) napStatus[entry.id] = entry.status;
+        if (napById.has(entry.id)) merge(napStatus, entry.id, entry.status);
         else unknownIds.push(entry.id);
         break;
       case "subscriber":
-        if (subscriberById.has(entry.id)) subscriberStatus[entry.id] = entry.status;
+        if (subscriberById.has(entry.id)) merge(subscriberStatus, entry.id, entry.status);
         else unknownIds.push(entry.id);
         break;
       case "run":
-        if (runById.has(entry.id)) {
-          const existing = runStatus[entry.id];
-          runStatus[entry.id] = existing === undefined ? entry.status : worseStatus(existing, entry.status);
-        } else {
-          unknownIds.push(entry.id);
-        }
+        if (runById.has(entry.id)) merge(runStatus, entry.id, entry.status);
+        else unknownIds.push(entry.id);
         break;
     }
   }

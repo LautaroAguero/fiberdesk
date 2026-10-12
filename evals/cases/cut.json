@@ -1,0 +1,74 @@
+[
+  {
+    "id": "cut-feeder-cascade-es",
+    "area": "cut",
+    "source": "cut-impact spec, 'A feeder cut through a cascade'",
+    "turns": ["¿qué pasa si se corta el tendido FR-03?"],
+    "expect": {
+      "trajectory": {
+        "required": [{ "tool": "list_cut_impact", "input": { "element_id": "FR-03" } }]
+      },
+      "highlight": {
+        "mode": "equals",
+        "ids": ["FR-03", "NAP-03", "NAP-12", "SUB-006", "SUB-025", "SUB-026", "SUB-027", "SUB-028"]
+      },
+      "grounding": true,
+      "figures": [5]
+    }
+  },
+  {
+    "id": "cut-leaf-en",
+    "area": "cut",
+    "source": "cut-impact spec, 'A leaf run cut'",
+    "turns": ["what goes down if fiber run FR-12 is cut?"],
+    "expect": {
+      "trajectory": {
+        "required": [{ "tool": "list_cut_impact", "input": { "element_id": "FR-12" } }]
+      },
+      "highlight": {
+        "mode": "equals",
+        "ids": ["FR-12", "NAP-12", "SUB-025", "SUB-026", "SUB-027", "SUB-028"]
+      },
+      "grounding": true,
+      "figures": [4]
+    }
+  },
+  {
+    "id": "cut-nap-es",
+    "area": "cut",
+    "source": "cut-impact spec, 'NAP-04 down'",
+    "turns": ["¿qué clientes se quedan sin servicio si se cae la NAP-04?"],
+    "expect": {
+      "trajectory": {
+        "required": [{ "tool": "list_cut_impact", "input": { "element_id": "NAP-04" } }]
+      },
+      "highlight": {
+        "mode": "equals",
+        "ids": ["NAP-04", "NAP-09", "SUB-007", "SUB-008", "SUB-018", "SUB-019", "SUB-020"]
+      },
+      "grounding": true,
+      "figures": [5]
+    }
+  },
+  {
+    "id": "cut-unknown-es",
+    "area": "cut",
+    "source": "network-assistant spec, 'An element that does not exist'",
+    "turns": ["¿qué pasa si se corta el FR-99?"],
+    "expect": { "abstention": true }
+  },
+  {
+    "id": "cut-olt-es",
+    "area": "cut",
+    "source": "network-assistant spec, 'A cut at the OLT'",
+    "turns": ["¿qué pasa si se cae el OLT?"],
+    "expect": { "abstention": true }
+  },
+  {
+    "id": "cut-count-followup-es",
+    "area": "cut",
+    "source": "network-assistant spec, 'How many customers, as a follow-up'",
+    "turns": ["¿qué pasa si se corta FR-04?", "¿cuántos clientes son?"],
+    "expect": { "grounding": true, "figures": [5] }
+  }
+]

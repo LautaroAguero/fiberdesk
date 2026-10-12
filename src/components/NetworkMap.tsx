@@ -15,6 +15,9 @@ import { useEffect, useRef, useState } from "react";
 import type { ExpressionSpecification, Map as MaplibreMap } from "maplibre-gl";
 
 import {
+  CUT_COLOR,
+  CUT_RUN_WIDTH,
+  DARK_RUN_OPACITY,
   FALLBACK_STYLE,
   FIBER_COLOR,
   FIT_BOUNDS_MAX_ZOOM,
@@ -25,6 +28,7 @@ import {
   MAP_STYLE_URL,
   NEUTRAL_NAP_COLOR,
   OLT_COLOR,
+  OUT_OF_SERVICE_COLOR,
   STATUS_COLOR,
   SUBSCRIBER_COLOR,
 } from "@/lib/map/config";
@@ -45,11 +49,11 @@ export interface NetworkMapProps {
 }
 
 /**
- * A paint expression that reads `featureStateKey` (a `BudgetStatus` string,
+ * A paint expression that reads `featureStateKey` (a `HighlightStatus` string,
  * or unset) off feature state and resolves it to that status's colour,
  * falling back to `fallback` when unset. Shared between the NAP and subscriber
  * layers (`status`) and the run layer (`onPath`): the colour of each is the
- * classification its payload entry carries.
+ * status its payload entry carries, a budget classification or a cut.
  */
 function statusColorExpression(featureStateKey: "status" | "onPath", fallback: string): ExpressionSpecification {
   return [
@@ -61,9 +65,35 @@ function statusColorExpression(featureStateKey: "status" | "onPath", fallback: s
     STATUS_COLOR.marginal,
     "fail",
     STATUS_COLOR.fail,
+    "out_of_service",
+    OUT_OF_SERVICE_COLOR,
+    "cut",
+    CUT_COLOR,
     fallback,
   ];
 }
+
+/**
+ * Line width of a run: the cut run widest, a run on a path or a dark run medium, the rest thin.
+ * A dark run is drawn as wide as a path: at the neutral width its slate would read as just
+ * another grey run (verified in the browser, add-cut-impact task 2.3).
+ */
+const RUN_WIDTH_EXPRESSION: ExpressionSpecification = [
+  "case",
+  ["==", ["feature-state", "onPath"], "cut"],
+  CUT_RUN_WIDTH,
+  ["!=", ["feature-state", "onPath"], null],
+  4,
+  2,
+];
+
+/** Opacity of a run: a dark run is slightly faded, so the subtree reads as switched off. */
+const RUN_OPACITY_EXPRESSION: ExpressionSpecification = [
+  "case",
+  ["==", ["feature-state", "onPath"], "out_of_service"],
+  DARK_RUN_OPACITY,
+  1,
+];
 
 /**
  * Adds the four network sources and their layers to `map`'s *current* style.
@@ -83,7 +113,8 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
     source: "runs",
     paint: {
       "line-color": statusColorExpression("onPath", FIBER_COLOR),
-      "line-width": ["case", ["!=", ["feature-state", "onPath"], null], 4, 2],
+      "line-width": RUN_WIDTH_EXPRESSION,
+      "line-opacity": RUN_OPACITY_EXPRESSION,
     },
   });
 
@@ -102,7 +133,14 @@ function addNetworkOverlay(map: MaplibreMap, geojson: NetworkGeoJson): void {
     id: "naps-circle",
     type: "circle",
     source: "naps",
-    paint: { "circle-radius": 7, "circle-color": statusColorExpression("status", NEUTRAL_NAP_COLOR) },
+    paint: {
+      "circle-radius": 7,
+      "circle-color": statusColorExpression("status", NEUTRAL_NAP_COLOR),
+      // A cut NAP gets a translucent ring in the cut colour, on top of its fill.
+      "circle-stroke-color": CUT_COLOR,
+      "circle-stroke-width": ["case", ["==", ["feature-state", "status"], "cut"], 4, 0],
+      "circle-stroke-opacity": 0.35,
+    },
   });
   map.addLayer({
     id: "naps-label",

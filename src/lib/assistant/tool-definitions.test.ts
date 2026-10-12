@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
   buildToolDefinitions,
   DETAIL_TOOL_NAME,
+  CUT_IMPACT_TOOL_NAME,
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
   SEARCH_DOCUMENTATION_TOOL_NAME,
   SUMMARIZE_TOOL_NAME,
@@ -17,6 +18,7 @@ const detail = tools.find((t) => t.name === DETAIL_TOOL_NAME)!;
 const searchDocs = tools.find((t) => t.name === SEARCH_DOCUMENTATION_TOOL_NAME)!;
 const getConstants = tools.find((t) => t.name === GET_OPTICAL_CONSTANTS_TOOL_NAME)!;
 const trace = tools.find((t) => t.name === TRACE_TOOL_NAME)!;
+const cut = tools.find((t) => t.name === CUT_IMPACT_TOOL_NAME)!;
 
 describe("2.4 strict schemas and the identifier enum", () => {
   test("both tools declare strict: true", () => {
@@ -98,8 +100,8 @@ describe("5.2 the optical constants tool", () => {
 });
 
 describe("3.1 the subscriber trace tool", () => {
-  test("is the fifth tool, and there are five", () => {
-    expect(tools).toHaveLength(5);
+  test("is the fifth tool", () => {
+    expect(tools[4]).toBe(trace);
     expect(trace.name).toBe("trace_subscriber_link");
   });
 
@@ -132,5 +134,45 @@ describe("3.1 the subscriber trace tool", () => {
   test("the description says a passing NAP does not vouch for its subscribers, and the drop is modelled", () => {
     expect(trace.description!.toLowerCase()).toContain("passing nap does not mean");
     expect(trace.description!.toLowerCase()).toContain("modelled estimate");
+  });
+});
+
+describe("3.1 the cut impact tool", () => {
+  test("is the sixth tool, and there are six", () => {
+    expect(tools).toHaveLength(6);
+    expect(tools[5]).toBe(cut);
+    expect(cut.name).toBe("list_cut_impact");
+  });
+
+  test("declares strict: true and forbids additional properties", () => {
+    expect(cut.strict).toBe(true);
+    expect(cut.input_schema.additionalProperties).toBe(false);
+  });
+
+  test("requires element_id, an enum of exactly the 12 runs then the 12 NAPs, and never the OLT", () => {
+    expect(cut.input_schema.required).toEqual(["element_id"]);
+    const properties = cut.input_schema.properties as { element_id: { enum: string[] } };
+    expect(Object.keys(properties)).toEqual(["element_id"]);
+    expect(properties.element_id.enum).toEqual([
+      ...network.fiber_runs.map((r) => r.id),
+      ...network.splitters.map((n) => n.id),
+    ]);
+    expect(properties.element_id.enum).toHaveLength(24);
+    expect(properties.element_id.enum).not.toContain(network.olt.id);
+    expect(properties.element_id.enum).not.toContain("FR-99");
+  });
+
+  test("the description says to cite the counts and never to count a list", () => {
+    expect(cut.description).toContain("counts");
+    expect(cut.description!.toLowerCase()).toContain("never a number you counted");
+  });
+
+  test("the description says a cut at the OLT is not supported", () => {
+    expect(cut.description).toContain("A cut at the OLT is NOT supported");
+  });
+
+  test("the description forbids substituting another element", () => {
+    expect(cut.description).toContain("do NOT call this tool");
+    expect(cut.description).toContain("not with another identifier");
   });
 });

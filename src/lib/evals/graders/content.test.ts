@@ -57,6 +57,51 @@ describe("gradeHighlight", () => {
     ]);
   });
 
+  test("a cut is compared by its element and what it takes out", () => {
+    const payload: HighlightPayload = {
+      highlight: [
+        { kind: "run", id: "FR-12", status: "cut" },
+        { kind: "nap", id: "NAP-12", status: "out_of_service" },
+        { kind: "subscriber", id: "SUB-025", nap_id: "NAP-12", status: "out_of_service" },
+        { kind: "subscriber", id: "SUB-026", nap_id: "NAP-12", status: "out_of_service" },
+        { kind: "subscriber", id: "SUB-027", nap_id: "NAP-12", status: "out_of_service" },
+        { kind: "subscriber", id: "SUB-028", nap_id: "NAP-12", status: "out_of_service" },
+      ],
+      fit_bounds: true,
+    };
+    const oracle = { mode: "equals" as const, ids: ["FR-12", "NAP-12", "SUB-025", "SUB-026", "SUB-027", "SUB-028"] };
+    expect(gradeHighlight(turn({ answer: "", payload }), oracle)).toEqual({ pass: true, reasons: [] });
+
+    // Without the cut run in the oracle, the cut element is unexpected.
+    const withoutRun = { mode: "equals" as const, ids: oracle.ids.filter((id) => id !== "FR-12") };
+    expect(gradeHighlight(turn({ answer: "", payload }), withoutRun).reasons).toEqual([
+      "unexpected in highlight: FR-12",
+    ]);
+  });
+
+  test("a dark downstream run is not compared", () => {
+    const payload: HighlightPayload = {
+      highlight: [
+        { kind: "run", id: "FR-03", status: "cut" },
+        { kind: "nap", id: "NAP-03", status: "out_of_service" },
+        { kind: "nap", id: "NAP-12", status: "out_of_service" },
+        { kind: "subscriber", id: "SUB-006", nap_id: "NAP-03", status: "out_of_service" },
+        { kind: "subscriber", id: "SUB-025", nap_id: "NAP-12", status: "out_of_service" },
+        { kind: "subscriber", id: "SUB-026", nap_id: "NAP-12", status: "out_of_service" },
+        { kind: "subscriber", id: "SUB-027", nap_id: "NAP-12", status: "out_of_service" },
+        { kind: "subscriber", id: "SUB-028", nap_id: "NAP-12", status: "out_of_service" },
+        { kind: "run", id: "FR-12", status: "out_of_service" },
+      ],
+      fit_bounds: true,
+    };
+    expect(highlightIds(payload)).not.toContain("FR-12");
+    const oracle = {
+      mode: "equals" as const,
+      ids: ["FR-03", "NAP-03", "NAP-12", "SUB-006", "SUB-025", "SUB-026", "SUB-027", "SUB-028"],
+    };
+    expect(gradeHighlight(turn({ answer: "", payload }), oracle)).toEqual({ pass: true, reasons: [] });
+  });
+
   test("contains tolerates extras but not omissions", () => {
     const contains = { mode: "contains" as const, ids: ["NAP-12"] };
     expect(gradeHighlight(turn({ answer: "", toolCalls: [detail("NAP-09"), detail("NAP-12")] }), contains).pass).toBe(true);

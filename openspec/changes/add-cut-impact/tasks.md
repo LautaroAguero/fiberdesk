@@ -7,7 +7,7 @@ pass before it is ticked.
 
 ## 1. The cut traversal (`cut-impact`)
 
-- [ ] 1.1 Write `seed/expected-cut-impacts.json` by hand from the tree (design.md, decision 8):
+- [x] 1.1 Write `seed/expected-cut-impacts.json` by hand from the tree (design.md, decision 8):
       - a `_note` like the other fixtures;
       - one entry per fiber run and per NAP (24), each with `kind`, `naps_out_of_service`,
         `subscribers_out_of_service`, `runs_out_of_service` (sorted ids) and `counts`.
@@ -15,7 +15,7 @@ pass before it is ticked.
       Verify by reading it against design.md's Context table. FR-03 and NAP-03 must give 2 NAPs and
       5 subscribers with FR-12 dark; FR-04 and NAP-04 must give 2 and 5 with FR-09 dark; FR-12 and
       NAP-12 must give 1 and 4.
-- [ ] 1.2 Add `src/lib/topology/cut.ts` with `cutImpact(network, elementId)` and the `CutImpact`
+- [x] 1.2 Add `src/lib/topology/cut.ts` with `cutImpact(network, elementId)` and the `CutImpact`
       type (design.md, decisions 1–3). It is pure, with no literals from the seed and a step bound
       on the walk. Tests in `cut.test.ts`, one per spec scenario:
       (a) FR-03: NAP-03 and NAP-12; SUB-006 and SUB-025–028; count 5; FR-12 dark;
@@ -33,11 +33,11 @@ pass before it is ticked.
 
 ## 2. Impact statuses, projection, map and grader (`network-assistant`, `network-map`, `assistant-evals`)
 
-- [ ] 2.1 Widen `src/lib/optical/status.ts` to `HighlightStatus`, ordered pass < marginal < fail <
+- [x] 2.1 Widen `src/lib/optical/status.ts` to `HighlightStatus`, ordered pass < marginal < fail <
       out_of_service < cut, and extend `HighlightEntry` in `src/lib/assistant/events.ts` with the
       impact variants (design.md, decision 5). Tests: the full order, and `worseStatus` on mixed
       pairs (`marginal` vs `cut` → `cut`). Verify that every existing test still passes unchanged.
-- [ ] 2.2 Extend `projectHighlight` for `list_cut_impact` results:
+- [x] 2.2 Extend `projectHighlight` for `list_cut_impact` results:
       - the element as `cut`, and every out-of-service NAP, subscriber and run as `out_of_service`,
         with no margin;
       - a merge into an impact status replaces the entry whole;
@@ -48,7 +48,7 @@ pass before it is ticked.
       - "An outage outranks a budget classification" (detail NAP-12, then cut FR-03: one NAP-12
         entry, `out_of_service`, no margin);
       - the existing detail and trace scenarios, unchanged.
-- [ ] 2.3 Update `resolveHighlight` to type its maps by `HighlightStatus` and merge by the shared
+- [x] 2.3 Update `resolveHighlight` to type its maps by `HighlightStatus` and merge by the shared
       order. Add `CUT_COLOR` and `OUT_OF_SERVICE_COLOR` to `src/lib/map/config.ts`, with a comment
       on why they sit outside the budget palette. In `NetworkMap.tsx`:
       - extend the colour expressions;
@@ -71,7 +71,7 @@ pass before it is ticked.
 
       Attach a screenshot of (a). An agent without browser tools implements and commits the code,
       and leaves this box unticked for the browser check.
-- [ ] 2.4 In `src/lib/evals`, add `cut` runs to `highlightIds` and accept fiber run ids in the case
+- [x] 2.4 In `src/lib/evals`, add `cut` runs to `highlightIds` and accept fiber run ids in the case
       validator (design.md, decision 7). Tests:
       - "A cut is compared by its element and what it takes out";
       - "A dark downstream run is not compared";
@@ -84,7 +84,7 @@ pass before it is ticked.
 
 ## 3. The tool (`network-assistant`)
 
-- [ ] 3.1 Add `list_cut_impact` to `src/lib/assistant/tool-definitions.ts` (design.md, decision 4):
+- [x] 3.1 Add `list_cut_impact` to `src/lib/assistant/tool-definitions.ts` (design.md, decision 4):
       `strict: true`, with `element_id` an enum of the 12 run ids then the 12 NAP ids, and the
       description as specified. Tests:
       - the enum is exactly those 24 and excludes OLT-RES-01;
@@ -92,12 +92,12 @@ pass before it is ticked.
       - the description says to cite the counts, that an OLT cut is not supported, and not to
         substitute an element;
       - six tools in total.
-- [ ] 3.2 Dispatch it in `src/lib/assistant/dispatcher.ts`, returning `cutImpact`'s result as JSON,
+- [x] 3.2 Dispatch it in `src/lib/assistant/dispatcher.ts`, returning `cutImpact`'s result as JSON,
       or an `is_error` result carrying the engine's message. Tests:
       - FR-03's result, with `counts.subscribers` 5;
       - OLT-RES-01 and FR-99 give error results with their messages;
       - the payload for a dispatched FR-12 cut.
-- [ ] 3.3 Update `src/lib/assistant/system-prompt.ts`:
+- [x] 3.3 Update `src/lib/assistant/system-prompt.ts`:
       - one paragraph on when to call `list_cut_impact`, and to cite its counts;
       - add an OLT cut and an element id the network lacks to the "cannot answer" list.
 
@@ -106,18 +106,18 @@ pass before it is ticked.
 
 ## 4. Eval cases (`assistant-evals`)
 
-- [ ] 4.1 Add `cut` to `AREAS` and write `evals/cases/cut.json` with the six cases of design.md,
+- [x] 4.1 Add `cut` to `AREAS` and write `evals/cases/cut.json` with the six cases of design.md,
       decision 7, by hand. Add a test that every figure and oracle id in a `cut-*` case agrees with
       `seed/expected-cut-impacts.json`. Verify that the cases load and that a fake run's summary
       has a `cut` row.
 
 ## 5. Live verification (by hand)
 
-- [ ] 5.1 Smoke run: `npm run eval -- --cases 'cut-*' --max-usd 0.40`. Verify that every
+- [x] 5.1 Smoke run: `npm run eval -- --cases 'cut-*' --max-usd 0.40`. Verify that every
       `list_cut_impact` call names a valid element, that no call names the OLT or a substitute, and
       that payloads hold the cut entries. Read the declines of `cut-unknown-es` and `cut-olt-es` by
       hand. Commit the record.
-- [ ] 5.2 Full run: `npm run eval -- --max-usd 2.00`. Commit the record, re-grade it, and run
+- [x] 5.2 Full run: `npm run eval -- --max-usd 2.00`. Commit the record, re-grade it, and run
       `npm run eval:compare` against `evals/runs/2026-10-12T14-05-31Z.regraded.json`. Write
       `openspec/changes/add-cut-impact/verification.md` with:
       - the `cut` area's pass rate and interval;
@@ -127,21 +127,21 @@ pass before it is ticked.
 
       A stable case that regresses through the cut tool or its prompt paragraph is fixed before
       group 6, and a fix that changes the prompt means a new run.
-- [ ] 5.3 In the app (`fiberdesk-dev` preview), ask "¿qué pasa si se corta el tendido FR-03?".
+- [x] 5.3 In the app (`fiberdesk-dev` preview), ask "¿qué pasa si se corta el tendido FR-03?".
       Verify that the answer streams and states 5 subscribers, that FR-03 is painted cut and the
       subtree out of service, that the view reframes, and that the server log shows the call.
       Record it in `verification.md`, with a screenshot.
 
 ## 6. Docs
 
-- [ ] 6.1 Update the README:
+- [x] 6.1 Update the README:
       - a cut-impact section with FR-03 as the worked example, figures copied from the oracle;
       - six tools;
       - the payload's impact statuses;
       - the eval table with the `cut` area, from the committed record.
 
       Verify each figure against its source.
-- [ ] 6.2 Update the status section of `CLAUDE.md`:
+- [x] 6.2 Update the status section of `CLAUDE.md`:
       - six tools;
       - the impact statuses;
       - the new test count and eval result;

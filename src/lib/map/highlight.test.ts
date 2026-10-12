@@ -198,3 +198,78 @@ describe("2.2 resolveHighlight edge cases", () => {
     expect(resolveHighlight(payload, network).napStatus).toEqual({ "NAP-03": "fail" });
   });
 });
+
+const CUT_FR03_PAYLOAD: HighlightPayload = {
+  highlight: [
+    { kind: "run", id: "FR-03", status: "cut" },
+    { kind: "nap", id: "NAP-03", status: "out_of_service" },
+    { kind: "nap", id: "NAP-12", status: "out_of_service" },
+    { kind: "subscriber", id: "SUB-006", nap_id: "NAP-03", status: "out_of_service" },
+    { kind: "subscriber", id: "SUB-025", nap_id: "NAP-12", status: "out_of_service" },
+    { kind: "subscriber", id: "SUB-026", nap_id: "NAP-12", status: "out_of_service" },
+    { kind: "subscriber", id: "SUB-027", nap_id: "NAP-12", status: "out_of_service" },
+    { kind: "subscriber", id: "SUB-028", nap_id: "NAP-12", status: "out_of_service" },
+    { kind: "run", id: "FR-12", status: "out_of_service" },
+  ],
+  fit_bounds: true,
+};
+
+describe("2.3 resolveHighlight on a cut", () => {
+  const result = resolveHighlight(CUT_FR03_PAYLOAD, network);
+
+  test("a cut through a cascade: FR-03 is cut, the subtree is out of service, the rest neutral", () => {
+    expect(result.runStatus).toEqual({ "FR-03": "cut", "FR-12": "out_of_service" });
+    expect(result.napStatus).toEqual({ "NAP-03": "out_of_service", "NAP-12": "out_of_service" });
+    expect(result.subscriberStatus).toEqual({
+      "SUB-006": "out_of_service",
+      "SUB-025": "out_of_service",
+      "SUB-026": "out_of_service",
+      "SUB-027": "out_of_service",
+      "SUB-028": "out_of_service",
+    });
+    expect(result.unknownIds).toEqual([]);
+    expect(network.splitters.filter((nap) => result.napStatus[nap.id] === undefined)).toHaveLength(10);
+  });
+
+  test("an outage outranks a classification on the same element, in either order", () => {
+    const classifiedFirst: HighlightPayload = {
+      highlight: [
+        { kind: "run", id: "FR-03", status: "marginal" },
+        { kind: "run", id: "FR-03", status: "cut" },
+      ],
+      fit_bounds: false,
+    };
+    const cutFirst: HighlightPayload = { highlight: [...classifiedFirst.highlight].reverse(), fit_bounds: false };
+    expect(resolveHighlight(classifiedFirst, network).runStatus["FR-03"]).toBe("cut");
+    expect(resolveHighlight(cutFirst, network).runStatus["FR-03"]).toBe("cut");
+
+    const nap: HighlightPayload = {
+      highlight: [
+        { kind: "nap", id: "NAP-12", status: "out_of_service" },
+        { kind: "nap", id: "NAP-12", status: "marginal", margin_db: 2.77 },
+      ],
+      fit_bounds: false,
+    };
+    expect(resolveHighlight(nap, network).napStatus["NAP-12"]).toBe("out_of_service");
+  });
+
+  test("a cut does not reclassify: statuses are the payload's own", () => {
+    const run = resolveHighlight(
+      { highlight: [{ kind: "run", id: "FR-12", status: "out_of_service" }], fit_bounds: true },
+      network,
+    );
+    expect(run.runStatus).toEqual({ "FR-12": "out_of_service" });
+  });
+
+  test("reframing on a cut: bounds contain the subtree, the OLT and every vertex of FR-03 and FR-12", () => {
+    expect(result.bounds).not.toBeNull();
+    const points: Array<[number, number]> = [[network.olt.lon, network.olt.lat]];
+    for (const nap of network.splitters.filter((n) => ["NAP-03", "NAP-12"].includes(n.id))) {
+      points.push([nap.lon, nap.lat]);
+    }
+    for (const sub of network.subscribers.filter((s) => result.subscriberStatus[s.id] !== undefined)) {
+      points.push([sub.lon, sub.lat]);
+    }
+    expectContained(result.bounds!, [...points, ...runVertices("FR-03", "FR-12")]);
+  });
+});

@@ -269,7 +269,7 @@ carga y validación estructural del dataset, y el flujo de OpenSpec andando de p
 Los checks visuales se verificaron en el navegador reproduciendo turnos grabados, sin llamar a la
 API (grupo 6 de `tasks.md`), y la corrida real se hizo una vez a mano, como en las Fases 1 y 2.
 
-**438 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
+**483 tests, y ninguno llama a la API.** Todo corre contra fixtures grabados, el seed y el corpus
 reales. Las conductas que ningún test puede cubrir se verificaron a mano una vez contra la API
 real, para las fases ya cerradas:
 
@@ -283,8 +283,8 @@ real, para las fases ya cerradas:
   respuesta y reencuadre, y que siga declinando la sensibilidad de la ONT con el mapa delante.
 
 **Evals (Fase 4, primer ítem: `add-eval-harness`, archivado).** La Fase 4 sigue abierta y no es
-desplegable por sí sola todavía: no hay deploy, y de las tres capacidades del handoff falta terminar dos (la primera, `add-subscriber-trace`, está archivada). Esas conductas ya no dependen sólo de la
-verificación a mano: `npm run eval` le hace 28 casos al modelo real y los califica con graders
+desplegable por sí sola todavía: no hay deploy, y de las tres capacidades del handoff falta terminar una: `add-feasibility` (`add-subscriber-trace` está archivada y `add-cut-impact`, implementada). Esas conductas ya no dependen sólo de la
+verificación a mano: `npm run eval` le hace 34 casos al modelo real y los califica con graders
 deterministas, bajo un tope de gasto obligatorio. Cada corrida queda en `evals/runs/` y se puede
 **re-calificar offline** (`npm run eval:regrade`), sin clave ni llamadas. El costo y la latencia de
 cada llamada se miden en código (`src/lib/assistant/pricing.ts`, `usage.ts`).
@@ -323,6 +323,21 @@ viejos se movieron tres (19/21 y 16/21): una sola corrida mide grueso. Para `add
 todos los abonados del seed están a 346–383 m de su NAP, más que los ~300 m máximos que sugiere
 el handoff. Lectura completa en `openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md`.
 
+**Cuarto ítem: `add-cut-impact`, implementado (falta archivar).** El asistente responde **qué se
+cae si se corta un tendido o una NAP**: `cutImpact` (`src/lib/topology/cut.ts`) recorre el árbol hacia
+abajo, por las cascadas, y devuelve las NAPs, abonados y tramos sin servicio **con sus conteos**, para
+que el modelo los cite y nunca cuente una lista. Ejemplo: cortar FR-03 deja sin servicio NAP-03 y,
+por la cascada, NAP-12: 5 abonados, aunque NAP-03 atiende a uno solo. Que se caiga una NAP o se corte
+su tendido de entrada da lo mismo; sólo cambia qué figura como cortado. El OLT no se puede cortar
+(no está en el enum). Oráculo escrito a mano: `seed/expected-cut-impacts.json` (24 elementos).
+**Sexta herramienta:** `list_cut_impact`. **El payload suma dos estados**, `cut` y
+`out_of_service`, sin margen, y un solo orden de severidad: cut > out_of_service > fail > marginal >
+pass. En el mapa, el corte va en magenta y lo sin servicio en gris pizarra oscuro (en el navegador hubo
+que engrosar los tramos apagados: al 40% de opacidad se confundían con los neutros). Corrida en vivo
+(`30844d48a2b6`): **30/34 (88,2%), `cut` 6/6, `trace` 7/7**; los cuatro fallos son casos viejos
+(dos se quedan en el censo, dos hacen cuentas en la prosa). Lectura en
+`openspec/changes/add-cut-impact/verification.md`.
+
 Correr la app requiere `ANTHROPIC_API_KEY` — ver `.env.example`. El mapa y la red se ven sin ella;
 sólo el chat lo necesita.
 
@@ -332,9 +347,11 @@ las dos desde disco. Ver la nota bajo la tabla de fases para por qué se descart
 Seis capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
 `network-assistant`, `documentation-search`, `network-map` y `assistant-evals`.
 
-**Lo próximo:** `add-cut-impact`, la segunda de las tres
-capacidades del handoff `docs/handoff/2026-10-07-map-user-capabilities.md`, que reusa el payload
-por tipo para marcar el subárbol afectado. Queda pendiente, como cambio
+**Lo próximo:** archivar `add-cut-impact` y después `add-feasibility`, la última de las tres
+capacidades del handoff `docs/handoff/2026-10-07-map-user-capabilities.md`. Arranca con un hallazgo
+de `add-subscriber-trace`: todos los abonados del seed están a 346–383 m de su NAP, más que los ~300 m
+de acometida máxima que sugiere el handoff, así que hay que decidir qué se mueve (el máximo, la
+holgura o el seed). Queda pendiente, como cambio
 aparte, el trabajo de prompt para que el modelo deje de hacer cuentas en la prosa. Es lo que frenó
 a Sonnet, y la misma regla puede volver a juzgarlo después.
 

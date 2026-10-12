@@ -3,7 +3,9 @@ import { describe, expect, test, vi } from "vitest";
 import { dispatchTool, runToolUse } from "@/lib/assistant/dispatcher";
 import * as budgets from "@/lib/assistant/budgets";
 import * as documentationSearch from "@/lib/assistant/documentation-search";
+import { projectHighlight } from "@/lib/assistant/highlight";
 import {
+  CUT_IMPACT_TOOL_NAME,
   DETAIL_TOOL_NAME,
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
   SEARCH_DOCUMENTATION_TOOL_NAME,
@@ -66,6 +68,58 @@ describe("3.2 dispatch covers the subscriber trace tool", () => {
   test("a call without a subscriber_id is an error result", () => {
     const result = dispatchTool(TRACE_TOOL_NAME, {}, network, searchIndex);
     expect(result.isError).toBe(true);
+  });
+});
+
+describe("3.2 dispatch covers the cut impact tool", () => {
+  test("list_cut_impact returns FR-03's impact as JSON, with 5 subscribers counted", () => {
+    const result = dispatchTool(CUT_IMPACT_TOOL_NAME, { element_id: "FR-03" }, network, searchIndex);
+    expect(result.isError).toBe(false);
+    const impact = JSON.parse(result.content as string);
+    expect(impact.element).toMatchObject({ kind: "run", id: "FR-03" });
+    expect(impact.counts).toEqual({ naps: 2, subscribers: 5, runs: 1 });
+    expect(impact.runs_out_of_service).toEqual(["FR-12"]);
+  });
+
+  test("the OLT is an error result carrying the engine's message, with no counts", () => {
+    const result = dispatchTool(CUT_IMPACT_TOOL_NAME, { element_id: "OLT-RES-01" }, network, searchIndex);
+    expect(result.isError).toBe(true);
+    expect(result.content as string).toContain("A cut at the OLT is not supported");
+    expect(result.content as string).not.toContain("counts");
+  });
+
+  test("an unknown element is an error result naming it, with no counts", () => {
+    const result = dispatchTool(CUT_IMPACT_TOOL_NAME, { element_id: "FR-99" }, network, searchIndex);
+    expect(result.isError).toBe(true);
+    expect(result.content as string).toContain("FR-99");
+    expect(result.content as string).not.toContain("counts");
+  });
+
+  test("a call without an element_id is an error result", () => {
+    expect(dispatchTool(CUT_IMPACT_TOOL_NAME, {}, network, searchIndex).isError).toBe(true);
+  });
+
+  test("the payload for a dispatched FR-12 cut", () => {
+    const { content } = dispatchTool(CUT_IMPACT_TOOL_NAME, { element_id: "FR-12" }, network, searchIndex);
+    const payload = projectHighlight([
+      {
+        name: CUT_IMPACT_TOOL_NAME,
+        input: { element_id: "FR-12" },
+        result: JSON.parse(content as string),
+        isError: false,
+        iteration: 1,
+      },
+    ]);
+
+    expect(payload.highlight).toEqual([
+      { kind: "run", id: "FR-12", status: "cut" },
+      { kind: "nap", id: "NAP-12", status: "out_of_service" },
+      { kind: "subscriber", id: "SUB-025", nap_id: "NAP-12", status: "out_of_service" },
+      { kind: "subscriber", id: "SUB-026", nap_id: "NAP-12", status: "out_of_service" },
+      { kind: "subscriber", id: "SUB-027", nap_id: "NAP-12", status: "out_of_service" },
+      { kind: "subscriber", id: "SUB-028", nap_id: "NAP-12", status: "out_of_service" },
+    ]);
+    expect(payload.fit_bounds).toBe(true);
   });
 });
 
@@ -150,6 +204,8 @@ describe("3.2 / 5.3 error paths", () => {
       DETAIL_TOOL_NAME,
       SEARCH_DOCUMENTATION_TOOL_NAME,
       GET_OPTICAL_CONSTANTS_TOOL_NAME,
+      TRACE_TOOL_NAME,
+      CUT_IMPACT_TOOL_NAME,
     ]) {
       expect(() => dispatchTool(name, { unexpected: "shape" }, network, searchIndex)).not.toThrow();
     }
