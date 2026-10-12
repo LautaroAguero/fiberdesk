@@ -256,7 +256,7 @@ the network lacks, and a question on whether an ONT will work. Every failure in 
 older cases, and each one is the model doing arithmetic in prose: "20.8 km" for 12 + 8.8, for
 instance. Between two runs of nearly the same configuration, those 21 older cases moved by three
 (19/21, then 16/21), so a single run is a rough measure. Every reading is in
-[`openspec/changes/add-subscriber-trace/verification.md`](openspec/changes/add-subscriber-trace/verification.md).
+[`openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md`](openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md).
 
 **Can a cheaper model do this?** Not yet. The change `reduce-cost-per-question` tried to halve the
 cost per question. Every configuration was judged by a rule fixed before any of them ran
