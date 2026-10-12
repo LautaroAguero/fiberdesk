@@ -289,7 +289,7 @@ from the survey without fetching the breakdown, and twice it does arithmetic in 
 "20 km"). Between two runs of nearly the same configuration, those 21 older cases have moved by
 three, so a single run is a rough measure. The readings are in
 [`openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md`](openspec/changes/archive/2026-10-12-add-subscriber-trace/verification.md)
-and `openspec/changes/add-cut-impact/verification.md`.
+and `openspec/changes/archive/2026-10-12-add-cut-impact/verification.md`.
 
 **Can a cheaper model do this?** Not yet. The change `reduce-cost-per-question` tried to halve the
 cost per question. Every configuration was judged by a rule fixed before any of them ran
