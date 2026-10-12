@@ -58,7 +58,7 @@ Code you will touch or read:
   assign `rank` from 1. `best_nap_id` is the rank-1 candidate if feasible, else `null`.
   `feasible_count` is computed in code. The point is echoed exactly as given.
 - **Expected values** (from the planning script; your oracle script must reproduce them):
-  - A (-27.4165, -59.0180): NAP-03 route 217 `[no_free_ports]` margin 19.17; NAP-08 3253 and NAP-12
+  - A (-27.4165, -59.0180): NAP-03 route 217 `[no_free_ports]` margin 19.17; NAP-08 3252 and NAP-12
     3549 `[too_far]`; no best.
   - B (-27.4955, -58.9380): NAP-09 route 217, 5 free, total 30.25, margin −2.25 `fail`
     `[budget_fail]`.

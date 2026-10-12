@@ -49,7 +49,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 - [ ] 2.2 Add `src/lib/feasibility/feasibility.ts`, with `evaluateConnection(network, point)`, the
       result types and `CANDIDATE_COUNT = 3` (design.md, decision 3). It is pure, with no literal
       from the seed. Tests in `feasibility.test.ts`, one per spec scenario:
-      (a) A: NAP-03 `[no_free_ports]`, route 217, margin 19.17; NAP-08 3253 and NAP-12 3549
+      (a) A: NAP-03 `[no_free_ports]`, route 217, margin 19.17; NAP-08 3252 and NAP-12 3549
       `[too_far]`; no best; count 0;
       (b) B: NAP-09 `[budget_fail]`, 5 free ports, total 30.25, margin −2.25 `fail`;
       (c) C: NAP-01 feasible, route 205, margin 14.81 `pass`, best NAP-01;

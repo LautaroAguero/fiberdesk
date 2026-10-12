@@ -34,7 +34,7 @@ Results for the eval points:
 
 | Point | Candidates (route, verdict) | Best |
 |---|---|---|
-| A (-27.4165, -59.0180) | NAP-03 217 m, `no_free_ports` · NAP-08 3253 m, `too_far` · NAP-12 3549 m, `too_far` | none |
+| A (-27.4165, -59.0180) | NAP-03 217 m, `no_free_ports` · NAP-08 3252 m, `too_far` · NAP-12 3549 m, `too_far` | none |
 | B (-27.4955, -58.9380) | NAP-09 217 m, `budget_fail` (−2.25 dB) · NAP-04 `too_far` · NAP-05 `too_far` | none |
 | C (-27.4432, -58.9770) | NAP-01 205 m, feasible (14.81 dB) · NAP-11 `too_far` · NAP-05 `too_far` | NAP-01 |
 | D (-27.4930, -59.0338) | NAP-06 539 m, feasible, marginal (2.51 dB) · NAP-02 `too_far` · NAP-08 `too_far` | NAP-06 |

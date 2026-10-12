@@ -124,7 +124,7 @@ every reason that applies, in this order: `too_far`, `no_free_ports`, `budget_fa
 - **WHEN** the point is (-27.4165, -59.0180)
 - **THEN** NAP-03 is not feasible with reasons `[no_free_ports]`, its route being 217 m and its
   projected margin 19.17 dB
-- **AND** NAP-08 (route 3253 m) and NAP-12 (route 3549 m) are not feasible with reasons
+- **AND** NAP-08 (route 3252 m) and NAP-12 (route 3549 m) are not feasible with reasons
   `[too_far]`
 
 #### Scenario: Close, with ports, failing
