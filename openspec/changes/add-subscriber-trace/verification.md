@@ -95,9 +95,9 @@ arithmetic in prose, which the separate prompt change is for.
 
 **The noise is wider than one case in 21.** The two full runs above differ only in the trace tool's
 description, a change that does not touch the 21 existing cases' turns. Even so, those cases score
-19/21 in the first run and 16/21 in the second, against 16 and 17 for B1 and B2. The one-case
-noise floor from B1/B2 understated how much a single run moves. A rate on these 21 cases is good to
-about ±3 cases from one run.
+19/21 in the first run (re-graded) and 16/21 in the second, against 16 and 17 for B1 and B2. The
+one-case noise floor from B1/B2 understated how much a single run moves: between two runs of
+nearly the same configuration, the old cases moved by three.
 
 ## Task 5.3 — the app, live
 
