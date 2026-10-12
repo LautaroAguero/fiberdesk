@@ -38,8 +38,8 @@ export default function Copilot({ network, budgets }: CopilotProps) {
   const [selectedNapId, setSelectedNapId] = useState<string | null>(null);
 
   const highlight = useMemo(
-    () => resolveHighlight(highlightPayload ?? EMPTY_PAYLOAD, network, budgets),
-    [highlightPayload, network, budgets],
+    () => resolveHighlight(highlightPayload ?? EMPTY_PAYLOAD, network),
+    [highlightPayload, network],
   );
 
   const selectedBreakdown = useMemo(() => {

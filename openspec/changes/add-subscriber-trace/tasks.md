@@ -73,7 +73,7 @@ pass before it is ticked.
       - the survey contributes nothing;
       - no tools gives an empty payload with `fit_bounds` false;
       - two details sharing a run keep the worse status.
-- [ ] 2.2 Rewrite `resolveHighlight(payload, network)` in `src/lib/map/highlight.ts` without the
+- [x] 2.2 Rewrite `resolveHighlight(payload, network)` in `src/lib/map/highlight.ts` without the
       `budgets` argument (design.md, decision 8). It returns `napStatus`, `subscriberStatus`,
       `runStatus`, `runIds`, `unknownIds` and `bounds`. Update `highlight.test.ts` in
       `src/lib/map`, one test per network-map scenario:

@@ -20,13 +20,7 @@ import type { ToolCallRecord } from "@/lib/assistant/loop";
 import { DETAIL_TOOL_NAME } from "@/lib/assistant/tool-definitions";
 import type { HighlightEntry, HighlightPayload } from "@/lib/assistant/events";
 import type { BudgetResult, BudgetStatus } from "@/lib/optical/budget";
-
-const SEVERITY: Record<BudgetStatus, number> = { pass: 0, marginal: 1, fail: 2 };
-
-/** The worse of two classifications: `fail` over `marginal` over `pass`. */
-export function worseStatus(a: BudgetStatus, b: BudgetStatus): BudgetStatus {
-  return SEVERITY[b] > SEVERITY[a] ? b : a;
-}
+import { worseStatus } from "@/lib/optical/status";
 
 /** Adds the runs of `hops` to `entries`, each with `status`, merging a repeated run to the worse one. */
 function addRuns(
