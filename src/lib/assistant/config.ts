@@ -24,3 +24,11 @@ export const EFFORT = "low" as const;
  * the model working rather than a silent pause.
  */
 export const THINKING = { type: "adaptive", display: "summarized" } as const;
+
+/**
+ * Marks the tool definitions and system prompt as a cacheable prefix, and
+ * lets the growing conversation cache after it. Billing only: the model reads
+ * the same bytes either way. See design.md (reduce-cost-per-question),
+ * decision 2; `false` turns it off without reverting anything else.
+ */
+export const PROMPT_CACHING = true;

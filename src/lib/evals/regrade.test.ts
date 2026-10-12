@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { EFFORT, MAX_TOKENS, MODEL, THINKING } from "@/lib/assistant/config";
+import { EFFORT, MAX_TOKENS, MODEL, PROMPT_CACHING, THINKING } from "@/lib/assistant/config";
 import { SYSTEM_PROMPT } from "@/lib/assistant/system-prompt";
 import {
   createFakeModelClient,
@@ -22,6 +22,7 @@ const config = {
   thinking: THINKING,
   system: SYSTEM_PROMPT,
   tools: buildToolDefinitions(network),
+  promptCaching: PROMPT_CACHING,
   overridden: { model: false, effort: false },
 };
 

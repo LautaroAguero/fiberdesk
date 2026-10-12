@@ -26,14 +26,14 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
 
 ## 2. Prompt caching (`network-assistant`)
 
-- [ ] 2.1 In `src/lib/assistant/pricing.ts`, confirm the cache-write and cache-read rates against
+- [x] 2.1 In `src/lib/assistant/pricing.ts`, confirm the cache-write and cache-read rates against
       the claude-api skill's prompt-caching reference (5-minute write = 1.25 × input; read 0.1 ×
       input on Opus 5, $0.20 on Opus 5.5 and Sonnet 5.5). Change each confirmed rate's comment from
       DERIVED to stated, citing the rule. Update `PRICES_VERIFIED_ON` and `PRICES_SOURCE`. This
       settles the open question in the archived add-eval-harness design; say so in the commit
       message rather than editing the archive. Add the spec's cache-write scenario to
       `pricing.test.ts`: Opus 5, 1,000 in / 2,500 cache-write / 200 out → `0.025625`.
-- [ ] 2.2 Add `PROMPT_CACHING = true` to `src/lib/assistant/config.ts`, with a comment pointing to
+- [x] 2.2 Add `PROMPT_CACHING = true` to `src/lib/assistant/config.ts`, with a comment pointing to
       design.md decision 2. Add an optional `promptCaching` parameter to `runAssistantLoop`. When
       it is true, `system` is sent as one text block with `cache_control: { type: "ephemeral" }`
       and the request carries top-level `cache_control: { type: "ephemeral" }`. Nothing is added
@@ -43,7 +43,7 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
       (c) with markers stripped, the cached and uncached requests are deep-equal: same system text,
       tools and messages (spec: "Caching changes nothing the model reads");
       (d) the `messages` passed in are not mutated across iterations.
-- [ ] 2.3 Pass `PROMPT_CACHING` from `src/app/api/chat/route.ts` and from the eval runner, which
+- [x] 2.3 Pass `PROMPT_CACHING` from `src/app/api/chat/route.ts` and from the eval runner, which
       reads it through `EvalConfig`. Verify with a runner test that the fake client receives the
       markers when the config says so. Verify by `grep -n "promptCaching" src/app src/lib/evals`
       that both call sites pass it.

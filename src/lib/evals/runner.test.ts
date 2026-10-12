@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { EFFORT, MAX_TOKENS, MODEL, THINKING } from "@/lib/assistant/config";
+import { EFFORT, MAX_TOKENS, MODEL, PROMPT_CACHING, THINKING } from "@/lib/assistant/config";
 import { SYSTEM_PROMPT } from "@/lib/assistant/system-prompt";
 import {
   createFakeModelClient,
@@ -24,6 +24,7 @@ const config: EvalConfig = {
   thinking: THINKING,
   system: SYSTEM_PROMPT,
   tools,
+  promptCaching: PROMPT_CACHING,
   overridden: { model: false, effort: false },
 };
 
@@ -182,6 +183,33 @@ describe("6.1 running cases", () => {
 
     expect(record.cases[0].outcome).toBe("pass");
     expect(record.cases[0].turns[0].stop_reason).toBe("refusal");
+  });
+});
+
+describe("prompt caching reaches the model client (reduce-cost-per-question, task 2.3)", () => {
+  test.each([true, false])("promptCaching %s in the config decides the markers on every request", async (promptCaching) => {
+    const { client, requests } = createFakeModelClient(surveyThenDetail("NAP-09 fails; NAP-12 is marginal."));
+    await runEvalSuite({
+      cases: [failingCase],
+      client,
+      network,
+      searchIndex,
+      config: { ...config, promptCaching },
+      maxUsd: 5,
+    });
+
+    expect(requests).toHaveLength(3);
+    for (const request of requests) {
+      if (promptCaching) {
+        expect(request.cache_control).toEqual({ type: "ephemeral" });
+        expect(request.system).toEqual([
+          { type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
+        ]);
+      } else {
+        expect(request).not.toHaveProperty("cache_control");
+        expect(request.system).toBe(SYSTEM_PROMPT);
+      }
+    }
   });
 });
 

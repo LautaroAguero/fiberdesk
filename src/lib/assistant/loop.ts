@@ -58,6 +58,13 @@ export interface RunAssistantLoopParams {
   effort?: "low" | "medium" | "high" | "xhigh" | "max";
   /** Caps how many request/tool-execute round trips one turn may take. */
   maxIterations?: number;
+  /**
+   * Adds the two cache breakpoints of design.md (reduce-cost-per-question),
+   * decision 2: one at the end of the system prompt, which tools render
+   * before, and the top-level automatic one on the conversation tail.
+   * Nothing is added inside `messages`.
+   */
+  promptCaching?: boolean;
 }
 
 export interface RunAssistantLoopResult {
@@ -72,10 +79,27 @@ export interface RunAssistantLoopResult {
 
 const DEFAULT_MAX_ITERATIONS = 8;
 
+/** The default 5-minute TTL. */
+const CACHE_MARKER = { type: "ephemeral" } as const;
+
+/**
+ * The request's `system` field. Without caching it is the plain string, as
+ * before; with it, the same text as one block carrying the breakpoint.
+ */
+function cacheableSystem(
+  system: string | undefined,
+  promptCaching: boolean | undefined,
+): Pick<Anthropic.MessageStreamParams, "system"> {
+  if (system === undefined) return {};
+  if (!promptCaching) return { system };
+  return { system: [{ type: "text", text: system, cache_control: CACHE_MARKER }] };
+}
+
 export async function runAssistantLoop(
   params: RunAssistantLoopParams,
 ): Promise<RunAssistantLoopResult> {
-  const { client, model, maxTokens, system, tools, network, searchIndex, onEvent, effort } = params;
+  const { client, model, maxTokens, system, tools, network, searchIndex, onEvent, effort, promptCaching } =
+    params;
   const maxIterations = params.maxIterations ?? DEFAULT_MAX_ITERATIONS;
 
   const messages: Anthropic.MessageParam[] = [...params.messages];
@@ -85,11 +109,12 @@ export async function runAssistantLoop(
     const turn = client.createTurn({
       model,
       max_tokens: maxTokens,
-      system,
+      ...cacheableSystem(system, promptCaching),
       tools,
       messages,
       thinking: THINKING,
       ...(effort ? { output_config: { effort } } : {}),
+      ...(promptCaching ? { cache_control: CACHE_MARKER } : {}),
     });
 
     turn.onText((delta) => onEvent({ type: "text", text: delta }));
