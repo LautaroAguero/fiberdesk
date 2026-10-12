@@ -28,6 +28,31 @@ export function wilsonInterval(passes: number, n: number, z: number = Z_95): { l
   return { low: Math.max(0, centre - halfWidth), high: Math.min(1, centre + halfWidth) };
 }
 
+/**
+ * The two-sided exact McNemar p-value over the discordant counts: `b` cases
+ * that went pass → fail and `c` that went fail → pass. Under the null, each
+ * discordant case is a fair coin, so `p = min(1, 2 · P(X ≤ min(b, c)))` with
+ * `X ~ Binomial(b + c, 0.5)`; `p = 1` when nothing is discordant. At the
+ * sizes of this eval (at most 21 discordant cases) the terms are exact in
+ * doubles. See design.md (reduce-cost-per-question), decision 6.
+ */
+export function mcnemarExact(b: number, c: number): number {
+  if (!Number.isInteger(b) || !Number.isInteger(c) || b < 0 || c < 0) {
+    throw new Error("mcnemarExact: counts must be non-negative integers");
+  }
+  const n = b + c;
+  if (n === 0) return 1;
+  const k = Math.min(b, c);
+  // P(X = i) = C(n, i) / 2^n, built up from P(X = 0) = 2^-n.
+  let term = 0.5 ** n;
+  let cumulative = 0;
+  for (let i = 0; i <= k; i++) {
+    cumulative += term;
+    term = (term * (n - i)) / (i + 1);
+  }
+  return Math.min(1, 2 * cumulative);
+}
+
 function sorted(values: number[]): number[] {
   if (values.length === 0) throw new Error("cannot summarize an empty sample");
   return [...values].sort((a, b) => a - b);

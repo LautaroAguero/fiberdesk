@@ -67,5 +67,6 @@ describe("formatComparison", () => {
     );
     expect(text).toContain("pass → fail: 1 (x)");
     expect(text).toContain("Unstable: x");
+    expect(text).toContain("McNemar exact p (two-sided): 1.0000");
   });
 });

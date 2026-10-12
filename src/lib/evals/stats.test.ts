@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import type { ModelCallRecord } from "@/lib/assistant/usage";
-import { coldCost, median, p95, summarizeRun, wilsonInterval } from "@/lib/evals/stats";
+import { coldCost, mcnemarExact, median, p95, summarizeRun, wilsonInterval } from "@/lib/evals/stats";
 import type { CaseRecord, RunRecord, TurnRecord } from "@/lib/evals/types";
 
 const pct = (x: number) => Math.round(x * 1000) / 10;
@@ -182,5 +182,40 @@ describe("coldCost (reduce-cost-per-question, task 3.2)", () => {
     expect(summary.cold_cost_per_question.n).toBe(24);
     expect(summary.cold_cost_per_question.median).toBe(summary.cost_per_question.median);
     expect(summary.cold_cost_per_question.median).toBeCloseTo(0.037605, 6);
+  });
+});
+
+describe("mcnemarExact (reduce-cost-per-question, task 3.3)", () => {
+  test("5 pass-to-fail against 1 fail-to-pass gives 0.21875", () => {
+    expect(mcnemarExact(5, 1)).toBe(0.21875);
+  });
+
+  test("10 against 2 gives 0.0386 to four decimals", () => {
+    expect(mcnemarExact(10, 2)).toBeCloseTo(0.0386, 4);
+  });
+
+  test("no discordant cases gives 1", () => {
+    expect(mcnemarExact(0, 0)).toBe(1);
+  });
+
+  test("the test is symmetric in b and c", () => {
+    for (const [b, c] of [[5, 1], [10, 2], [0, 7], [3, 9]]) {
+      expect(mcnemarExact(b, c)).toBe(mcnemarExact(c, b));
+    }
+  });
+
+  test("the result never exceeds 1: (3, 3) gives 1", () => {
+    expect(mcnemarExact(3, 3)).toBe(1);
+    expect(mcnemarExact(1, 1)).toBe(1);
+    expect(mcnemarExact(10, 11)).toBe(1);
+  });
+
+  test("all discordant cases in one direction", () => {
+    expect(mcnemarExact(6, 0)).toBe(0.03125);
+  });
+
+  test("negative or fractional counts are refused", () => {
+    expect(() => mcnemarExact(-1, 2)).toThrow();
+    expect(() => mcnemarExact(1.5, 2)).toThrow();
   });
 });

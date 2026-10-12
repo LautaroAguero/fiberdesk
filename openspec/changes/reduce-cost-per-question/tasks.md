@@ -68,7 +68,7 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
       (d) an unpriced model → `null`.
       Also verify `summarizeRun` over the baseline record's cases gives a cold median equal to its
       measured median, $0.037605.
-- [ ] 3.3 Add `mcnemarExact(b, c)` to `stats.ts`, the two-sided exact test (design.md, decision 6),
+- [x] 3.3 Add `mcnemarExact(b, c)` to `stats.ts`, the two-sided exact test (design.md, decision 6),
       and add `mcnemar_p` to `RunComparison`, printed by `formatComparison`. Tests:
       (a) (5, 1) → `0.21875`;
       (b) (10, 2) → `0.0386` to four decimals;

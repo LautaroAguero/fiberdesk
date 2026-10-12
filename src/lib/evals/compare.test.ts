@@ -59,4 +59,20 @@ describe("compareRuns", () => {
     expect(comparison.only_in_a).toEqual(["c"]);
     expect(comparison.only_in_b).toEqual(["e"]);
   });
+
+  test("the McNemar p-value is computed from the two flip counts", () => {
+    const a: Record<string, CaseOutcome> = {};
+    const b: Record<string, CaseOutcome> = {};
+    for (let i = 0; i < 5; i++) {
+      a[`down-${i}`] = "pass";
+      b[`down-${i}`] = "fail";
+    }
+    a["up"] = "fail";
+    b["up"] = "pass";
+    expect(compareRuns(run(a), run(b)).mcnemar_p).toBe(0.21875);
+  });
+
+  test("no flips gives p = 1", () => {
+    expect(compareRuns(run({ x: "pass" }), run({ x: "pass" })).mcnemar_p).toBe(1);
+  });
 });

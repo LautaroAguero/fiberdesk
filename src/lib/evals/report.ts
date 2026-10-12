@@ -66,6 +66,7 @@ export function formatComparison(comparison: RunComparison): string {
     `pass → fail: ${comparison.pass_to_fail.length} (${list(comparison.pass_to_fail)})`,
     `fail → pass: ${comparison.fail_to_pass.length} (${list(comparison.fail_to_pass)})`,
     `Unstable: ${list(comparison.unstable)}`,
+    `McNemar exact p (two-sided): ${comparison.mcnemar_p.toFixed(4)}`,
   ];
   if (comparison.excluded.length > 0) {
     lines.push(`Excluded: ${comparison.excluded.map((e) => `${e.id} (${e.a} / ${e.b})`).join(", ")}`);

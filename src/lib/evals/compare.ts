@@ -3,11 +3,12 @@
  *
  * Over two runs of the same configuration, the flips are pure noise — the
  * level of discordance a later comparison must exceed before it means
- * anything — and the flipped cases are unstable. Statistical testing on these
- * counts belongs to reduce-cost-per-question; this only counts and names.
- * See design.md (add-eval-harness), decision 13.
+ * anything — and the flipped cases are unstable. The exact McNemar test over
+ * the two flip counts is reported beside them, for context. See design.md
+ * (add-eval-harness), decision 13, and (reduce-cost-per-question), decision 6.
  */
 
+import { mcnemarExact } from "@/lib/evals/stats";
 import type { CaseOutcome, RunRecord } from "@/lib/evals/types";
 
 export interface RunComparison {
@@ -21,6 +22,8 @@ export interface RunComparison {
   only_in_b: string[];
   /** Present in both, but errored or skipped in at least one — excluded from the counts. */
   excluded: Array<{ id: string; a: CaseOutcome; b: CaseOutcome }>;
+  /** Two-sided exact McNemar p-value over `pass_to_fail` and `fail_to_pass`. */
+  mcnemar_p: number;
 }
 
 const completed = (outcome: CaseOutcome) => outcome === "pass" || outcome === "fail";
@@ -37,6 +40,7 @@ export function compareRuns(a: RunRecord, b: RunRecord): RunComparison {
     only_in_a: [],
     only_in_b: b.cases.filter((c) => !idsA.has(c.id)).map((c) => c.id),
     excluded: [],
+    mcnemar_p: 1,
   };
 
   for (const { id, outcome: outcomeA } of a.cases) {
@@ -55,5 +59,6 @@ export function compareRuns(a: RunRecord, b: RunRecord): RunComparison {
   }
 
   result.unstable = [...result.pass_to_fail, ...result.fail_to_pass];
+  result.mcnemar_p = mcnemarExact(result.pass_to_fail.length, result.fail_to_pass.length);
   return result;
 }
