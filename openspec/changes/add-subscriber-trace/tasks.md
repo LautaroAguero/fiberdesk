@@ -132,7 +132,7 @@ pass before it is ticked.
 - [x] 3.3 Add `drop_slack_factor` and `drop_connectors` to the `get_optical_constants` result in
       `src/lib/assistant/optical-constants.ts`, each with its unit and the pending-validation
       status. Verify with an extended test in `optical-constants.test.ts`.
-- [ ] 3.4 Update `src/lib/assistant/system-prompt.ts` (design.md, decision 6):
+- [x] 3.4 Update `src/lib/assistant/system-prompt.ts` (design.md, decision 6):
       - one paragraph on when to call `trace_subscriber_link`, and that a NAP's status does not
         stand for its subscribers';
       - add to the "cannot answer" list: a subscriber id the network lacks, and whether a
