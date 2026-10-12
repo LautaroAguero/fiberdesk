@@ -165,7 +165,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 
       Verify that `npm run eval:regrade` on add-cut-impact's run of record reproduces its outcomes
       case for case. Restore the overwritten `.regraded.json` afterwards; do not commit it.
-- [ ] 5.2 Add candidate ids to `highlightIds`, skip the point entry, and accept candidate ids as NAP
+- [x] 5.2 Add candidate ids to `highlightIds`, skip the point entry, and accept candidate ids as NAP
       ids in the case validator. Tests: the scenario "Candidates are compared, the point is not",
       and the existing grader scenarios, unchanged.
 - [ ] 5.3 Add `feasibility` to `AREAS`, and write `evals/cases/feasibility.json` with the eight cases

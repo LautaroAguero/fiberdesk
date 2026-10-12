@@ -336,3 +336,19 @@ describe("5.1 a case can carry a selected point", () => {
     expect(error.message).toContain("finite numeric");
   });
 });
+
+describe("5.2 candidate ids in a highlight oracle", () => {
+  test("an oracle naming the three candidate NAPs loads: they are NAP ids", () => {
+    const cases = loadCases(
+      network,
+      caseDir({
+        "a.json": [
+          validCase({
+            expect: { highlight: { mode: "equals", ids: ["NAP-03", "NAP-08", "NAP-12"] }, grounding: true },
+          }),
+        ],
+      }),
+    );
+    expect(cases[0].expect.highlight?.ids).toEqual(["NAP-03", "NAP-08", "NAP-12"]);
+  });
+});

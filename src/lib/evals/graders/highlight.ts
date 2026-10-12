@@ -4,7 +4,9 @@
  * describe the paths or the downstream set of those subjects and are not
  * compared (design.md, add-subscriber-trace, decision 9). A run whose status is
  * `cut` is the subject of its answer, so it is compared (design.md,
- * add-cut-impact, decision 7). Applied only where the reference
+ * add-cut-impact, decision 7). A candidate is compared by its NAP id; the point
+ * entry is not, because the point is the case's own input, not something the
+ * assistant chose (add-feasibility, decision 9). Applied only where the reference
  * behaviour requires a detail call — a survey-only answer projects nothing,
  * by design. See design.md (add-eval-harness), decision 7.
  */
@@ -14,12 +16,13 @@ import type { GradedTurn } from "@/lib/evals/graders/input";
 import type { GraderResult, HighlightExpectation } from "@/lib/evals/types";
 
 /**
- * The entity ids a payload highlights: NAPs, subscribers and cut runs. The other
- * runs, which describe a path or go dark downstream of a cut, are not included.
+ * The entity ids a payload highlights: NAPs, subscribers, cut runs and
+ * connection candidates. The other runs, which describe a path or go dark
+ * downstream of a cut, are not included, nor is the point.
  */
 export function highlightIds(payload: HighlightPayload): string[] {
   return payload.highlight
-    .filter((entry) => entry.kind !== "run" || entry.status === "cut")
+    .filter((entry) => entry.kind !== "point" && (entry.kind !== "run" || entry.status === "cut"))
     .map((entry) => entry.id);
 }
 
