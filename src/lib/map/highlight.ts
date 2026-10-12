@@ -60,14 +60,17 @@ export function resolveHighlight(
   const runIdSet = new Set<string>();
   const unknownIds: string[] = [];
 
+  // Interim shape (task 2.1): reads NAP entries only; task 2.2 rewrites this
+  // function to paint subscribers and the payload's own run entries.
   for (const entry of payload.highlight) {
-    const budget = budgetByNapId.get(entry.nap_id);
-    if (!knownNapIds.has(entry.nap_id) || budget === undefined) {
-      unknownIds.push(entry.nap_id);
+    if (entry.kind !== "nap") continue;
+    const budget = budgetByNapId.get(entry.id);
+    if (!knownNapIds.has(entry.id) || budget === undefined) {
+      unknownIds.push(entry.id);
       continue;
     }
 
-    napStatus[entry.nap_id] = entry.status;
+    napStatus[entry.id] = entry.status;
     for (const hop of budget.hops) {
       runIdSet.add(hop.run_id);
       runStatus[hop.run_id] = entry.status;

@@ -10,8 +10,8 @@ const budgets = calculateAllBudgets(network);
 
 const REFERENCE_PAYLOAD: HighlightPayload = {
   highlight: [
-    { nap_id: "NAP-12", status: "marginal", margin_db: 2.77 },
-    { nap_id: "NAP-09", status: "fail", margin_db: -1.4 },
+    { kind: "nap", id: "NAP-12", status: "marginal", margin_db: 2.77 },
+    { kind: "nap", id: "NAP-09", status: "fail", margin_db: -1.4 },
   ],
   fit_bounds: true,
 };
@@ -80,8 +80,8 @@ describe("2.2 resolveHighlight edge cases", () => {
   test("an unknown id lands in unknownIds and does not affect the rest", () => {
     const payload: HighlightPayload = {
       highlight: [
-        { nap_id: "NAP-99", status: "fail", margin_db: -5 },
-        { nap_id: "NAP-01", status: "pass", margin_db: 10 },
+        { kind: "nap", id: "NAP-99", status: "fail", margin_db: -5 },
+        { kind: "nap", id: "NAP-01", status: "pass", margin_db: 10 },
       ],
       fit_bounds: true,
     };
@@ -97,7 +97,7 @@ describe("2.2 resolveHighlight edge cases", () => {
     // NAP-03 actually passes; feed it a payload claiming "fail" to prove the
     // map trusts the payload, not a re-classification from `budgets`.
     const payload: HighlightPayload = {
-      highlight: [{ nap_id: "NAP-03", status: "fail", margin_db: -99 }],
+      highlight: [{ kind: "nap", id: "NAP-03", status: "fail", margin_db: -99 }],
       fit_bounds: false,
     };
 

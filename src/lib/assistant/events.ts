@@ -20,12 +20,20 @@
 
 import type Anthropic from "@anthropic-ai/sdk";
 
-/** One NAP the map should draw attention to, with the figures that justify it. */
-export interface HighlightEntry {
-  nap_id: string;
-  status: "pass" | "marginal" | "fail";
-  margin_db: number;
-}
+import type { BudgetStatus } from "@/lib/optical/budget";
+
+/**
+ * One entity the map should draw attention to, named by kind. Every entry uses
+ * `id`; only a subscriber entry carries `nap_id`, the NAP that serves it. A run
+ * entry marks a span on the path of a highlighted NAP or subscriber and takes
+ * that entity's classification. See design.md (add-subscriber-trace),
+ * decision 7: the payload states everything to paint, so the map derives
+ * nothing, and a new kind is a new member of the union rather than a reshape.
+ */
+export type HighlightEntry =
+  | { kind: "nap"; id: string; status: BudgetStatus; margin_db: number }
+  | { kind: "subscriber"; id: string; nap_id: string; status: BudgetStatus; margin_db: number }
+  | { kind: "run"; id: string; status: BudgetStatus };
 
 /** The terminal payload of a turn — see design.md, decision 5: projected, never emitted. */
 export interface HighlightPayload {

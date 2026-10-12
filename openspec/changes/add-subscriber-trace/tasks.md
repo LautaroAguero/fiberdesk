@@ -61,7 +61,7 @@ pass before it is ticked.
 
 ## 2. The payload by kind, the map and the grader (`network-assistant`, `network-map`, `assistant-evals`)
 
-- [ ] 2.1 Replace `HighlightEntry` in `src/lib/assistant/events.ts` with the union of design.md,
+- [x] 2.1 Replace `HighlightEntry` in `src/lib/assistant/events.ts` with the union of design.md,
       decision 7, and rewrite `projectHighlight`:
       - detail → the NAP plus its runs;
       - merge by `(kind, id)`, where a run keeps the worse status;

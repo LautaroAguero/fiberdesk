@@ -9,9 +9,9 @@ import type { HighlightPayload } from "@/lib/assistant/events";
 import type { GradedTurn } from "@/lib/evals/graders/input";
 import type { GraderResult, HighlightExpectation } from "@/lib/evals/types";
 
-/** The entity ids a payload highlights. */
+/** The entity ids a payload highlights: NAPs and subscribers, not the runs that describe their paths. */
 export function highlightIds(payload: HighlightPayload): string[] {
-  return payload.highlight.map((entry) => entry.nap_id);
+  return payload.highlight.filter((entry) => entry.kind !== "run").map((entry) => entry.id);
 }
 
 export function gradeHighlight(turn: GradedTurn, expected: HighlightExpectation): GraderResult {

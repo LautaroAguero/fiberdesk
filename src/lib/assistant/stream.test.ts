@@ -28,7 +28,7 @@ const SAMPLE_EVENTS: AssistantEvent[] = [
   { type: "tool_end", tool_use_id: "toolu_1", name: "summarize_optical_budgets", is_error: false },
   {
     type: "done",
-    payload: { highlight: [{ nap_id: "NAP-12", status: "marginal", margin_db: 2.77 }], fit_bounds: true },
+    payload: { highlight: [{ kind: "nap", id: "NAP-12", status: "marginal", margin_db: 2.77 }], fit_bounds: true },
     messages: [{ role: "user", content: "which fail?" }],
   },
   { type: "error", message: "something went wrong" },
