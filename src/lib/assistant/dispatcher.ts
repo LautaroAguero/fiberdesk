@@ -8,7 +8,7 @@
  * user rather than being swallowed".
  *
  * `content` is `Anthropic.ToolResultBlockParam["content"]` — a JSON string
- * for the four tools that return plain data, or an array of content blocks
+ * for the five tools that return plain data, or an array of content blocks
  * for documentation search. The two cannot share one shape: citations work
  * off structural `search_result` blocks, not off a string the model would
  * have to re-parse, so that tool's content is never stringified.
@@ -20,6 +20,7 @@ import { detailOpticalBudget, summarizeOpticalBudgets } from "@/lib/assistant/bu
 import { searchDocumentation } from "@/lib/assistant/documentation-search";
 import { getOpticalConstantsSnapshot } from "@/lib/assistant/optical-constants";
 import {
+  CUT_IMPACT_TOOL_NAME,
   DETAIL_TOOL_NAME,
   GET_OPTICAL_CONSTANTS_TOOL_NAME,
   SEARCH_DOCUMENTATION_TOOL_NAME,
@@ -29,6 +30,7 @@ import {
 import type { SearchIndex } from "@/lib/corpus/search";
 import type { Network } from "@/lib/network/types";
 import { traceSubscriber } from "@/lib/optical/trace";
+import { cutImpact } from "@/lib/topology/cut";
 
 /** Parsed arguments of `summarize_optical_budgets`. */
 interface SummarizeInput {
@@ -46,6 +48,11 @@ interface TraceInput {
   subscriber_id: string;
 }
 
+/** Parsed arguments of `list_cut_impact`. */
+interface CutImpactInput {
+  element_id: string;
+}
+
 /** Parsed arguments of `search_documentation`. */
 interface SearchInput {
   query: string;
@@ -57,6 +64,10 @@ function isDetailInput(input: unknown): input is DetailInput {
 
 function isTraceInput(input: unknown): input is TraceInput {
   return typeof input === "object" && input !== null && typeof (input as TraceInput).subscriber_id === "string";
+}
+
+function isCutImpactInput(input: unknown): input is CutImpactInput {
+  return typeof input === "object" && input !== null && typeof (input as CutImpactInput).element_id === "string";
 }
 
 function isSearchInput(input: unknown): input is SearchInput {
@@ -111,6 +122,15 @@ export function dispatchTool(
         // An id the network lacks makes the engine throw, naming it: the catch below
         // turns that into an errored result, never a zeroed or partial trace.
         return { content: JSON.stringify(traceSubscriber(network, input.subscriber_id)), isError: false };
+      }
+      case CUT_IMPACT_TOOL_NAME: {
+        if (!isCutImpactInput(input)) {
+          return errorResult("list_cut_impact requires an element_id");
+        }
+        // The OLT and any id the network lacks make the engine throw with a plain
+        // message: the catch below turns it into an errored result, never an empty
+        // or guessed impact.
+        return { content: JSON.stringify(cutImpact(network, input.element_id)), isError: false };
       }
       case SEARCH_DOCUMENTATION_TOOL_NAME: {
         if (!isSearchInput(input)) {

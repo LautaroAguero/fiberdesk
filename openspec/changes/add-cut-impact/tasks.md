@@ -92,7 +92,7 @@ pass before it is ticked.
       - the description says to cite the counts, that an OLT cut is not supported, and not to
         substitute an element;
       - six tools in total.
-- [ ] 3.2 Dispatch it in `src/lib/assistant/dispatcher.ts`, returning `cutImpact`'s result as JSON,
+- [x] 3.2 Dispatch it in `src/lib/assistant/dispatcher.ts`, returning `cutImpact`'s result as JSON,
       or an `is_error` result carrying the engine's message. Tests:
       - FR-03's result, with `counts.subscribers` 5;
       - OLT-RES-01 and FR-99 give error results with their messages;
