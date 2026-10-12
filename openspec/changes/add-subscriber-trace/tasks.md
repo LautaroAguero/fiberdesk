@@ -7,7 +7,7 @@ pass before it is ticked.
 
 ## 1. The subscriber link budget (`optical-budget`)
 
-- [ ] 1.1 Add `src/lib/geo/distance.ts` with `haversineKm(a: Position, b: Position)`, using the
+- [x] 1.1 Add `src/lib/geo/distance.ts` with `haversineKm(a: Position, b: Position)`, using the
       IUGG mean Earth radius of 6,371.0088 km, with a unit-and-source comment (design.md,
       decision 3). Tests:
       (a) one degree of longitude on the equator is 111.195 km, to three decimals;
