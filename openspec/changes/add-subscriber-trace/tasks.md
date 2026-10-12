@@ -150,7 +150,7 @@ pass before it is ticked.
 
 ## 5. Live verification (by hand)
 
-- [ ] 5.1 Smoke run: `npm run eval -- --cases 'trace-*' --max-usd 0.40`. Verify that the
+- [x] 5.1 Smoke run: `npm run eval -- --cases 'trace-*' --max-usd 0.40`. Verify that the
       `trace_subscriber_link` calls carry valid ids, that payloads hold subscriber entries, and that
       every call after the first reads from the cache. Commit the record.
 - [ ] 5.2 Full run: `npm run eval -- --max-usd 2.00`. Commit the record, re-grade it, and run
