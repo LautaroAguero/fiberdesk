@@ -143,7 +143,7 @@ If a run shows the rule is wrong, the run is recorded, the rule is revised throu
       Then the choice and why, and the honest limit (no non-inferiority at n = 21). Copy every
       figure from the stored summaries or from `eval:decide` output; compute none by hand. Verify
       each figure against its record by reading both.
-- [ ] 6.3 Update the status section of `CLAUDE.md`: the new baseline figures, the model in use, the
+- [x] 6.3 Update the status section of `CLAUDE.md`: the new baseline figures, the model in use, the
       noise-floor result, and "Lo próximo: `add-subscriber-trace`". Verify that the README and
       `CLAUDE.md` state the same numbers.
 
