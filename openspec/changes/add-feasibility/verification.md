@@ -154,3 +154,29 @@ Cost per question, measured: median $0.0176, p95 $0.0322. Cold: median $0.0482. 
   - the seven trace cases, since `cc779bf` added the metres to the drop.
 
   This run is the new base for both groups.
+
+## Task 6.3 — in the app, live
+
+This ran on 2026-10-12 against the `fiberdesk-dev` server on port 3000, with the real API
+(`claude-opus-5`, effort `low`, prompt `5bb26aa37361`).
+
+- **A point next to NAP-03.** I clicked just north-east of NAP-03 and asked "¿puedo conectar un
+  cliente acá?".
+  - The answer streamed. It says the point cannot be connected:
+    - NAP-03 is 382 m in straight line and 497 m of route, with no free ports (2 outputs, 0
+      free), although its projection would pass with 19.10 dB;
+    - NAP-08 is too far, at 3477 m of route;
+    - NAP-12 is too far, at 3690 m, and would also be marginal (1.05 dB).
+  - It calls the drop a modelled estimate and declines the ONT question.
+  - The map rings the three candidates with their ranks and reframes on them. The evaluated point
+    sits inside the user's marker.
+  - The server log has `assistant_turn` with trajectory `[list_connection_candidates]`, 2
+    iterations, $0.0247 and 10450 cached input tokens read.
+  - Screenshot: `screenshots/6.3-live-near-nap03.jpg`.
+- **Coordinates typed into the chat.** I cleared the point and the highlight, then asked "¿y en
+  -27.46, -58.97?".
+  - The answer says it cannot work with coordinates written in the chat, because the tool reads
+    the point from the map, and asks for a click.
+  - It names no NAP and states no figure. The server log has an empty trajectory: no tool was
+    called.
+  - Screenshot: `screenshots/6.3-live-typed-coordinates.jpg`.

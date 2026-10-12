@@ -190,7 +190,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 
       A stable case that regresses through the new tool or its prompt paragraph is fixed before
       group 7, and a fix that changes the prompt means a new run.
-- [ ] 6.3 In the app (`fiberdesk-dev` preview), click near NAP-03 and ask "¿puedo conectar un
+- [x] 6.3 In the app (`fiberdesk-dev` preview), click near NAP-03 and ask "¿puedo conectar un
       cliente acá?". Verify that the answer streams, says NAP-03 is full and the rest too far, that
       the candidates are painted and the view reframes, and that the server log shows the call.
       Then type "¿y en -27.46, -58.97?" with no point selected, and verify that the assistant asks
