@@ -9,7 +9,12 @@ import {
   toolUseBlock,
   type FixtureTurn,
 } from "@/lib/assistant/test-fixtures";
-import { buildToolDefinitions, DETAIL_TOOL_NAME, SUMMARIZE_TOOL_NAME } from "@/lib/assistant/tool-definitions";
+import {
+  buildToolDefinitions,
+  CONNECTION_CANDIDATES_TOOL_NAME,
+  DETAIL_TOOL_NAME,
+  SUMMARIZE_TOOL_NAME,
+} from "@/lib/assistant/tool-definitions";
 import { network, searchIndex } from "@/lib/evals/graders/test-helpers";
 import { regradeRecord } from "@/lib/evals/regrade";
 import { runEvalSuite } from "@/lib/evals/runner";
@@ -157,5 +162,59 @@ describe("regradeRecord", () => {
     const reworded = { ...failingCase, turns: ["which boxes fail?"] };
     const { issues } = regradeRecord(original, [reworded], network, searchIndex);
     expect(issues[0].message).toContain("turns changed");
+  });
+});
+
+describe("5.1 map context in re-grading", () => {
+  const pointA = { lat: -27.4165, lon: -59.018 };
+  const feasCase: LoadedCase = {
+    id: "feas-full-test",
+    area: "abstention",
+    source: "test",
+    file: "feasibility.json",
+    turns: ["¿puedo conectar un cliente acá?"],
+    map_context: { selected_point: pointA },
+    expect: { grounding: true },
+  };
+
+  async function feasRun(evalCase: LoadedCase): Promise<RunRecord> {
+    const { client } = createFakeModelClient([
+      reply([toolUseBlock("t1", CONNECTION_CANDIDATES_TOOL_NAME, {})], "tool_use"),
+      reply([textBlock("NAP-03 está lleno.")], "end_turn"),
+    ]);
+    const record = await runEvalSuite({ cases: [evalCase], client, network, searchIndex, config, maxUsd: 5 });
+    return JSON.parse(JSON.stringify(record)) as RunRecord;
+  }
+
+  test("a feasibility result is rebuilt from the recorded point, and the hashes match", async () => {
+    const original = await feasRun(feasCase);
+    expect(original.cases[0].outcome).toBe("pass");
+
+    const { record, issues } = regradeRecord(original, [feasCase], network, searchIndex);
+
+    expect(issues).toEqual([]);
+    expect(record.cases[0].outcome).toBe("pass");
+    expect(record.cases[0].map_context).toEqual({ selected_point: pointA });
+  });
+
+  test("a record from before map context re-grades with no point, as before", async () => {
+    const original = await recordedRun();
+    expect(original.cases.every((c) => !("map_context" in c))).toBe(true);
+
+    const { record, issues } = regradeRecord(original, [failingCase, followUpCase, skippedCase], network, searchIndex);
+
+    expect(issues).toEqual([]);
+    expect(record.cases.map((c) => c.outcome)).toEqual(original.cases.map((c) => c.outcome));
+  });
+
+  test("a record whose point was removed no longer rebuilds: the hash mismatch is reported", async () => {
+    const original = await feasRun(feasCase);
+    delete original.cases[0].map_context;
+
+    const { record, issues } = regradeRecord(original, [feasCase], network, searchIndex);
+
+    expect(issues).toHaveLength(1);
+    expect(issues[0].message).toContain("list_connection_candidates");
+    expect(record.cases[0]).toEqual(original.cases[0]);
   });
 });

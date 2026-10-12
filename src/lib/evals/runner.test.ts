@@ -9,7 +9,12 @@ import {
   toolUseBlock,
   type FixtureTurn,
 } from "@/lib/assistant/test-fixtures";
-import { buildToolDefinitions, DETAIL_TOOL_NAME, SUMMARIZE_TOOL_NAME } from "@/lib/assistant/tool-definitions";
+import {
+  buildToolDefinitions,
+  CONNECTION_CANDIDATES_TOOL_NAME,
+  DETAIL_TOOL_NAME,
+  SUMMARIZE_TOOL_NAME,
+} from "@/lib/assistant/tool-definitions";
 import { dispatchTool } from "@/lib/assistant/dispatcher";
 import { network, searchIndex } from "@/lib/evals/graders/test-helpers";
 import { sha256Json } from "@/lib/evals/hash";
@@ -314,5 +319,71 @@ describe("6.2 the spend cap and the record", () => {
     expect(record.prompt_hash).toMatch(/^[0-9a-f]{64}$/);
     expect(record.summary.overall).toMatchObject({ passes: 1, completed: 1 });
     expect(record.summary.cost_per_question.n).toBe(1);
+  });
+});
+
+describe("5.1 map context in the runner", () => {
+  const pointE = { lat: -27.4659, lon: -58.97 };
+  const askTwice = (extra: Partial<LoadedCase> = {}): LoadedCase => ({
+    id: "feas-test",
+    area: "abstention",
+    source: "test",
+    file: "feasibility.json",
+    turns: ["¿puedo conectar un cliente acá?", "¿y si lo conecto a la segunda opción?"],
+    expect: { grounding: true },
+    ...extra,
+  });
+  const script = [
+    toolTurn([toolUseBlock("t1", CONNECTION_CANDIDATES_TOOL_NAME, {})]),
+    answer("Sí."),
+    toolTurn([toolUseBlock("t2", CONNECTION_CANDIDATES_TOOL_NAME, {})]),
+    answer("Sí."),
+  ];
+
+  test("a point is sent with every turn of the case, and recorded", async () => {
+    const { client } = createFakeModelClient(script);
+    const record = await runEvalSuite({
+      cases: [askTwice({ map_context: { selected_point: pointE } })],
+      client,
+      network,
+      searchIndex,
+      config,
+      maxUsd: 5,
+    });
+
+    const expected = sha256Json(
+      JSON.parse(dispatchTool(CONNECTION_CANDIDATES_TOOL_NAME, {}, network, searchIndex, { selected_point: pointE }).content as string),
+    );
+    for (const turn of record.cases[0].turns) {
+      expect(turn.trajectory[0].is_error).toBe(false);
+      expect(turn.trajectory[0].result_sha256).toBe(expected);
+    }
+    expect(record.cases[0].map_context).toEqual({ selected_point: pointE });
+  });
+
+  test("with no point declared, the turn is sent with none: the tool errors, and nothing is recorded", async () => {
+    const { client } = createFakeModelClient(script);
+    const record = await runEvalSuite({ cases: [askTwice()], client, network, searchIndex, config, maxUsd: 5 });
+
+    expect(record.cases[0].turns[0].trajectory[0].is_error).toBe(true);
+    expect(record.cases[0].turns[0].highlight_ids).toEqual([]);
+    expect("map_context" in record.cases[0]).toBe(false);
+  });
+
+  test("the point never enters the messages the model reads", async () => {
+    const { client, requests } = createFakeModelClient(script);
+    await runEvalSuite({
+      cases: [askTwice({ map_context: { selected_point: pointE } })],
+      client,
+      network,
+      searchIndex,
+      config,
+      maxUsd: 5,
+    });
+
+    // The first request of a turn precedes any tool result: it carries only the prompt, the
+    // tools and the question. The point reaches the model later, echoed by the tool.
+    expect(JSON.stringify([requests[0].system, requests[0].tools, requests[0].messages])).not.toContain("27.4659");
+    expect(JSON.stringify(requests[1].messages)).toContain("27.4659");
   });
 });

@@ -155,7 +155,7 @@ by hand, each run under its own `--max-usd` cap. Every code task ends green: `np
 
 ## 5. Eval support and cases (`assistant-evals`)
 
-- [ ] 5.1 Add `map_context` to `EvalCase`, check it with `isInsideCity` on load, pass it on every
+- [x] 5.1 Add `map_context` to `EvalCase`, check it with `isInsideCity` on load, pass it on every
       turn in the runner, record it in `CaseRecord`, and pass it to `dispatchTool` in regrade,
       defaulting to `{}` (design.md, decision 9). Tests:
       - the spec scenarios "A point sent with every turn", "No point declared" and "A point outside

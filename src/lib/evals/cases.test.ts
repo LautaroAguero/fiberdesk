@@ -310,3 +310,29 @@ describe("the cut cases agree with seed/expected-cut-impacts.json", () => {
     }
   });
 });
+
+describe("5.1 a case can carry a selected point", () => {
+  const withPoint = (point: unknown) => ({ ...validCase(), map_context: { selected_point: point } });
+
+  test("a point inside the city loads, and is kept on the case", () => {
+    const cases = loadCases(network, caseDir({ "a.json": [withPoint({ lat: -27.4659, lon: -58.97 })] }));
+    expect(cases[0].map_context).toEqual({ selected_point: { lat: -27.4659, lon: -58.97 } });
+  });
+
+  test("a case without one loads with no map context", () => {
+    const cases = loadCases(network, caseDir({ "a.json": [validCase()] }));
+    expect(cases[0].map_context).toBeUndefined();
+  });
+
+  test("a point outside the city fails, naming the case and the problem", () => {
+    const error = loadError({ "a.json": [withPoint({ lat: -34.6037, lon: -58.3816 })] });
+    expect(error.message).toContain("[budget-failing-es]");
+    expect(error.message).toContain("outside the modelled city");
+  });
+
+  test("a malformed point fails, naming the case", () => {
+    const error = loadError({ "a.json": [withPoint({ lat: "north", lon: -58.97 })] });
+    expect(error.message).toContain("[budget-failing-es]");
+    expect(error.message).toContain("finite numeric");
+  });
+});

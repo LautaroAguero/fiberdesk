@@ -12,6 +12,7 @@
 import { dispatchTool } from "@/lib/assistant/dispatcher";
 import { projectHighlight } from "@/lib/assistant/highlight";
 import type { ToolCallRecord } from "@/lib/assistant/loop";
+import type { MapContext } from "@/lib/assistant/map-context";
 import { buildToolDefinitions } from "@/lib/assistant/tool-definitions";
 import type { SearchIndex } from "@/lib/corpus/search";
 import type { Network } from "@/lib/network/types";
@@ -36,8 +37,13 @@ export interface RegradeResult {
 class RebuildError extends Error {}
 
 /** Re-dispatches one recorded step, refusing a result that differs from what the model saw. */
-function rebuild(step: RecordedToolCall, network: Network, searchIndex: SearchIndex): ToolCallRecord {
-  const { content, isError } = dispatchTool(step.name, step.input, network, searchIndex);
+function rebuild(
+  step: RecordedToolCall,
+  network: Network,
+  searchIndex: SearchIndex,
+  mapContext: MapContext,
+): ToolCallRecord {
+  const { content, isError } = dispatchTool(step.name, step.input, network, searchIndex, mapContext);
   const result = isError ? null : typeof content === "string" ? JSON.parse(content) : content;
   const hash = isError ? null : sha256Json(result);
   if (isError !== step.is_error || hash !== step.result_sha256) {
@@ -60,7 +66,11 @@ function regradeCase(
     throw new RebuildError("the case's turns changed since the run; its answers no longer answer them");
   }
 
-  const toolCallsByTurn = turns.map((turn) => turn.trajectory.map((step) => rebuild(step, network, searchIndex)));
+  // A record from before map context has none: it re-grades with no point selected.
+  const mapContext = caseRecord.map_context ?? {};
+  const toolCallsByTurn = turns.map((turn) =>
+    turn.trajectory.map((step) => rebuild(step, network, searchIndex, mapContext)),
+  );
   const last = turns.length - 1;
   const toolCalls = toolCallsByTurn[last];
   const graded: GradedTurn = {

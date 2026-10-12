@@ -4,6 +4,7 @@
  * `evals/runs/`). See design.md (add-eval-harness), decisions 6, 7 and 11.
  */
 
+import type { MapContext } from "@/lib/assistant/map-context";
 import type { ModelCallRecord } from "@/lib/assistant/usage";
 
 /** The areas cases are grouped into. Each capability change adds its own. */
@@ -59,6 +60,11 @@ export interface EvalCase {
   source: string;
   /** User turns, in order. The graders judge the answer to the last. */
   turns: string[];
+  /**
+   * The map state sent with every turn, the way the chat page sends it: a selected
+   * point (design.md, add-feasibility, decision 9). Absent means no point selected.
+   */
+  map_context?: MapContext;
   expect: Expectations;
 }
 
@@ -113,6 +119,11 @@ export interface CaseRecord {
   outcome: CaseOutcome;
   /** Set when `outcome` is `error`. */
   error?: string;
+  /**
+   * The map context the case ran with. Kept so a re-grade rebuilds the same tool
+   * results; absent in records from before map context, which re-grade with none.
+   */
+  map_context?: MapContext;
   graders: Partial<Record<GraderName, GraderResult>>;
   /** Answer figures that matched a source only by absolute value — for a human to read. */
   sign_only: number[];
