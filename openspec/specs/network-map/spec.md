@@ -44,9 +44,15 @@ two entries mark the same element with different statuses, it SHALL take the mor
 the order `cut`, `out_of_service`, `fail`, `marginal`, `pass`. NAPs, subscribers and runs not listed
 SHALL remain in the neutral un-highlighted style.
 
-The statuses and margins shown SHALL be the ones in the payload. The map SHALL NOT reclassify an
-entity, recompute a margin, derive a path or a downstream set the payload does not list, or take
-any figure from the assistant's prose.
+A point entry SHALL be drawn as the evaluated point. Each candidate entry SHALL mark its NAP in a
+style for its feasibility: one style each for `feasible`, `marginal` and `not_feasible`, with the
+candidate's rank visible. When the point names a best candidate, a drop line SHALL be drawn from
+the point to that NAP. When a NAP has both a NAP entry and a candidate entry, the NAP entry's style
+SHALL win, because it describes the NAP's own link.
+
+The statuses, feasibilities, ranks and margins shown SHALL be the ones in the payload. The map
+SHALL NOT reclassify an entity, recompute a margin, choose a best candidate, derive a path or a
+downstream set the payload does not list, or take any figure from the assistant's prose.
 
 #### Scenario: The reference question
 
@@ -73,6 +79,21 @@ any figure from the assistant's prose.
 - **AND** NAP-03, NAP-12, FR-12 and the five subscribers are drawn in the out-of-service style
 - **AND** the other ten NAPs, the other runs and the other subscribers stay neutral
 
+#### Scenario: Connection candidates
+
+- **WHEN** a turn ends with a payload listing the point (-27.4659, -58.9700) with best candidate
+  NAP-11, and candidates NAP-11 (rank 1, `feasible`), NAP-05 (rank 2, `feasible`) and NAP-04
+  (rank 3, `not_feasible`)
+- **THEN** the point is drawn, NAP-11 and NAP-05 in the feasible style and NAP-04 in the
+  not-feasible style, each with its rank
+- **AND** a drop line runs from the point to NAP-11
+- **AND** the other nine NAPs, every run and every subscriber stay neutral
+
+#### Scenario: No feasible candidate, no drop line
+
+- **WHEN** a payload lists a point with no best candidate and three `not_feasible` candidates
+- **THEN** the point and the three candidates are drawn, and no drop line is drawn
+
 #### Scenario: A shared run takes the worse classification
 
 - **WHEN** a payload lists SUB-006 as `pass` and NAP-12 as `marginal`, and both mark FR-03
@@ -97,7 +118,8 @@ any figure from the assistant's prose.
 #### Scenario: The highlight can be cleared
 
 - **WHEN** a highlight is on the map and the user clears it
-- **THEN** every NAP, subscriber and run returns to the neutral style
+- **THEN** every NAP, subscriber and run returns to the neutral style, and any candidate styles and
+  drop line are removed
 
 #### Scenario: A payload names a NAP the map does not know
 
@@ -111,11 +133,22 @@ any figure from the assistant's prose.
 - **THEN** that entry is ignored, the remaining entries are still drawn, and nothing is added to the
   map at an invented position
 
+#### Scenario: A payload names a candidate the map does not know
+
+- **WHEN** a payload lists a candidate whose NAP identifier is not in the loaded network
+- **THEN** that entry is ignored, no drop line is drawn to it, and the remaining entries are still
+  drawn
+
 ### Requirement: The view reframes when the payload asks
 
-When a payload has `fit_bounds` true and at least one NAP or subscriber entry the map knows, the
-system SHALL move the view so that every highlighted NAP and subscriber, the OLT, and every run the
-payload lists, including a cut run, are visible. When `fit_bounds` is false the view SHALL NOT move.
+When a payload has `fit_bounds` true and at least one NAP, subscriber, point or candidate entry the
+map knows, the system SHALL move the view so that the following are visible:
+
+- every highlighted NAP and subscriber, the OLT, and every run the payload lists, including a cut
+  run;
+- for a feasibility answer, the point and every candidate NAP.
+
+When `fit_bounds` is false the view SHALL NOT move.
 
 #### Scenario: Reframing on the reference question
 
@@ -133,6 +166,12 @@ payload lists, including a cut run, are visible. When `fit_bounds` is false the 
 - **WHEN** a payload lists the cut of FR-03 and its out-of-service subtree, with `fit_bounds` true
 - **THEN** the view contains NAP-03, NAP-12, SUB-006, SUB-025 to SUB-028, the OLT and every vertex
   of FR-03 and FR-12
+
+#### Scenario: Reframing on connection candidates
+
+- **WHEN** a payload lists the point (-27.4165, -59.0180) and candidates NAP-03, NAP-08 and NAP-12,
+  with `fit_bounds` true
+- **THEN** the view contains the point, NAP-03, NAP-08 and NAP-12
 
 #### Scenario: No reframe requested
 
@@ -196,3 +235,36 @@ answer, the assistant still says so, and the map shows no highlight for it.
 
 - **WHEN** the page is viewed at phone width
 - **THEN** the map and the chat are both reachable, stacked, with no horizontal scrolling
+
+### Requirement: Clicking empty map space selects a point
+
+A click on the map that does not land on a NAP SHALL select that location as the point and show a
+marker there. A click on a NAP SHALL keep opening its breakdown, and SHALL NOT move the point. A
+new click SHALL move the point. The user SHALL be able to clear the point. A click outside the
+modelled city SHALL NOT select a point.
+
+Every chat request SHALL carry the point selected when it is sent, or none. When a new point is
+selected while the map shows a feasibility highlight for an earlier point, that highlight SHALL be
+cleared, so the candidates on screen never belong to a point other than the marker.
+
+#### Scenario: Selecting a point
+
+- **WHEN** the user clicks empty map space at (-27.4659, -58.9700)
+- **THEN** a marker is shown there
+- **AND** the next chat request carries that point
+
+#### Scenario: Clicking a NAP keeps its breakdown
+
+- **WHEN** a point is selected and the user clicks NAP-12
+- **THEN** NAP-12's breakdown opens and the point stays where it was
+
+#### Scenario: Clearing the point
+
+- **WHEN** a point is selected and the user clears it
+- **THEN** the marker disappears and the next chat request carries no point
+
+#### Scenario: A new point clears stale candidates
+
+- **WHEN** the map shows the candidates for one point and the user selects another
+- **THEN** the candidates and the drop line are cleared
+- **AND** a highlight from any other tool, with no point entry, is left as it was

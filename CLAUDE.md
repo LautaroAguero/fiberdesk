@@ -284,7 +284,7 @@ real, para las fases ya cerradas:
 
 **Evals (Fase 4, primer ítem: `add-eval-harness`, archivado).** La Fase 4 sigue abierta y no es
 desplegable por sí sola todavía: no hay deploy. Las tres capacidades del handoff están hechas
-(`add-subscriber-trace` y `add-cut-impact` archivadas, `add-feasibility` implementada y por archivar).
+(`add-subscriber-trace`, `add-cut-impact` y `add-feasibility`, las tres archivadas).
 Esas conductas ya no dependen sólo de la verificación a mano: `npm run eval` le hace 42 casos al
 modelo real y los califica con graders
 deterministas, bajo un tope de gasto obligatorio. Cada corrida queda en `evals/runs/` y se puede
@@ -340,7 +340,7 @@ que engrosar los tramos apagados: al 40% de opacidad se confundían con los neut
 (dos se quedan en el censo, dos hacen cuentas en la prosa). Lectura en
 `openspec/changes/archive/2026-10-12-add-cut-impact/verification.md`.
 
-**Quinto ítem: `add-feasibility`, implementado, falta archivar.** El asistente responde **"¿puedo
+**Quinto ítem: `add-feasibility`, archivado.** El asistente responde **"¿puedo
 conectar un cliente acá?"** sobre un punto marcado en el mapa. `evaluateConnection`
 (`src/lib/feasibility/`) evalúa siempre **las 3 NAPs más cercanas** al punto y les aplica tres
 chequeos:
@@ -371,7 +371,7 @@ Corrida en vivo de registro (`5bb26aa37361`): **37/42 (88,1%), `feasibility` 8/8
 `cut` 6/6**. La primera corrida completa mostró una regresión en un caso estable: la traza convirtió
 0,383 km en "383 m". Se corrigió dando las dos unidades en la acometida. Los cinco fallos son casos
 viejos de presupuesto y conversación: dos se quedan en el censo y cuatro escriben cifras que ninguna
-herramienta devolvió. Lectura en `openspec/changes/add-feasibility/verification.md`.
+herramienta devolvió. Lectura en `openspec/changes/archive/2026-10-12-add-feasibility/verification.md`.
 
 Correr la app requiere `ANTHROPIC_API_KEY` — ver `.env.example`. El mapa y la red se ven sin ella;
 sólo el chat lo necesita.
@@ -379,13 +379,14 @@ sólo el chat lo necesita.
 **No hay base de datos.** La red se lee de `seed/network.json` y la documentación de `corpus/`,
 las dos desde disco. Ver la nota bajo la tabla de fases para por qué se descartó pgvector.
 
-Siete capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
-`network-assistant`, `documentation-search`, `network-map`, `assistant-evals` y `cut-impact`. Al
-archivar `add-feasibility` se suma la octava, `connection-feasibility`.
+Ocho capacidades viven en `openspec/specs/`: `network-dataset`, `optical-budget`,
+`network-assistant`, `documentation-search`, `network-map`, `assistant-evals`, `cut-impact` y
+`connection-feasibility`.
 
-**Lo próximo:** archivar `add-feasibility`, que cierra las tres capacidades del handoff
-`docs/handoff/2026-10-07-map-user-capabilities.md`. Después, como cambio aparte, el trabajo de prompt
-para que el modelo deje de hacer cuentas en la prosa. Es lo que frenó a Sonnet, la misma regla puede
+**Lo próximo:** las tres capacidades del handoff
+`docs/handoff/2026-10-07-map-user-capabilities.md` están cerradas. La Fase 4 sigue abierta y no es
+desplegable por sí sola: falta el deploy, que es opcional. Lo siguiente es, como cambio aparte, el
+trabajo de prompt para que el modelo deje de hacer cuentas en la prosa. Es lo que frenó a Sonnet, la misma regla puede
 volver a juzgarlo después, y es también el origen de los fallos que quedan en los casos viejos. Ahí
 mismo conviene mirar el idioma: el modelo a veces abre en inglés una respuesta en español, y ningún
 grader lo controla. El resto de la Fase 4 (deploy, observabilidad) sigue siendo opcional.
